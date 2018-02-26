@@ -13,7 +13,7 @@
 		private var sqrQantH:int; //Количество квадратов в столбце
 		private var sqrQantW:int; //Количество квадратов в ряду
 		private var errorType:Object;//Контейнер для ошибок
-		private var debugLevel:Boolean;
+		private var debugLevel:String;
 		private var lifeQuant:int//Убыль жизни за ход
 		public var chessDesk:Array;
 		public var envParams:Object;
@@ -22,7 +22,7 @@
 		
 		
 		function CommunityStage(stgh:int,stgw:int,extOptions:Object){
-			//trace(dbg)
+			
 			this.errorType = new ModelErrors();
 			try{
 				for(var i:int = 0; i<arguments.length; i++){
@@ -30,20 +30,20 @@
 						throw new Error(errorType.paramError);
 						}
 					}
-				this.squSize = extOptions.rectSize;
+				this.squSize = int(extOptions.getOption('main.dropSize'));
 				if(squSize<CRITICAL_LEVEL){//Если мы рискуем получить слишком много слишком мелких квадратов
 					throw new Error(errorType.tooSmall + ' ' + errorType.unstableWarning);//Лучше сразу выбросить ошибку, чтобы не повесить комп
 					}
-				this.debugLevel = extOptions.debugLevel;
+				this.debugLevel = extOptions.getOption('main.debugLevel');
 				//this.envParams = new EnvParams();//Загружаем условия окружающей среды по умолчанию
 				this.stgHeight = stgh;
 				this.stgWidth = stgw;
 				this.sqrQantH = stgHeight/squSize;//Количество квадратов по высоте
 				this.sqrQantW = stgWidth/squSize;//Количество квадратов по ширине
-				this.lifeQuant = extOptions.lifeQuant;
+				this.lifeQuant = int(extOptions.getOption('main.lifeQuant'));
 				buildStage();
 				buildNet();
-				if(debugLevel){
+				if(debugLevel=='true'){
 					trace('The stage ' + chessDesk.length + 'X' + chessDesk[0].length + ' has bulded succesfully\n');
 				}
 				}

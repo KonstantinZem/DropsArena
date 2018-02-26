@@ -7,6 +7,7 @@
 	import flash.utils.getDefinitionByName;
 	
 	public class PluginLoader extends Sprite{
+		//Класс предназначен для загрузки в главную программу дополнительных модулей и предоставления информации об этих модулях
 		private var pluginsList:Array;//Ссылка на список плагинов в списки передаваемых ролику опций
 		private var errorType:Object;
 		public var currentPlugName:String;
@@ -14,20 +15,22 @@
 		private var currentPlNumber:int
 		private var content:Array
 		private var options:Object;
-		private var debugLevel:Boolean;
+		private var debugLevel:String;
 		private var msgString:String;
 		private var ClassReference:Class;
 		
 		public var loaderEvent:Object;
 		
 		function PluginLoader(opt:Object){
+			var pluginString:String
 			errorType = new ModelErrors();
 			try{
 				this.options = opt;
-				this.debugLevel = options.debugLevel;
+				this.debugLevel = options.getOption('main.debugLevel');
 				this.m_loader = new Array();
 				this.currentPlNumber = 0;
-				this.pluginsList = options.pluginsList;
+				pluginString = options.getOption('main.pluginsList');
+				this.pluginsList = pluginString.split(';')//Отделяем пути к плагинам друг от друга
 				this.content = new Array();
 				loaderEvent = new DispatchEvent();
 			
@@ -45,7 +48,7 @@
 				}
 			}
 		
-		public function loadPlugins(i:int):*{
+		public function loadPlugins(i:int):*{//Начинаем загрузку файлов плагинов в корневой ролик
 			
 			if(i>pluginsList.length-1){//Когда список плагинов закончился, прерываемся
 				//return 'complite';
@@ -54,14 +57,22 @@
 				return 0
 				}
            else{
-			    
+			    //Здесь надо вставить код, разбивающий строку по двоеточию на имя файла и передаваемые ему параметы. 
+			    //Например так
+			    //var myPlugin = parsePlStreeng(pluginsList[i])
 				m_loader[i].contentLoaderInfo.addEventListener(Event.COMPLETE, onPluginFileDownloading);
-				m_loader[i].load(new URLRequest(pluginsList[i]));
+				m_loader[i].load(new URLRequest(pluginsList[i]));//А здесь тогда уже загружать не pluginsList[i] а myPlugin['file']
 				currentPlugName = pluginsList[i];
 				msgString = 'Load plugin ' + i + ' '+ currentPlugName + '\n';
 				debugMsg(msgString)
 				}
 			}
+			
+			//function parsePlStreeng(rawStreeng:String){
+			//Только надо сначала проверить строку на наличие двоеточий
+			//var plInformation:Array = new Array;
+			//return plInformation
+			//}
 			
 			function onPluginFileDownloading(e:Event):void{
 				//После того, как файл плагина загрузится в основной ролик
@@ -110,7 +121,7 @@
 				//m_loader.removeEventListener(IOErrorEvent.IO_ERROR,onError);
 				}
 			private function debugMsg(msg:String):void{
-				if(debugLevel){
+				if(debugLevel =='true'){
 				trace(msg);
 				}
 			}

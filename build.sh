@@ -11,11 +11,13 @@ mxmlc=$sdk'bin/mxmlc'
 cp ../bin/plugins/cover.swf ../bin/plugins/grass.swf
 cp ../bin/plugins/cover.swf ../bin/plugins/ground.swf
 cp ../bin/plugins/cover.swf ../bin/plugins/stones.swf
-cp cover.cfg ../bin
-cp grass.cfg ../bin
-cp ground.cfg ../bin
-cp stones.cfg ../bin
-cp community.cfg ../bin
+
+cp configuration.xml ../bin
+#cp cover.cfg ../bin
+#cp grass.cfg ../bin
+#cp ground.cfg ../bin
+#cp stones.cfg ../bin
+#cp community.cfg ../bin
  
 # открыть скомпилированную флещку
 #open model.swf

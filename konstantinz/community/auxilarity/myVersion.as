@@ -8,14 +8,14 @@
         private var myTextBox:TextField = new TextField(); 
         private var myText:String = "<b>version</b>: ";
 		private var versionNunber:String;
-		private var  debugLevel:Boolean;
+		private var  debugLevel:String;
 		private var msg:String;
 		
-		function myVersion(vn:String='?', dbgLevel:Boolean=false){
+		function myVersion(vn:String='?', dbgLevel:String='true'){
 			this.versionNunber = vn;
 			this.debugLevel = dbgLevel;
 			versionText();
-			msg = '\n Population dynamick model. Version ' + vn + '\n' + 'created by Konstantin Zemoglyadchuk. \n' + 'konstantinz@bk.ru \n'
+			msg = 'Population dynamick model. Version ' + vn + '\n' + 'created by Konstantin Zemoglyadchuk. \n' + 'konstantinz@bk.ru \n'
 			debugMsg(msg)
 			}
  
@@ -24,7 +24,7 @@
             myTextBox.htmlText = myText+ versionNunber;
         } 
 		private function debugMsg(msg:String):void{
-				if(debugLevel){
+				if(debugLevel=='true'){
 					trace(msg);
 				}
     } 

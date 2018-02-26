@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+	<main>
+		<debugLevel>true</debugLevel>
+		<pluginEnable>true</pluginEnable>
+		<indQuntaty>15</indQuntaty>
+		<lifeTime>6880</lifeTime>
+		<lifeQuant>1</lifeQuant>
+		<adultAge>2340</adultAge>
+		<maturingDeley>1170</maturingDeley>
+		<offspringsQuant>2</offspringsQuant>
+		<dropSize>12</dropSize>
+		<initPosition>random</initPosition>
+		<pluginsList>plugins/grass.swf;plugins/ground.swf;plugins/stones.swf</pluginsList>
+	</main>
+	<plugins>
+		<grass>
+			<picture>grass.png</picture>
+			<stepDeley>6</stepDeley>
+			<debugLevel>false</debugLevel>
+			<color>0x00FF00</color>
+		</grass>
+		<ground>
+			<picture>ground.png</picture>
+			<stepDeley>2</stepDeley>
+			<debugLevel>false</debugLevel>
+			<color>0xCCCCCC</color>
+		</ground>
+		<stones>
+			<picture>stones.png</picture>
+			<stepDeley>3</stepDeley>
+			<debugLevel>false</debugLevel>
+			<color>0xb4bc3c</color>
+		</stones>
+	</plugins>
+</configuration>

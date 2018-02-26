@@ -12,6 +12,8 @@
 package konstantinz.plugins{
 	
 	import flash.events.Event
+	import flash.errors.IOError;
+	import flash.events.IOErrorEvent;
 	import flash.net.URLRequest
 	import flash.display.Sprite
 	import flash.display.Bitmap;
@@ -23,7 +25,6 @@ package konstantinz.plugins{
 	import konstantinz.community.auxilarity.*;
 	import konstantinz.plugins.*;
 	
-	
 public class cover extends Sprite{
 	
 	private var adeley:int = 1//Задержка при движении взрослых особей. Должна быть включена в интерфейс этого типа плагинов
@@ -32,20 +33,19 @@ public class cover extends Sprite{
 	private var color:Number = 0x000000; //Должна быть включена в интерфейс этого типа плагинов. Определяет цвет участка с данными характеристиками
 	private var ct:ColorTransform;
 	private var BORDERCOLOR:Number = 0x000000;
-	private var debug:Boolean = true;
+	private var debug:String = 'true';
 	private var msg:String;
 	private var image:*; //Должна быть включена в интерфейс этого типа плагинов
-	//private var myRoot:*; //Должна быть включена в интерфейс этого типа плагинов. Это ссылка на главную программу
+	private var myRoot:*; //Должна быть включена в интерфейс этого типа плагинов. Это ссылка на главную программу
 	private var loader:Loader;
 	private var errors:Object;
 	private var timer:Timer
 	private var options:Object//В эту переменную будет загружатся класс, содержащий настройки
 	
 	public var pluginName:String; //Должна быть включена в интерфейс этого типа плагинов
-	
 	public var pluginEvent:Object;
 	
-public function cover(){
+function cover(){
 		
 		msg = 'Ground cover plugin. Version 0.3\n'
 		debugMessage(msg);
@@ -56,102 +56,107 @@ public function cover(){
 		pluginEvent = new DispatchEvent();
 		pluginName = ''
 
-		timer = new Timer(500, 1);//Ждем некоторое время, пока в главная программа не передаст нужные плагину параметры
-		timer.addEventListener(TimerEvent.TIMER, loadOptions);
+		timer = new Timer(1000, 1);//Ждем некоторое время, пока в главная программа не передаст нужные плагину параметры
+		timer.addEventListener(TimerEvent.TIMER, initPlugin);// потом запускаем программу
 		timer.start();
-		
-
 		}
-private function loadOptions(e:TimerEvent):void{
-	//После небольшой паузы
-	myRoot = root;//Устанавливаем ссылук на структуы главной программы
-	var myName:String
-	myName = pluginName + '.cfg';
+	
+private function initPlugin(e:TimerEvent):void{
 	timer.stop();
-	timer.removeEventListener(TimerEvent.TIMER, loadOptions);
-  		
-  		if(myRoot != null){//Если клип запущен из главной программы
-			options = new CoverOptionsContainer(myName);
-			options.addEventListener(CoverOptionsContainer.PLUG_LOADED, initPlugin);//
-			
-		}
-		else{//Иначе просто выводим предупреждение о неправильном запуске
-			msg = errors.pluginStartAlong;
-			debugMessage(msg)
-		}
-	}
+	timer.removeEventListener(TimerEvent.TIMER, initPlugin);
 	
+	if(root != null){//Если клип запущен из главной программы
 		
-private function initPlugin(e:Event):void{
+		if(pluginName !=''){//Если плагин знает све имя
+		
+			var optionPath:String = 'plugins.'+ pluginName + '.'
  
- options.removeEventListener(CoverOptionsContainer.PLUG_LOADED, initPlugin);//
- this.image = options.picture;
- this.color = options.color
- ct.color = this.color;
- this.adeley = options.adeley;
+			this.image = root.configuration.getOption(optionPath + 'picture');
+			this.color = root.configuration.getOption(optionPath + 'color');
+			ct.color = this.color;
+			this.adeley = root.configuration.getOption(optionPath + 'stepDeley');
+			this.debug = root.configuration.getOption(optionPath + 'debugLevel');
  
- msg = 'Wating for start...';
- debugMessage(msg);
-		  
-			if(pluginName !=''){//Если плагин знает све имя
-				
-				debug = options.debugLevel;
-				loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
-   				loader.load(new URLRequest(image));
-			}
-		
-		
+			msg = 'Wating for start...';
+			debugMessage(msg);
 	
+			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
+			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
+   			loader.load(new URLRequest(image));
+   				
+   		}
+	}else{//Иначе просто выводим предупреждение о неправильном запуске
+		msg = errors.pluginStartAlong;
+		debugMessage(msg)
+	}	
 }
+
+private function onIOError(error:IOErrorEvent){
+	 trace("Unable to load picture: " + error.text); 
+	 loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onIOError);
+	 pluginEvent.ready();//Сообщаем о том, что все уже сделано, ведь другие плагины тоже хотят загрузится
+	}
 
 private function onLoadComplete(e:Event):void{
    image = loader.contentLoaderInfo.content;
    addChild(image);
    loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, onLoadComplete);
-   trace("This plugin naime is " + pluginName)
-   modifyTable()//Запускаем функционал, изменяющий структуры внутри этой программы
-  
-   
+   msg = "This plugin naime is " + pluginName;
+   debugMessage(msg);
+   modifyTable()//Запускаем функционал, изменяющий структуры внутри этой программы 
 }
 
 private function modifyTable():void{
-			
+	var controllX:int
+	var controllY:int
+	
 	var bmd:BitmapData = image.bitmapData;
-	image.x = myRoot.commStage.x;
-   	image.y = myRoot.commStage.y;
-   	image.height = myRoot.commStage.height
-   	image.width = myRoot.commStage.width
+	image.x = root.commStage.x;
+   	image.y = root.commStage.y;
+   	image.height = root.commStage.height
+   	image.width = root.commStage.width
 			
    			
-   	var tableRoot:Array = myRoot.commStage.chessDesk;
-			for(var i:int = 0; i<tableRoot.length; i++){
+   	var tableRoot:Array = root.commStage.chessDesk;
+			
+		for(var i:int = 0; i<tableRoot.length; i++){
 				
 				for(var j:int = 0; j<tableRoot[i].length; j++){
 					var pixelValue:String = bmd.getPixel(tableRoot[i][j]['sqrX']/2,tableRoot[i][j]['sqrY']/2).toString(16)
 		
 					if(pixelValue!='ffffff'){//Если участок картинки не белый
-						myRoot.commStage.chessDesk[i][j].picture.transform.colorTransform = ct;
-						myRoot.commStage.chessDesk[i][j]['speedDeleyA'] += adeley//Переопределяем скорость взрослых
-						myRoot.commStage.chessDesk[i][j]['speedDeleyY'] += YDELEY//И молодых особей
-						myRoot.commStage.chessDesk[i][j]['lifeQuant'] += lifequant;//Переопределяем время жизни особи за ход
+						root.commStage.chessDesk[i][j].picture.transform.colorTransform = ct;
+						root.commStage.chessDesk[i][j]['speedDeleyA'] += adeley//Переопределяем скорость взрослых
+						root.commStage.chessDesk[i][j]['speedDeleyY'] += YDELEY//И молодых особей
+						root.commStage.chessDesk[i][j]['lifeQuant'] += lifequant;//Переопределяем время жизни особи за ход
+						controllX = i
+						controllY =j
 					}
-						}
-					
-					}
-					//По окончанию работы плагина
-					removeChild(image);//Удаляем вспомогательную картинку с рисунком напочвенного покрова
-					pluginEvent.ready();//Сообщаем о том, что все уже сделано,
-	}
-				
-					
-private function debugMessage(debugMsg:String):void{
-		
-	if(debug){
-		trace(debugMsg);
+				}	
 		}
-	}
+		//По окончанию работы плагина
+		//Выводим результат работы
+		msg = 'Individuals speed now is ' + root.commStage.chessDesk[controllX][controllY]['speedDeleyA'];
+		debugMessage(msg);
+	    msg = 'Individuals life decriasing now is ' + root.commStage.chessDesk[controllX][controllY]['lifeQuant'] + ' points after step';
+	    debugMessage(msg);
+	    
+		removeChild(image);//Удаляем вспомогательную картинку с рисунком напочвенного покрова
+		pluginEvent.ready();//Сообщаем о том, что все уже сделано,
+}
 
+private function summsry():void{//Печатаем в консоль результат работы плагина
 	
 	}
+								
+private function debugMessage(debugMsg:String):void{
+		
+	if(debug=='true'){
+		trace(debugMsg);
+	}
+}
+
+	
+}
 }
 	
