@@ -28,7 +28,6 @@
 		
 		private function jobeDone(e:ModelEvent):void{
 			plEntry.pluginEvent.removeEventListener(ModelEvent.FINISH, jobeDone)
-			trace('Jobe done')
 			plEntry = null
 			}
 		}
