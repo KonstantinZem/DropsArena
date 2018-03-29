@@ -9,14 +9,17 @@
 		public static var LOADED:String = 'loaded';//Так мы говорим, что загрузка файла окнчена и программа может к нему обращаться
 		public static var LOADING_ERROR:String = 'loading_error';//Так говорим, что произошла какая то ошибка
 		
-		private var cfgFileName:String;
+		private var cfgFileName:String = 'configuration.xml';
 		private var myXML:XML;
-		private var myXMLURL;
-		private var myLoader;
-		private var debugeLevel:String
+		private var myXMLURL:URLRequest;
+		private var myLoader:URLLoader;
+		private var debugLevel:String;
+		private var msgStreeng:String;
+		private var debugeMessage:DebugeMessenger
 		
-		function ConfigurationContainer(loadedFileName:String='configuration.xml'){
+		function ConfigurationContainer(loadedFileName:String, dbg:String){
 			cfgFileName = loadedFileName;
+			debugLevel = dbg
 			myXML = new XML(); 
 			myXMLURL = new URLRequest(cfgFileName); 
 			myLoader = new URLLoader(myXMLURL);
@@ -24,7 +27,7 @@
 			myLoader.addEventListener(Event.COMPLETE, xmlLoaded);  
 			myLoader.addEventListener(IOErrorEvent.IO_ERROR, onError)
 			
-			debugeLevel = '0'
+			debugLevel = 'true';
 			
 			}
 		
@@ -33,17 +36,18 @@
 			dispatchEvent(new Event(ConfigurationContainer.LOADED))  
 			removeListeners();//Убираем уже ненужные листенеры
 			
-			debugeLevel = getOption('main.debugLevel')
+			debugLevel = getOption('main.debugLevel');
+			debugeMessage = new DebugeMessenger(debugLevel);
+			debugeMessage.setMessageMark('Options container');
 			
-			if(debugeLevel == 'true'){
-				trace('Configuration file ' + cfgFileName + ' has loaded')
-				
-				}
+				msgStreeng = 'Configuration file ' + cfgFileName + ' has loaded';
+				debugeMessage.message(msgStreeng, 1)
+			
 			
 		}
 		
 		
-		private function onError(event:IOErrorEvent){//Если загрузить XML файл не удалось
+		private function onError(event:IOErrorEvent):void{//Если загрузить XML файл не удалось
 			dispatchEvent(new Event(ConfigurationContainer.LOADING_ERROR))
 			removeListeners()//Убираем уже ненужные листенеры
 			}
@@ -53,9 +57,9 @@
 			myLoader.removeEventListener(IOErrorEvent.IO_ERROR, onError)
 			}
 		
-		public function getOption(optionPath:String){//С помощью этого вызова программа будет получать от класса запрашиваемые опции
-			var optionValue:String
-			var parsedPath:Object
+		public function getOption(optionPath:String):String{//С помощью этого вызова программа будет получать от класса запрашиваемые опции
+			var parsedPath:Array;
+			var optionValue:String;
 			
 			parsedPath = parsePathString(optionPath)//Разбираем переданную строку на массив из слов
 			
@@ -71,8 +75,8 @@
 			return parsedPath
 			}
 				 
-		private function displayXML(node:XML, indentLevel:int, elementsList):String {//Функция взята из кники Рич Шуп, Зеван Россер Изучаем ActionScript 3.0.
-			var optionValueString:String = 'Error'//По умолчанию опция не найдена
+		private function displayXML(node:XML, indentLevel:int, elementsList:Array):String {//Функция взята из кники Рич Шуп, Зеван Россер Изучаем ActionScript 3.0.
+			var optionValueString:String = 'Error';//По умолчанию опция не найдена
 						
 			for each (var element:XML in node.elements()) {
 			

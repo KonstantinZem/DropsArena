@@ -12,9 +12,7 @@
 package{
     
     import flash.display.Sprite
-	import flash.events.TimerEvent; 
 	import flash.events.Event; 
-	import flash.utils.Timer;
 	import konstantinz.community.comStage.*
 	import konstantinz.community.auxilarity.*
    
@@ -22,11 +20,12 @@ package{
 		
 		private var stgHeight:int;
 		private var stgWidth:int;
-		
 		private var versionText:Sprite
 		private var debugLevel:String;
 		private var msgStreeng:String;
+		private var debugeMessage:DebugeMessenger
 		
+		public var indSuspender:Array//Структура, через которую особей можно на нужное время останавливать
 		public var configuration:ConfigurationContainer;
 		public var commStage:*
 		public var plugins:Sprite;
@@ -37,12 +36,12 @@ package{
 			
 			stgHeight = parent.stage.stageHeight;
 			stgWidth = parent.stage.stageWidth;
-			configuration = new ConfigurationContainer();
+			configuration = new ConfigurationContainer('configuration.xml', 'true');
 			configuration.addEventListener(ConfigurationContainer.LOADED, init);//
 			configuration.addEventListener(ConfigurationContainer.LOADING_ERROR, init)//Если не найдем конфигурационного файла, все равно загружаем программу дальше
 			
 			model = new Sprite();
-			this.addChild(model)
+			this.addChild(model);
         }
         
 
@@ -51,22 +50,25 @@ package{
 			var intX:int = 0//Первоначальная координата по x
 			var intY:int = 0//Первоначальная координата по y
 			debugLevel = configuration.getOption('main.debugLevel'); //Нужно ли отображать отладочную информацию
+			debugeMessage = new DebugeMessenger(debugLevel);
+			debugeMessage.setMessageMark('Main');
+						
+			versionText = new myVersion('0.42',debugLevel);
 			
-			versionText = new myVersion('0.41',debugLevel)
+			initPosition = configuration.getOption('main.initPosition');
+			model.addChild(versionText);
 			
-			initPosition = configuration.getOption('main.initPosition')
-			model.addChild(versionText)
-			
-			versionText.x = 10
-			versionText.y = 0
+			versionText.x = 10;
+			versionText.y = 0;
 
 			commStage = new CommunityStage(stgHeight+10,stgWidth+20,configuration);
 			model.addChild(commStage);
-			commStage.x = 10
-			commStage.y = 20
-			commStage.scaleX = 0.9
-			commStage.scaleY = 0.9
-			individuals = new Array();
+			commStage.x = 10;
+			commStage.y = 20;
+			commStage.scaleX = 0.9;
+			commStage.scaleY = 0.9;
+			individuals = new Array;
+			indSuspender = new Array;
 						
 			switch(initPosition){//Помещаем первых особей по разным схемам, согласно конфигу
 				case 'left-top':
@@ -90,7 +92,6 @@ package{
 				case 'right-bottom':
 					intX = commStage.chessDesk.length-1;
 					intY = commStage.chessDesk[0].length-1;
-					trace(intX + ' ' + intY)
 					addInitIndividuals(intX,intY);
 				break;
 				
@@ -108,35 +109,36 @@ package{
 					addInitIndividuals(0,0);
 				}
 			
-			
-			
 			if(configuration.getOption('main.pluginEnable')=='true'){
-				plugins = new PluginLoader(configuration)
+				plugins = new PluginLoader(configuration);
 				model.addChild(plugins);
-				msgStreeng = 'Plugins are anebled'
+				msgStreeng = 'Plugins are enabled';
 				
 			}else{
-				msgStreeng = 'Plugins are disabled'
+				msgStreeng = 'Plugins are disabled';
 				}
+					
 			configuration.removeEventListener(ConfigurationContainer.LOADED, init);
-			debugMsg(msgStreeng)
+			debugeMessage.message(msgStreeng, 2)
 		}
 		
 		private function addInitIndividuals(indX:int, indY:int):void{//Добавляем первых особей
 			
 			for (var i:int = 0; i< int(configuration.getOption('main.indQuntaty')); i++){
 				individuals[i] = new Individual(this,commStage.chessDesk,configuration,i,indX,indY);
+				indSuspender[i] = new Suspender(individuals[i],commStage.chessDesk,configuration)
 				
 				commStage.addChild(individuals[i])
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
+				individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
 			}
 			
 			}
 			
 		private function rndAddInitIndividuals():void{//Добавляем первых особей в случайных позициях
 			
-			var indXRnd : int
-			var indYRnd : int
+			var indXRnd : int;
+			var indYRnd : int;
 			
 			var chessDeskLengthX:int = commStage.chessDesk.length - 1
 			var chessDeskLengthY:int = commStage.chessDesk[1].length - 1
@@ -146,9 +148,10 @@ package{
 				indYRnd = Math.round(Math.random() * chessDeskLengthY)
 				
 				individuals[i] = new Individual(this,commStage.chessDesk,configuration,i,indXRnd,indYRnd);
-				
+				indSuspender[i] = new Suspender(individuals[i],commStage.chessDesk,configuration)
 				commStage.addChild(individuals[i])
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
+				individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
 			}
 			
 			}
@@ -162,15 +165,30 @@ package{
 					var newX:int = e.target.currentChessDeskI;
 					var newY:int = e.target.currentChessDeskJ;
 					individuals[i] = new Individual(this,commStage.chessDesk, configuration, i,newX,newY);
+					indSuspender[i] = new Suspender(individuals[i],commStage.chessDesk,configuration)
+					
 					commStage.addChild(individuals[i])
 					individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
+					individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
 				}
 		}
 		
-		private function debugMsg(msg:String):void{
-			if(debugLevel=='true'){
-				trace(msg);
-			}
+		private function removeIndividuals(e:Event):void {
+			var indName = e.target.indName
+			
+			individuals[indName].IndividualEvent.removeEventListener(ModelEvent.DEATH, removeIndividuals);
+			individuals[indName] = null;//Убираем из массива особей
+			indSuspender[indName] = null;//И связанные с ними драйверы
+			
+			indSuspender.splice(indName,1);//Ужимаем массивы
+			individuals.splice(indName,1);
+			
+			for(var i:int = 0; i<individuals.length; i++){
+				individuals[i].setName(i);//После ужимания массива делаем так, чтобы имя особи совпадало с ее позицией
+				}
+			
+			msgStreeng = 'Now number of individuals is ' + individuals.length;
+			debugeMessage.message(msgStreeng, 2)
 			}
 
     }

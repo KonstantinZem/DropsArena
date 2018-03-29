@@ -15,8 +15,11 @@
 		private var errorType:Object;//Контейнер для ошибок
 		private var debugLevel:String;
 		private var lifeQuant:int//Убыль жизни за ход
+		private var msgMark:String = '[stage]: '
+		private var msgString:String
 		public var chessDesk:Array;
 		public var envParams:Object;
+		
 		
 		
 		
@@ -44,11 +47,13 @@
 				buildStage();
 				buildNet();
 				if(debugLevel=='true'){
-					trace('The stage ' + chessDesk.length + 'X' + chessDesk[0].length + ' has bulded succesfully\n');
+					msgString = 'The stage ' + chessDesk.length + 'X' + chessDesk[0].length + ' has bulded succesfully';
+					debugMsg(msgString);
 				}
 				}
 			catch(error:ArgumentError){
-				trace("<Error> " +  error.message);
+				msgString = "<Error> " +  error.message;
+				debugMsg(msgString);
 				}
 				}
 		   private function buildStage():void{
@@ -98,5 +103,10 @@
 				}
 				
 				}
+			private function debugMsg(msg:String):void{
+				if(debugLevel=='true'){
+					trace(msgMark + msg + ';\n');
+				}
+			}
 		}
 	}

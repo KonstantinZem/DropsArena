@@ -17,6 +17,7 @@
 		private var options:Object;
 		private var debugLevel:String;
 		private var msgString:String;
+		private var msgMark:String = '[plugins loader]: ';
 		private var ClassReference:Class;
 		
 		public var loaderEvent:Object;
@@ -63,7 +64,7 @@
 				m_loader[i].contentLoaderInfo.addEventListener(Event.COMPLETE, onPluginFileDownloading);
 				m_loader[i].load(new URLRequest(pluginsList[i]));//А здесь тогда уже загружать не pluginsList[i] а myPlugin['file']
 				currentPlugName = pluginsList[i];
-				msgString = 'Load plugin ' + i + ' '+ currentPlugName + '\n';
+				msgString = 'Load plugin ' + i + ' '+ currentPlugName;
 				debugMsg(msgString)
 				}
 			}
@@ -90,7 +91,7 @@
 					m_loader[currentPlNumber].content.plEntry.pluginName = currentPlugName;
 				}
 				else{
-					msgString = 'Plugin ' + currentPlugName + ' has no property pluginName\n'
+					msgString = 'Plugin ' + currentPlugName + ' has no property pluginName'
 					debugMsg(msgString)
 					}
 				
@@ -100,7 +101,7 @@
 				}
 				else{//Если плагин не содержит такого события, то просто загружаем следующий не дожидаясь окончания работы предыдущего
 					loadPlugins(currentPlNumber)
-					msgString = 'Plugin ' + currentPlugName + ' has no property pluginEvent\n'
+					msgString = 'Plugin ' + currentPlugName + ' has no property pluginEvent'
 					debugMsg(msgString)
 					}
 
@@ -116,19 +117,19 @@
 				}
 			
 			function onError(e:ModelEvent):void{
-				msgString = 'Error plagin has not loaded. ' + errorType.fileNotFound
+				msgString = 'Error plagin has not loaded. ' + errorType.fileNotFound;
 				debugMsg(msgString)
 				//m_loader.removeEventListener(IOErrorEvent.IO_ERROR,onError);
 				}
 			private function debugMsg(msg:String):void{
 				if(debugLevel =='true'){
-				trace(msg);
+				trace(msgMark + msg);
 				}
 			}
 			
 			private function onPluginsJobeFinish(e:ModelEvent):void{
 				
-				loadPlugins(currentPlNumber)//После загрузки очерного плагина загружаем следующий
+				loadPlugins(currentPlNumber)//После загрузки очередного плагина загружаем следующий
 				
 				}
 		}

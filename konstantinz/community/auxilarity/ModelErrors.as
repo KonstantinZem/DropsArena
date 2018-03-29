@@ -9,6 +9,7 @@
 		public var fileNotFound:String = 'File not found'
 		public var idUndefined:String = 'The name of object (id) is undefined'
 		public var pluginStartAlong:String = 'Plugin start along, but must loaded by comunity main program'
+		public var indExemplarNotExist:String = 'Trying to operate with non exist individual exemplar'
 		
 		function ModelErrors(){}
 		
