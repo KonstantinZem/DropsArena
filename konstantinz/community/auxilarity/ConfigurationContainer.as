@@ -15,7 +15,7 @@
 		private var myLoader:URLLoader;
 		private var debugLevel:String;
 		private var msgStreeng:String;
-		private var debugeMessage:DebugeMessenger
+		private var messenger:Messenger;
 		
 		function ConfigurationContainer(loadedFileName:String, dbg:String){
 			cfgFileName = loadedFileName;
@@ -37,11 +37,11 @@
 			removeListeners();//Убираем уже ненужные листенеры
 			
 			debugLevel = getOption('main.debugLevel');
-			debugeMessage = new DebugeMessenger(debugLevel);
-			debugeMessage.setMessageMark('Options container');
+			messenger = new Messenger(debugLevel);
+			messenger.setMessageMark('Options container');
 			
 				msgStreeng = 'Configuration file ' + cfgFileName + ' has loaded';
-				debugeMessage.message(msgStreeng, 1)
+				messenger.message(msgStreeng, 1)
 			
 			
 		}

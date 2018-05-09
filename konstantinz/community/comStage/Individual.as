@@ -20,11 +20,11 @@ package konstantinz.community.comStage{
 	public class Individual extends Sprite{
 		//Класс, описывающий поведение отдельного организма в сообществе
 		private var tickInterval:int = 20;//Интервал между тиками таймера
-		private var indName:Sprite;
+		private var individual:Sprite;
 		private var indNumber:int
 		private var indConfiguration:Object
 		private var maturingDeley:int;//Промежуток между размножениями
-		private var debugeMessage:DebugeMessenger
+		private var messanger:Messenger;
 		
 		//**************************** Colors ************************************************//
 		private var BORDERCOLOR:Number = 0x000000;
@@ -37,7 +37,7 @@ package konstantinz.community.comStage{
 		private var lifeStart:Date
 		private var lifeEnd:Date;
 		private var adultAge:int;//Время взросления. Передается из настроек
-		private var offspringsQuant:int
+		private var offspringsQuant:int;
 		private var chessDesk:Array; //Ссылка на внешний массив с координатами и условиями среды
 		private var errorType:Object;//Контейнер для ошибок;
 		private var indDirection:int;//Текущие направление
@@ -46,8 +46,9 @@ package konstantinz.community.comStage{
 		private var timerForIndividuals:Timer; //Не самое удачное решение, снабдить каждую особь своим таймером, но сделать один из главного класса у меня не получается
 		private var msgString:String;
 		private var date:Date;
-		private var currentChessDeskI:int//Номер строки текущего квадрата
-		private var currentChessDeskJ:int//Номер столбца текущего квадрата
+		private var currentChessDeskI:int;//Номер строки текущего квадрата
+		private var currentChessDeskJ:int;//Номер столбца текущего квадрата
+		private var indStatus:String
 				
 		public var IndividualEvent:DispatchEvent;
 		
@@ -58,14 +59,14 @@ package konstantinz.community.comStage{
 			try{
 				indConfiguration = behaviour;
 				debugLevel = indConfiguration.getOption('main.debugLevel');
-				debugeMessage = new DebugeMessenger(debugLevel);
-				debugeMessage.setMessageMark('Individual');
+				messanger = new Messenger(debugLevel);
+				messanger.setMessageMark('Individual');
 				indNumber = args[0];
 			
 			if(args[0]==undefined){
 				indNumber = Math.round(Math.random()*1000);;
 				msgString = 'Individual ' + errorType.idUndefined + ' There were set random name ' + indNumber;
-				debugeMessage.message(msgString, 2);
+				messanger.message(msgString, 2);
 				}
 				
 			adultAge = int(indConfiguration.getOption('main.adultAge'))
@@ -91,23 +92,23 @@ package konstantinz.community.comStage{
 			timerForIndividuals.start();
 			lifeStart = new Date();
 			msgString = 'Individual ' + indNumber + ' has created. \n It current position is '+ currentChessDeskI+ ':' + currentChessDeskJ;
-			debugeMessage.message(msgString, 1);
+			messanger.message(msgString, 1);
 			
 			}
 			catch(error:ArgumentError){
 				msgString = "<Error> " +  error.message;
-				debugeMessage.message(msgString, 0);
+				messanger.message(msgString, 0);
 				}
 			}
 		/////////////////////////Private//////////////////////////////////////////////////////////////////////
 		
 		private function drawIndividual():void{//Рисует особь в виде цветного квадрата
 			//Функция напрямую завязана на графике
-			indName = new Sprite();
-			indName.graphics.lineStyle(1,BORDERCOLOR);
-		    indName.graphics.beginFill(INDCOLOR);
-			indName.graphics.drawRect(0,0,indSize,indSize);
-			addChild(indName);
+			individual = new Sprite();
+			individual.graphics.lineStyle(1,BORDERCOLOR);
+		    individual.graphics.beginFill(INDCOLOR);
+			individual.graphics.drawRect(0,0,indSize,indSize);
+			addChild(individual);
 			}
 		
 		private function isIndividualAdult():Boolean{
@@ -121,33 +122,32 @@ package konstantinz.community.comStage{
 					if(adultAge==0){//После этого adultAge станет меньше нуля и сообщение появлятся не должно
 						adultAge--;
 						msgString= 'Individual ' + indNumber + ' now adult';
-						debugeMessage.message(msgString, 2);
+						messanger.message(msgString, 2);
 					}
 					return true;
 				}
 			}
 		private function isIndividualAlong():Boolean{//Есть ли в заданном квадрате кто либо еще
 			//Функция платформонезависимая
-			var YSIGN:int = 1;
-			var ASIGN:int = 2;
-			var cs:int
+			var YSIGN:String = 'A';//Adult
+			var ASIGN:String = 'Y';//Young
 			
 			if(adultAge<0){
 				chessDesk[currentChessDeskI][currentChessDeskJ]['numberOfIndividuals']+=ASIGN;//Делаем в квадрате отметку своего присутсвия
-				cs = ASIGN;
+				indStatus = ASIGN;
 			}
 			else{
 				chessDesk[currentChessDeskI][currentChessDeskJ]['numberOfIndividuals']+=YSIGN;//В квадрате побывала молодая особь
-				cs=YSIGN;
+				indStatus =YSIGN;
 				}
 			
-			if(chessDesk[currentChessDeskI][currentChessDeskJ]['numberOfIndividuals']>cs){
+			if(chessDesk[currentChessDeskI][currentChessDeskJ]['numberOfIndividuals'].length == 2){//Если встретились две особи
 				
 				if(deleySteps>2){//если перемещение происходит слишком быстро, не переключаем цвета
 					
 					markIndividual('collision');//Визуально отмечаем факт встречи особей
 				}
-				setTimeout(clearCell, 2)
+				setTimeout(clearCell, 2);
 				return false;
 				}
 				else{
@@ -158,49 +158,49 @@ package konstantinz.community.comStage{
 					 }
 			}
 			
-		private function markIndividual(individualState:String):void{//Отмечает цветом особей в различном состоянии
+		public function markIndividual(individualState:String):void{//Отмечает цветом особей в различном состоянии
 			var ct:ColorTransform = new ColorTransform();
 			
 			switch(individualState) 
 				{ 
 					case 'collision': 
 					ct.color = COLLISIONCOLOR;
-					indName.transform.colorTransform = ct;
+					individual.transform.colorTransform = ct;
 					break; 
 					
 					case 'nothing':
 					ct.color = INDCOLOR;
-					indName.transform.colorTransform = ct;
+					individual.transform.colorTransform = ct;
 					break; 
 					
 					 case 'stoped':
 					
 					ct.color = STOPEDCOLOR
-					indName.transform.colorTransform = ct;
+					individual.transform.colorTransform = ct;
 					
 					break;
 					
 					default: 
 					ct.color = INDCOLOR;
-					indName.transform.colorTransform = ct;
+					individual.transform.colorTransform = ct;
 				}
 		}
 
 		private function clearCell():void{
 			//функция полностью платформонезависимая
-			chessDesk[currentChessDeskI][currentChessDeskJ]['numberOfIndividuals'] = 0
+			chessDesk[currentChessDeskI][currentChessDeskJ]['numberOfIndividuals'] = '';
 			}
 		
 		private function maturing():void{
 			//функция полностью платформонезависимая
 			if(maturingDeley==0){
 				
-				IndividualEvent.currentChessDeskI = this.currentChessDeskI;
-				IndividualEvent.currentChessDeskJ = this.currentChessDeskJ;
+				IndividualEvent.currentChessDeskI = currentChessDeskI;
+				IndividualEvent.currentChessDeskJ = currentChessDeskJ;
 				IndividualEvent.maturing();
 				
 				msgString = 'Maturing in '+ currentChessDeskI+ ':'+ currentChessDeskJ;
-				debugeMessage.message(msgString, 3);
+				messanger.message(msgString, 3);
 				maturingDeley = int(indConfiguration.getOption('main.maturingDeley'));
 			
 			}
@@ -209,12 +209,13 @@ package konstantinz.community.comStage{
 				}
 			}
 		private function internalMoveImpuls(event:TimerEvent):void{//Заставляем особь двигаться по собственному таймеру
-			nextStep()
+			nextStep();
 			}
 		
 		
 		private function nextStep():void{
-			//функция платформонезавмсимая, при условии, что кто то будет читать переменную indName.x и indName.y и на изменять сведения о положении особи
+			markIndividual('nothing');
+			//функция платформонезавмсимая, при условии, что кто то будет читать переменную individual.x и individual.y и на изменять сведения о положении особи
 			deleySteps--;//Уменьшаем количество пропущеных ходов
 						
 			var amIAdult:Boolean = isIndividualAdult();//Стоит здесь, так как взрослеть особь должна в не зависимости от того, стоит она на месте или движется
@@ -226,7 +227,7 @@ package konstantinz.community.comStage{
 			
 			if(amIAdult){
 				if(!amIAlong){
-					if(chessDesk[currentChessDeskI][currentChessDeskJ]['numberOfIndividuals']==4){//Если встретились две взрослые
+					if(chessDesk[currentChessDeskI][currentChessDeskJ]['numberOfIndividuals']=='AA'){//Если встретились две взрослые
 					maturing();
 					}
 				}
@@ -237,32 +238,32 @@ package konstantinz.community.comStage{
 			
 			switch(indDirection){
 				case 0: //Стоим наместе
-				indName.x = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrX'];
-				indName.y = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrY'];
+				individual.x = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrX'];
+				individual.y = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrY'];
 				
 				break;
 				case 1://Идем вниз
 				
 				if(currentChessDeskI>chessDesk.length-2){
 					currentChessDeskI--;
-					indName.x = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrX'];
-					indName.y = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrY'];
+					individual.x = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrX'];
+					individual.y = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrY'];
 					}
 					else{
-						indName.x = chessDesk[currentChessDeskI+1][currentChessDeskJ]['sqrX'];
-						indName.y = chessDesk[currentChessDeskI+1][currentChessDeskJ]['sqrY'];
+						individual.x = chessDesk[currentChessDeskI+1][currentChessDeskJ]['sqrX'];
+						individual.y = chessDesk[currentChessDeskI+1][currentChessDeskJ]['sqrY'];
 						currentChessDeskI++;
 						}
 				break;
 				case 2://Идем вверх
 				
 				if(currentChessDeskI==0){
-					indName.x = chessDesk[0][currentChessDeskJ]['sqrX'];
-					indName.y = chessDesk[0][currentChessDeskJ]['sqrY'];
+					individual.x = chessDesk[0][currentChessDeskJ]['sqrX'];
+					individual.y = chessDesk[0][currentChessDeskJ]['sqrY'];
 					}
 					else{
-						indName.x = chessDesk[currentChessDeskI-1][currentChessDeskJ]['sqrX'];
-						indName.y = chessDesk[currentChessDeskI-1][currentChessDeskJ]['sqrY'];
+						individual.x = chessDesk[currentChessDeskI-1][currentChessDeskJ]['sqrX'];
+						individual.y = chessDesk[currentChessDeskI-1][currentChessDeskJ]['sqrY'];
 						currentChessDeskI--;
 					}
 				break;
@@ -270,32 +271,32 @@ package konstantinz.community.comStage{
 				
 				if(currentChessDeskJ>chessDesk[0].length-2){
 					currentChessDeskJ--;
-					indName.x = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrX'];
-					indName.y = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrY'];
+					individual.x = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrX'];
+					individual.y = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrY'];
 					
 					}
 					else{
-						indName.x = chessDesk[currentChessDeskI][currentChessDeskJ+1]['sqrX'];
-						indName.y = chessDesk[currentChessDeskI][currentChessDeskJ+1]['sqrY'];
+						individual.x = chessDesk[currentChessDeskI][currentChessDeskJ+1]['sqrX'];
+						individual.y = chessDesk[currentChessDeskI][currentChessDeskJ+1]['sqrY'];
 						currentChessDeskJ++;
 						}
 				break;
 				case 4://Идем налево
 				
 				if (currentChessDeskJ==0){
-					indName.x = chessDesk[currentChessDeskI][0]['sqrX'];
-					indName.y = chessDesk[currentChessDeskI][0]['sqrY'];
+					individual.x = chessDesk[currentChessDeskI][0]['sqrX'];
+					individual.y = chessDesk[currentChessDeskI][0]['sqrY'];
 					}
 					else{
-						indName.x = chessDesk[currentChessDeskI][currentChessDeskJ-1]['sqrX'];
-						indName.y = chessDesk[currentChessDeskI][currentChessDeskJ-1]['sqrY'];
+						individual.x = chessDesk[currentChessDeskI][currentChessDeskJ-1]['sqrX'];
+						individual.y = chessDesk[currentChessDeskI][currentChessDeskJ-1]['sqrY'];
 						currentChessDeskJ--;
 						}
 				break;
 				default://Стоим на месте
 				
-				indName.x = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrX'];
-				indName.y = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrY'];
+				individual.x = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrX'];
+				individual.y = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrY'];
 				
 				}
 				
@@ -313,14 +314,14 @@ package konstantinz.community.comStage{
 				
 				deltaTime = lifeEnd.getTime()-lifeStart.getTime();
 				msgString = 'Individual ' + indNumber + ' is dead. R.I.P. \n' + 'It lived ' +Math.round((deltaTime)*0.00006) + ' min';
-				debugeMessage.message(msgString, 2);
-				debugeMessage = null;
-				IndividualEvent.indName = indNumber;//Посылаем сообщение о том что особь с этим номером
+				messanger.message(msgString, 2);
+				messanger = null;
+				IndividualEvent.individual = indNumber;//Посылаем сообщение о том что особь с этим номером
 				IndividualEvent.death();//Умерла
 				
 				
-				if(parent.contains(indName)){//Перед тем как удалить особь со сцены 
-					removeChild(indName);//Проверяем, не была ли она уже удалена до этого
+				if(parent.contains(individual)){//Перед тем как удалить особь со сцены 
+					removeChild(individual);//Проверяем, не была ли она уже удалена до этого
 				}
 			}
 			
@@ -329,22 +330,22 @@ package konstantinz.community.comStage{
 		public function externalTimer():void{
 			timerForIndividuals.stop()
 			msgString = 'Individual number '+ indNumber + ': ' + 'Internal timer has stoped';
-			debugeMessage.message(msgString, 3);
+			messanger.message(msgString, 3);
 			}
 			
 		public function doStep():void{//Заставляем особь двигаться по внешнему таймеру
-			nextStep()
+			nextStep();
 			}
 		
 		public function stop():void{//Так особь можно заставить остановится
 				msgString = 'Individual number '+ indNumber + ' has been stoped'
-				debugeMessage.message(msgString, 3);
+				messanger.message(msgString, 3);
 				markIndividual('stoped');
 			}
 		
 		public function start():void{//Так особь можно заставить двигаться снова
 				msgString = 'Individual number '+ indNumber + ' has been started';
-				debugeMessage.message(msgString, 3);
+				messanger.message(msgString, 3);
 				markIndividual('nothing');
 			}
 		
@@ -361,12 +362,16 @@ package konstantinz.community.comStage{
 			var oldNumber:int = indNumber;
 			indNumber = newNumber
 			msgString = 'Individual has change it number from ' + oldNumber + ' to ' + newNumber;
-			debugeMessage.message(msgString, 3);
+			messanger.message(msgString, 3);
 		}
 	
 		public function kill():void{
 			killIndividual();
 		}
+		
+		public function markPresenceInPlot(){
+			chessDesk[currentChessDeskI][currentChessDeskJ]['numberOfIndividuals'] += indStatus;
+			}
 	
 			
 		}

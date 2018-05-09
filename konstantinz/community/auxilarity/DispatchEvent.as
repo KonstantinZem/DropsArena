@@ -8,7 +8,7 @@
 		public var currentChessDeskI:int;//Посылаем вместе с событием координаты объекта вызвавшего его
 		public var currentChessDeskJ:int;
 		public var pluginName:String;//Передаем плагину его имя так как сам он его не узнает. А это надо для загрузки, например, конфига
-		public var indName:int;//Передаем номер особи в массиве
+		public var individual:int;//Передаем номер особи в массиве
 		public function DispatchEvent(){
 		}		
 		public function maturing():void{

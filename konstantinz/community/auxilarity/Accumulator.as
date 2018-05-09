@@ -17,6 +17,7 @@ public class Accumulator{
 	private var paramPosition:int;
 	
 	public var statTable:Array;//Здесь будет хранится собираемая статистика
+	public var statusBarText:String;
 	
 	private static var _instance:Accumulator;
 
@@ -39,6 +40,7 @@ public class Accumulator{
 		statTable = new Array;
 		statTable[0] = new Array;
 		paramPosition = 0;
+		statusBarText = ''
 				 }
 		}
 	
@@ -112,6 +114,7 @@ public class Accumulator{
 				valueBuffer[0]=counter;
 				msgString = tableToString();
 				messenger.message(msgString, 1);
+				setStatusText();//Сохраняем статистическую информацию для показа в строке состояния
 				
 		}
 		private function tableToString():String{//Готовит таблицу для печати в консоли отладки
@@ -153,6 +156,13 @@ public class Accumulator{
 				}
 			return emptyString;
 			}
+			
+	private function setStatusText():void{
+         statusBarText = '';
+         for(var i:int = 1; i<statTable[0].length; i++){
+            statusBarText = statusBarText + (statTable[0][i] + ": " + statTable[statTable.length - 1][i] + "    ");
+         }
+      }
 
 }
 

@@ -11,7 +11,8 @@
 		<offspringsQuant>4</offspringsQuant>
 		<dropSize>12</dropSize>
 		<initPosition>center</initPosition>
-		<pluginsList>plugins/grass.swf;plugins/ground.swf;plugins/stones.swf;plugins/activity.swf</pluginsList>
+		<statRefreshTime>60</statRefreshTime>
+		<pluginsList>plugins/grass.swf;plugins/ground.swf;plugins/stones.swf;plugins/activity.swf;plugins/morisitaCounter.swf</pluginsList>
 	</main>
 	<plugins>
 		<grass>
@@ -33,7 +34,7 @@
 			<color>0xb4bc3c</color>
 		</stones>
                 <activity>
-                    <steps>15000</steps>
+                    <steps>3000</steps>
                     <debugLevel>1</debugLevel>
                     <data><![CDATA[
                         <activity state='unactive'>
@@ -321,5 +322,10 @@
 </activity>
 ]]></data>
                 </activity>
+    <morisitaCounter>
+		<debugLevel>1</debugLevel>
+		<refreshTime>20</refreshTime>
+		<plotSize>8</plotSize>
+    </morisitaCounter>
 	</plugins>
 </configuration>

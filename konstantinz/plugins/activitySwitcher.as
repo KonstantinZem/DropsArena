@@ -10,8 +10,8 @@ import flash.events.Event
 	import flash.xml.*
     
 public class activitySwitcher extends Sprite{
-	private var stopingTimer:Timer
-	var timerStatement:String
+	private var stopingTimer:Timer;
+	var timerStatement:String;
 	public var pluginName:String; //Должна быть включена в интерфейс этого типа плагинов
 	public var pluginEvent:Object;
 	private var dispatchedObjects:Array//Ссылка на массив с управляемыми объектами
@@ -21,20 +21,21 @@ public class activitySwitcher extends Sprite{
 	private var stopedObjects:Array;//Список остановленных в данный момент особей
 	private var stopedNumber:int;
 	private var listenedSuspender:int
-	private var currentActivitIndNumber:int = 0
+	private var currentActivitIndNumber:int = 0//Позиция в таблице активности где надо искать текущее число особей, которых необходимо остановить
 	private var debugeLevel:String;
-	private var debugeMessage:DebugeMessenger
 	private var msgString:String;
+	private var timer:Timer;
 	
-	var timer:Timer;
+	public var messenger:Messenger;
 	
 	function activitySwitcher(){
+		debugeLevel = '3';
 		pluginEvent = new DispatchEvent();
 		timer = new Timer(1000, 1);//Ждем некоторое время, пока в главная программа не передаст нужные плагину параметры
 		timer.addEventListener(TimerEvent.TIMER, initPlugin);// потом запускаем программу
 		timer.start();
-		suspendTime = 5000
-		
+		suspendTime = 5000;
+		messenger = new Messenger(debugeLevel);
 		}
 	
 	private function initPlugin(e:TimerEvent):void{
@@ -43,10 +44,10 @@ public class activitySwitcher extends Sprite{
 		
 			if(root != null){
 				var rawData:String = root.configuration.getOption('plugins.activity.data');
-				debugeLevel = '3';
+	
 				debugeLevel = root.configuration.getOption('plugins.activity.debugLevel');
-				debugeMessage = new DebugeMessenger(debugeLevel);
-				debugeMessage.setMessageMark('Activity');
+				messenger.setDebugLevel (debugeLevel);
+				messenger.setMessageMark('Activity');
 				
 				var time:int
 				activityData = prepareData(rawData);
@@ -69,7 +70,7 @@ public class activitySwitcher extends Sprite{
 			return dataXML;
 		}catch(e:Error){
 			msgString = 'Error: data file is corruped';
-			debugeMessage.message(msgString, 0)
+			messenger.message(msgString, 0)
 			}
 		}
 	
@@ -96,12 +97,12 @@ public class activitySwitcher extends Sprite{
 		
 			}catch(e:ArgumentError){
 	
-				debugeMessage.message(e, 0)
+				messenger.message(e, 0)
 				numberOfSteps = int(root.configuration.getOption('main.lifeTime'));
 				}
 			catch(e:Error){
 				msgString = e
-				debugeMessage.message(msgString, 0)
+				messenger.message(msgString, 0)
 				timeQant =20
 				}
 		}
@@ -113,7 +114,7 @@ public class activitySwitcher extends Sprite{
 			
 			if(currentActivitIndNumber > activityData.firstChild.childNodes.length - 1){
 				msgString = 'New cycle: ' + currentActivitIndNumber
-				debugeMessage.message(msgString, 3) 
+				messenger.message(msgString, 3) 
 				currentActivitIndNumber = 0;
 					
 				}else{
@@ -123,11 +124,13 @@ public class activitySwitcher extends Sprite{
 				stopOnly(currentActivity, 'percents');
 			
 				msgString = 'Current stoped individuals part is = ' +  currentActivitIndNumber + ':'+ currentActivity;
-				debugeMessage.message(msgString, 3);
+				messenger.message(msgString, 3);
+				msgString = 'inactive_ind_numb:' + currentActivity;
+				messenger.message(msgString, 10);//Посылаем данные о количестве неактивных особей как статистику
 				
 				
 			}catch(e:Error){
-				debugeMessage.message(e, 0)
+				messenger.message(e, 0)
 				}
 		}
 			
@@ -160,11 +163,11 @@ public class activitySwitcher extends Sprite{
 		
 		default:
 			itemsNumber = 0
-			debugeMessage.message('wrong unit type', 0);
+			messenger.message('wrong unit type', 0);
 		}
 	}
 	private function setObjRange():int{
-		var stopedObjPosition:int = 0
+		var stopedObjPosition:int = 0;
 		
 			stopedObjPosition = Math.round(Math.random()*dispatchedObjects.length);
 			

@@ -7,9 +7,9 @@
 	
 	public class Suspender{
 		private static var tickInterval:int = 20;//Интервал между тиками таймера
-		private var indName:*
+		private var individual:Individual;
 		private var suspendTime:Timer;
-		private var debugeMessage:DebugeMessenger;
+		private var messanger:Messenger;
 		private var indStepPulsor:Timer;
 		private var immortal:Boolean;//Можно сделать особь бессмертной
 		private var lifeTime:int//Время жизни в ходах
@@ -18,11 +18,13 @@
 		private var debugLevel:String;
 		private var errorType:ModelErrors;
 		private var msgString:String;
+		private var individualState:String;//Помечаем состояние особи, чтобы не посылать стоп-команды если особь уже остановлена
 		
 		public var SuspenderEvent:DispatchEvent;//О результатах работы будем сообщать другим компонентам посредством сообщений
 		//Приостанавливает активность особи на некоторое время
 		function Suspender(individualName:Individual, desk:Array, extOptions:ConfigurationContainer){
-			indName = individualName;
+			individualState = 'moved';
+			individual = individualName;
 			config = extOptions;
 			chessDesk = desk;
 			errorType = new ModelErrors();
@@ -30,37 +32,40 @@
 			SuspenderEvent = new DispatchEvent(); 
 			indStepPulsor.addEventListener(TimerEvent.TIMER, step);
 			debugLevel = config.getOption('main.debugLevel');
-			debugeMessage = new DebugeMessenger(debugLevel);
-			debugeMessage.setMessageMark('Suspender');
+			messanger = new Messenger(debugLevel);
+			messanger.setMessageMark('Suspender');
 			immortal = false;//По умолчанию время жизни особи конечно
 			
 			lifeTime = config.getOption('main.lifeTime');
 			if(lifeTime==0){//Если так, то особь становится бессмертной
 				immortal=true;
-				msgString = 'Individual ' + indName.getName() + ' will be immortal';
-				debugeMessage.message(msgString, 2);
+				msgString = 'Individual ' + individual.getName() + ' will be immortal';
+				messanger.message(msgString, 2);
 				}
 			msgString = 'Individual life time is ' + lifeTime;
-			debugeMessage.message(msgString, 2);
+			messanger.message(msgString, 2);
 			
 			indStepPulsor.start();
-			indName.externalTimer();
-			msgString = 'Suspender begin to serch individual ' + indName.getName();
+			individual.externalTimer();
+			msgString = 'Suspender begin to serch individual ' + individual.getName();
 			
-			debugeMessage.message(msgString, 1);
+			messanger.message(msgString, 1);
 			}
 		
 		public function stopIndividual(time:int):void{
 			
 			try{
-				suspendTime = new Timer(time, 1)
-				suspendTime.addEventListener(TimerEvent.TIMER, startIndividual);
-				suspendTime.start();
-				indStepPulsor.stop();
-				indName.stop();
+				if(individualState=='moved'){
+					individualState = 'stoped';
+					suspendTime = new Timer(time, 1);
+					suspendTime.addEventListener(TimerEvent.TIMER, startIndividual);
+					suspendTime.start();
+					indStepPulsor.stop();
+					individual.stop();
+				}
 			}catch(e:Error){//Если что то пошло не так
-				msgString = 'Error: Can not stop individual ' + indName.getName() + ': ' + errorType.indExemplarNotExist;
-				debugeMessage.message(msgString, 0);
+				msgString = 'Error: Can not stop individual ' + individual.getName() + ': ' + errorType.indExemplarNotExist;
+				messanger.message(msgString, 0);
 				suspendTime.stop();//Сбрасываем паузу
 				indStepPulsor.stop();//И вообще отключаем подачу сигналов к этой особи
 				}
@@ -72,11 +77,12 @@
 		/////////////////////////////////////////////Private//////////////////////////////////////////////////////////////////
 		private function startIndividual(event:TimerEvent):void{
 			try{
-					msgString = 'Try to start individual ' + indName.getName();
-					debugeMessage.message(msgString, 3);
+					individualState = 'moved';
+					msgString = 'Try to start individual ' + individual.getName();
+					messanger.message(msgString, 3);
 					
 					indStepPulsor.start();
-					//indName.start();//
+					//individual.start();//
 					SuspenderEvent.done();//Говорим о том что особи вновь запущены тому компоненту, который просил приостановить особей
 			}catch(e:Error){
 				trace(e)
@@ -90,17 +96,19 @@
 					lifeTime = lifeTime - chessDesk[10][10]['lifeQuant'];
 					if(lifeTime==0){//Если время жизни вышло
 						indStepPulsor.stop();
-						//SuspenderEvent = null;
-						indName.kill();//Даем особи команду убиться
+						individual.kill();//Даем особи команду убиться
 					}
 				else{
-					indName.doStep();
+					
+					//individual.markIndividual('nothing');
+					individual.doStep();
+					
 					}
 				}
 			}catch(e:Error){
 				indStepPulsor.stop();
-				msgString = 'Error: Can not drive individual ' + indName.getName() + ': ' + errorType.indExemplarNotExist;
-				debugeMessage.message(msgString, 0);
+				msgString = 'Error: Can not drive individual ' + individual.getName() + ': ' + errorType.indExemplarNotExist;
+				messanger.message(msgString, 0);
 				}
 			
 			

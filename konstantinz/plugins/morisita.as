@@ -44,8 +44,6 @@ package konstantinz.plugins{
 	
 		private function initPlugin(e:TimerEvent):void{
 		
-		timerStatement = 'start';
-		
 			if(root != null){//Если плагин загрузился внутри модели
 				var time:int;
 				config = root.configuration;
@@ -56,6 +54,7 @@ package konstantinz.plugins{
 				debugeLevel = config.getOption('plugins.morisitaCounter.debugLevel');
 				plotSize = int(config.getOption('plugins.morisitaCounter.plotSize'));
 				refreshTime = (int(config.getOption('plugins.morisitaCounter.refreshTime')))*1000;//Берем время обновления из конфига и переводим его в миллисекунды
+				
 				cellSize = int(config.getOption('main.dropSize'));
 				plotsCells = new Array;
 				plotsPosition = new Array;
@@ -69,9 +68,14 @@ package konstantinz.plugins{
 				msgString = 'Morisita counter plugin';
 				messenger.message(msgString, 1);
 				
-				refreshTimer = new Timer(refreshTime);
-				refreshTimer.addEventListener(TimerEvent.TIMER, countMorisita);
-				refreshTimer.start();
+				if(refreshTime>0){
+					refreshTimer = new Timer(refreshTime);
+					refreshTimer.addEventListener(TimerEvent.TIMER, countMorisita);
+					refreshTimer.start();
+				}else{
+					msgString = 'Refresh time not set';
+					messenger.message(msgString, 0);
+					}
 
 			}
 		pluginEvent.ready();//Сообщаем загружающей плагин программе о том что плагин загружен и готов к работе
@@ -106,7 +110,7 @@ package konstantinz.plugins{
 				getPlotPosition();//Составляем его чтобы в дальнейшем не расчитывать позиции которые уже не изменятся а просто брать уже готовые координаты
 				}
 		
-			for(var i = 0; i<indDrivers.length;i++){//Перед тем как расчитать индекс приостанавливаем особей на некоторое время
+			for(var i:int = 0; i<indDrivers.length;i++){//Перед тем как расчитать индекс приостанавливаем особей на некоторое время
 				indDrivers[i].stopIndividual(500);
 				}
 				
@@ -179,7 +183,7 @@ package konstantinz.plugins{
 				}
 			
 			mIndex = allPlotsNumber*(niSumm/(allIndividuals*(allIndividuals-1)));
-			msgString = 'sorce data: nidividuals '+ allIndividuals + ', plots ' + allPlotsNumber;
+			msgString = 'source data: nidividuals '+ allIndividuals + ', plots ' + allPlotsNumber;
 			messenger.message(msgString, 3);//Возвращаем индекс Мориситы с точностью 3 знака после запятой
 			
 			return mIndex.toFixed(3);

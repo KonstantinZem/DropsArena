@@ -15,19 +15,22 @@
 		private var errorType:Object;//Контейнер для ошибок
 		private var debugLevel:String;
 		private var lifeQuant:int//Убыль жизни за ход
-		private var msgMark:String = '[stage]: '
 		private var msgString:String
+		private var messenger:Messenger;
+		
 		public var chessDesk:Array;
 		public var envParams:Object;
 		
 		
-		
-		
-		
 		function CommunityStage(stgh:int,stgw:int,extOptions:Object){
 			
-			this.errorType = new ModelErrors();
+			errorType = new ModelErrors();
+			
 			try{
+				debugLevel = extOptions.getOption('main.debugLevel');
+				messenger = new Messenger(debugLevel);
+				messenger.setMessageMark('Community stage');
+				
 				for(var i:int = 0; i<arguments.length; i++){
 					if(arguments[i] ==0){ //Если аргументу передали некорректные аргументы, генерируем ошибку
 						throw new Error(errorType.paramError);
@@ -37,23 +40,22 @@
 				if(squSize<CRITICAL_LEVEL){//Если мы рискуем получить слишком много слишком мелких квадратов
 					throw new Error(errorType.tooSmall + ' ' + errorType.unstableWarning);//Лучше сразу выбросить ошибку, чтобы не повесить комп
 					}
-				this.debugLevel = extOptions.getOption('main.debugLevel');
+				
 				//this.envParams = new EnvParams();//Загружаем условия окружающей среды по умолчанию
-				this.stgHeight = stgh;
-				this.stgWidth = stgw;
-				this.sqrQantH = stgHeight/squSize;//Количество квадратов по высоте
-				this.sqrQantW = stgWidth/squSize;//Количество квадратов по ширине
-				this.lifeQuant = int(extOptions.getOption('main.lifeQuant'));
+				stgHeight = stgh;
+				stgWidth = stgw;
+				sqrQantH = stgHeight/squSize;//Количество квадратов по высоте
+				sqrQantW = stgWidth/squSize;//Количество квадратов по ширине
+				lifeQuant = int(extOptions.getOption('main.lifeQuant'));
 				buildStage();
 				buildNet();
-				if(debugLevel=='true'){
-					msgString = 'The stage ' + chessDesk.length + 'X' + chessDesk[0].length + ' has bulded succesfully';
-					debugMsg(msgString);
-				}
+					
+				msgString = 'The stage ' + chessDesk.length + 'X' + chessDesk[0].length + ' has bulded succesfully';
+				messenger.message(msgString, 1);
 				}
 			catch(error:ArgumentError){
 				msgString = "<Error> " +  error.message;
-				debugMsg(msgString);
+				messenger.message(msgString, 0);
 				}
 				}
 		   private function buildStage():void{
@@ -94,8 +96,9 @@
 						chessDesk[i][j]['speedDeleyA'] = 1;//по умолчанию двигаемся без задержки 
 						chessDesk[i][j]['speedDeleyY'] = 1;
 						chessDesk[i][j]['lifeQuant'] = lifeQuant;
-						chessDesk[i][j]['numberOfIndividuals'] = 0;//Изначально в квадрате нет ни одной особи
-						this.addChild(chessDesk[i][j]['picture']);
+						chessDesk[i][j]['numberOfIndividuals'] = '';//Изначально в квадрате нет ни одной особи
+						
+						addChild(chessDesk[i][j]['picture']);
 						xpos = xpos + squSize;
 						}
 					   ypos = ypos + squSize;
@@ -103,10 +106,5 @@
 				}
 				
 				}
-			private function debugMsg(msg:String):void{
-				if(debugLevel=='true'){
-					trace(msgMark + msg + ';\n');
-				}
-			}
 		}
 	}

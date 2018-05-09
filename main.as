@@ -11,26 +11,31 @@
 
 package{
     
-    import flash.display.Sprite
+    import flash.display.Sprite;
 	import flash.events.Event; 
-	import konstantinz.community.comStage.*
-	import konstantinz.community.auxilarity.*
+	import konstantinz.community.comStage.*;
+	import konstantinz.community.auxilarity.*;
+	import konstantinz.community.auxilarity.gui.*;
    
     public class main extends Sprite{
 		
+		private const IND_NUMB = 'ind_numb:';//Пометка сообщения о количестве особей
+		
 		private var stgHeight:int;
 		private var stgWidth:int;
-		private var versionText:Sprite
+		private var versionText:Sprite;
 		private var debugLevel:String;
-		private var msgStreeng:String;
-		private var debugeMessage:DebugeMessenger
+		private var msgString:String;
+		private var messenger:Messenger;
+		private var statRefreshTime:String;//Время обновления статистической информации
+		private var statusBar:StatusBar;
 		
 		public var indSuspender:Array//Структура, через которую особей можно на нужное время останавливать
 		public var configuration:ConfigurationContainer;
-		public var commStage:*
+		public var commStage:CommunityStage;
 		public var plugins:Sprite;
 		public var individuals:Array;
-		public var model:Sprite
+		public var model:Sprite;
 
 		public function main(){
 			
@@ -50,10 +55,11 @@ package{
 			var intX:int = 0//Первоначальная координата по x
 			var intY:int = 0//Первоначальная координата по y
 			debugLevel = configuration.getOption('main.debugLevel'); //Нужно ли отображать отладочную информацию
-			debugeMessage = new DebugeMessenger(debugLevel);
-			debugeMessage.setMessageMark('Main');
+			messenger = new Messenger(debugLevel);
+			messenger.setMessageMark('Main');
+			messenger.addEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);
 						
-			versionText = new myVersion('0.42',debugLevel);
+			versionText = new myVersion('0.44',debugLevel);
 			
 			initPosition = configuration.getOption('main.initPosition');
 			model.addChild(versionText);
@@ -69,6 +75,14 @@ package{
 			commStage.scaleY = 0.9;
 			individuals = new Array;
 			indSuspender = new Array;
+			
+			statRefreshTime = configuration.getOption('main.statRefreshTime');
+			Accumulator.instance.setDebugLevel(debugLevel);
+			Accumulator.instance.setRefreshTime(int(statRefreshTime));//Устанавливаем время обновления статистики
+			
+			statusBar = new StatusBar();
+			addChild(statusBar);
+			statusBar.setBarAt(10,700);
 						
 			switch(initPosition){//Помещаем первых особей по разным схемам, согласно конфигу
 				case 'left-top':
@@ -112,14 +126,14 @@ package{
 			if(configuration.getOption('main.pluginEnable')=='true'){
 				plugins = new PluginLoader(configuration);
 				model.addChild(plugins);
-				msgStreeng = 'Plugins are enabled';
+				msgString = 'Plugins are enabled';
 				
 			}else{
-				msgStreeng = 'Plugins are disabled';
+				msgString = 'Plugins are disabled';
 				}
 					
 			configuration.removeEventListener(ConfigurationContainer.LOADED, init);
-			debugeMessage.message(msgStreeng, 2)
+			messenger.message(msgString, 2);
 		}
 		
 		private function addInitIndividuals(indX:int, indY:int):void{//Добавляем первых особей
@@ -132,7 +146,8 @@ package{
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
 			}
-			
+			msgString = IND_NUMB + individuals.length;
+			messenger.message(msgString, 10);//Сохраняем количество особей для статистики
 			}
 			
 		private function rndAddInitIndividuals():void{//Добавляем первых особей в случайных позициях
@@ -140,20 +155,22 @@ package{
 			var indXRnd : int;
 			var indYRnd : int;
 			
-			var chessDeskLengthX:int = commStage.chessDesk.length - 1
-			var chessDeskLengthY:int = commStage.chessDesk[1].length - 1
+			var chessDeskLengthX:int = commStage.chessDesk.length - 1;
+			var chessDeskLengthY:int = commStage.chessDesk[1].length - 1;
 			
 			for (var i:int = 0; i< int(configuration.getOption('main.indQuntaty')); i++){
-				indXRnd = Math.round(Math.random() * chessDeskLengthX)
-				indYRnd = Math.round(Math.random() * chessDeskLengthY)
+				indXRnd = Math.round(Math.random() * chessDeskLengthX);
+				indYRnd = Math.round(Math.random() * chessDeskLengthY);
 				
 				individuals[i] = new Individual(this,commStage.chessDesk,configuration,i,indXRnd,indYRnd);
-				indSuspender[i] = new Suspender(individuals[i],commStage.chessDesk,configuration)
-				commStage.addChild(individuals[i])
+				indSuspender[i] = new Suspender(individuals[i],commStage.chessDesk,configuration);
+				commStage.addChild(individuals[i]);
+				
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
 			}
-			
+			msgString = IND_NUMB + individuals.length;
+			messenger.message(msgString, 10);//Сохраняем количество особей для статистики
 			}
 		
 		private function addNewIndividuals(e:Event):void {
@@ -165,30 +182,40 @@ package{
 					var newX:int = e.target.currentChessDeskI;
 					var newY:int = e.target.currentChessDeskJ;
 					individuals[i] = new Individual(this,commStage.chessDesk, configuration, i,newX,newY);
-					indSuspender[i] = new Suspender(individuals[i],commStage.chessDesk,configuration)
+					indSuspender[i] = new Suspender(individuals[i],commStage.chessDesk,configuration);
 					
-					commStage.addChild(individuals[i])
+					commStage.addChild(individuals[i]);
+					
 					individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
 					individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
 				}
+				msgString = IND_NUMB + individuals.length;
+			    messenger.message(msgString, 10);//Сохраняем количество особей для статистики
 		}
 		
-		private function removeIndividuals(e:Event):void {
-			var indName = e.target.indName
+		public function getNewStatistics(e:Event):void{
+				Accumulator.instance.pushToBuffer(e.target.msg);
+				statusBar.setTexSource(Accumulator.instance.statusBarText);
+			    }
+		
+		private function removeIndividuals(e:Event):void{
+			var individual = e.target.individual;
 			
-			individuals[indName].IndividualEvent.removeEventListener(ModelEvent.DEATH, removeIndividuals);
-			individuals[indName] = null;//Убираем из массива особей
-			indSuspender[indName] = null;//И связанные с ними драйверы
+			individuals[individual].IndividualEvent.removeEventListener(ModelEvent.DEATH, removeIndividuals);
+			individuals[individual] = null;//Убираем из массива особей
+			indSuspender[individual] = null;//И связанные с ними драйверы
 			
-			indSuspender.splice(indName,1);//Ужимаем массивы
-			individuals.splice(indName,1);
+			indSuspender.splice(individual,1);//Ужимаем массивы
+			individuals.splice(individual,1);
 			
 			for(var i:int = 0; i<individuals.length; i++){
 				individuals[i].setName(i);//После ужимания массива делаем так, чтобы имя особи совпадало с ее позицией
 				}
 			
-			msgStreeng = 'Now number of individuals is ' + individuals.length;
-			debugeMessage.message(msgStreeng, 2)
+			msgString = 'Now number of individuals is ' + individuals.length;
+			messenger.message(msgString, 2);
+			msgString = IND_NUMB + individuals.length;
+			messenger.message(msgString, 10);//Сохраняем количество особей для статистики
 			}
 
     }
