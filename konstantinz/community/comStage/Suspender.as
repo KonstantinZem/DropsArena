@@ -18,8 +18,8 @@
 		private var debugLevel:String;
 		private var errorType:ModelErrors;
 		private var msgString:String;
-		private var individualState:String;//Помечаем состояние особи, чтобы не посылать стоп-команды если особь уже остановлена
 		
+		private var individualState:String;//Помечаем состояние особи, чтобы не посылать стоп-команды если особь уже остановлена
 		public var SuspenderEvent:DispatchEvent;//О результатах работы будем сообщать другим компонентам посредством сообщений
 		//Приостанавливает активность особи на некоторое время
 		function Suspender(individualName:Individual, desk:Array, extOptions:ConfigurationContainer){
@@ -70,8 +70,19 @@
 				indStepPulsor.stop();//И вообще отключаем подачу сигналов к этой особи
 				}
 			}
+		public function killIndividual():void{
+			if(individualState=='moved'){
+				individualState = 'stoped';
+				}
+				indStepPulsor.stop();
+				individual.kill();
+			}
 		public function getTimeQuant():int{
 			return tickInterval;
+			}
+		
+		public function indState():String{
+				return individualState;
 			}
 		
 		/////////////////////////////////////////////Private//////////////////////////////////////////////////////////////////
@@ -82,7 +93,6 @@
 					messanger.message(msgString, 3);
 					
 					indStepPulsor.start();
-					//individual.start();//
 					SuspenderEvent.done();//Говорим о том что особи вновь запущены тому компоненту, который просил приостановить особей
 			}catch(e:Error){
 				trace(e)
@@ -113,5 +123,6 @@
 			
 			
 		}
+		
 	}
 }

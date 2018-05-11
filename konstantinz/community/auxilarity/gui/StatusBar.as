@@ -12,16 +12,16 @@
 		
 			statusBarText = new TextField();
 			statusBarText.autoSize = TextFieldAutoSize.LEFT;
-			statusBarText.text = '...'
+			statusBarText.text = '...';
 			addChild(statusBarText);
 		}
 		
-		public function setBarAt(stBarX, stBarY){
+		public function setBarAt(stBarX:int, stBarY:int):void{
 			this.x = stBarX;
 			this.y = stBarY;
 			}
 		
-		public function setTexSource(ts){
+		public function setTexSource(ts:String):void{
 			statusBarText.htmlText = '';
 			texSource = ts;
 			statusBarText.htmlText = texSource;

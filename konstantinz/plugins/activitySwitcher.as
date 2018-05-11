@@ -11,25 +11,31 @@ import flash.events.Event
     
 public class activitySwitcher extends Sprite{
 	private var stopingTimer:Timer;
-	var timerStatement:String;
-	public var pluginName:String; //Должна быть включена в интерфейс этого типа плагинов
-	public var pluginEvent:Object;
+	private var timerStatement:String;
 	private var dispatchedObjects:Array//Ссылка на массив с управляемыми объектами
+	private var configuration:ConfigurationContainer;
 	private var objectsRange:Array;
-	private var suspendTime:int;
+	private var suspendTime:int;//Время на которое нужно остановить особь
 	private var activityData:XMLDocument;//Здесь будет хранится массив данных с информацией об активности
 	private var stopedObjects:Array;//Список остановленных в данный момент особей
 	private var stopedNumber:int;
-	private var listenedSuspender:int
-	private var currentActivitIndNumber:int = 0//Позиция в таблице активности где надо искать текущее число особей, которых необходимо остановить
+	private var currentActivitIndNumber:int = 0;//Позиция в таблице активности где надо искать текущее число особей, которых необходимо остановить
 	private var debugeLevel:String;
 	private var msgString:String;
 	private var timer:Timer;
-	
+	private var signalType:String;
+	private var optionPath:String;
+	private var statMessageHead:String;
+	private var killStoped:String;//Будудт ли подвержены случайной смерти неактивные особи
+	private var errorType:ModelErrors;
 	public var messenger:Messenger;
+	public var pluginName:String; //В эту переменную загрузчик плагина передает его имя
+	public var pluginEvent:Object;
 	
 	function activitySwitcher(){
 		debugeLevel = '3';
+		pluginName = '';
+		killStoped = 'false';
 		pluginEvent = new DispatchEvent();
 		timer = new Timer(1000, 1);//Ждем некоторое время, пока в главная программа не передаст нужные плагину параметры
 		timer.addEventListener(TimerEvent.TIMER, initPlugin);// потом запускаем программу
@@ -39,20 +45,46 @@ public class activitySwitcher extends Sprite{
 		}
 	
 	private function initPlugin(e:TimerEvent):void{
-		
-		timerStatement = 'start';
-		
-			if(root != null){
-				var rawData:String = root.configuration.getOption('plugins.activity.data');
+			
+			if(root != null && pluginName !=''){
+				errorType = new ModelErrors();
+				dispatchedObjects = root.indSuspender;//Чтобы дальше root не встречался в тексте
+				configuration = root.configuration;
+				optionPath = 'plugins.'+ pluginName + '.';//Формируем путь к настройкам ф XML файле на основе имя файла плагина
+				
+				var rawData:String = configuration.getOption(optionPath + 'data');
+				var time:int;
 	
-				debugeLevel = root.configuration.getOption('plugins.activity.debugLevel');
+				debugeLevel = configuration.getOption(optionPath + 'debugLevel');
+				
 				messenger.setDebugLevel (debugeLevel);
-				messenger.setMessageMark('Activity');
+				messenger.setMessageMark(pluginName);
 				
-				var time:int
+				signalType = configuration.getOption(optionPath + 'signal');
+				killStoped = configuration.getOption(optionPath + 'killStoped');
+				
+				if(killStoped !='true'&& killStoped !='false'){
+					messenger.message('killStoped: ' + errorType.varIsIncorrect, 0);//
+					killStoped = 'false';
+					}
+				
+				switch(signalType){
+						case 'stop':		
+							statMessageHead = 'inactive_ind_numb';
+						break;
+						case 'kill':
+							statMessageHead = 'dead_ind_numb';
+						break;
+						case 'Error':
+							signalType = 'stop';
+							statMessageHead = 'inactive_ind_numb';
+						default:
+							messenger.message('wrong type of signal', 0);
+							signalType = 'stop';
+							statMessageHead = 'inactive_ind_numb';
+				}
+				
 				activityData = prepareData(rawData);
-				
-				dispatchedObjects = root.indSuspender;
 				time = setTimingQant();
 				stopingTimer = new Timer(time);
 				stopingTimer.addEventListener(TimerEvent.TIMER, stopInd);
@@ -70,19 +102,19 @@ public class activitySwitcher extends Sprite{
 			return dataXML;
 		}catch(e:Error){
 			msgString = 'Error: data file is corruped';
-			messenger.message(msgString, 0)
+			messenger.message(msgString, 0);
 			}
 		}
 	
 	private function setTimingQant():int{//Расчитываем время между переключениями
 		try{
-			var stepsFromConfig:String = root.configuration.getOption('plugins.activity.steps');//Из конфига получаем количество шагов которые должен отработать плагин
-			var numberOfSteps:int;
+			var stepsFromConfig:String = configuration.getOption(optionPath + 'steps');//Из конфига получаем количество шагов которые должен отработать плагин
+			var numberOfSteps:int;//Временной промежуток для таймера
 			var numberOfData:int = activityData.firstChild.childNodes.length;//Получаем количество заданных вариантов
 			var timeQant:int;
 		
 			if(dispatchedObjects[0] == undefined){
-				throw new Error('Can not find dispatchedObjects')
+				throw new Error('Can not find dispatchedObjects');
 				}else{
 					timeQant = dispatchedObjects[0].getTimeQuant();//Получаем время переключения активности из первого драйвера особи
 					}
@@ -90,30 +122,30 @@ public class activitySwitcher extends Sprite{
 			if(stepsFromConfig == 'Error'){
 				throw new ArgumentError('Number of steps do not set. get it from lifeTime option'); 
 				}else{
-					numberOfSteps = Math.round((int(stepsFromConfig)/numberOfData)*timeQant);//Расчитываем временной промежуток для таймера
+					numberOfSteps = Math.round((int(stepsFromConfig)/numberOfData)*timeQant);//Расчитываем временной промежуток для таймера как (Количество шагов/Количество вариантов)*время таймера
 					}
-			
-			return numberOfSteps
 		
 			}catch(e:ArgumentError){
 	
 				messenger.message(e, 0)
-				numberOfSteps = int(root.configuration.getOption('main.lifeTime'));
+				numberOfSteps = int(configuration.getOption('main.lifeTime'));//Есл особии количество шагов не заданно, принимаем его как время жизн
 				}
 			catch(e:Error){
-				msgString = e
-				messenger.message(msgString, 0)
-				timeQant =20
+				msgString = e;
+				messenger.message(msgString, 0);
+				timeQant =20;
 				}
+			
+			return numberOfSteps;
 		}
 	
 	private function stopInd(e:TimerEvent):void{
 		//Узнать размер таймера у особи, посмотреть число ходов в конфиге, запускать паузы по таймеру и не ждать ответа от драйверов особей
 		try{
-			var currentActivity:int
+			var currentActivity:int;
 			
 			if(currentActivitIndNumber > activityData.firstChild.childNodes.length - 1){
-				msgString = 'New cycle: ' + currentActivitIndNumber
+				msgString = 'New cycle: ' + currentActivitIndNumber;
 				messenger.message(msgString, 3) 
 				currentActivitIndNumber = 0;
 					
@@ -125,12 +157,12 @@ public class activitySwitcher extends Sprite{
 			
 				msgString = 'Current stoped individuals part is = ' +  currentActivitIndNumber + ':'+ currentActivity;
 				messenger.message(msgString, 3);
-				msgString = 'inactive_ind_numb:' + currentActivity;
+				msgString = statMessageHead + ':' + currentActivity;
 				messenger.message(msgString, 10);//Посылаем данные о количестве неактивных особей как статистику
 				
 				
 			}catch(e:Error){
-				messenger.message(e, 0)
+				messenger.message(e, 0);
 				}
 		}
 			
@@ -142,7 +174,7 @@ public class activitySwitcher extends Sprite{
 		switch(unit_type){
 		case 'percents':
 
-			itemsNumber = 0
+			itemsNumber = 0;
 			itemsNumber = Math.round((objNumber/100)*dispatchedObjects.length)//Высчитываем количество из процентов
 			for(var i:int = 0; i< itemsNumber; i++){
 			
@@ -166,16 +198,16 @@ public class activitySwitcher extends Sprite{
 			messenger.message('wrong unit type', 0);
 		}
 	}
-	private function setObjRange():int{
+	private function setObjRange():int{//поиск случайной особи
 		var stopedObjPosition:int = 0;
 		
 			stopedObjPosition = Math.round(Math.random()*dispatchedObjects.length);
 			
-			if(dispatchedObjects[stopedObjPosition]==null){
-				stopedObjPosition = setObjRange()
+			if(dispatchedObjects[stopedObjPosition]==null){//Если особь существует и движеться
+				stopedObjPosition = setObjRange();
 				}
 				
-		return stopedObjPosition
+		return stopedObjPosition;
 	}
 
 	private function sendStop():void{
@@ -183,9 +215,22 @@ public class activitySwitcher extends Sprite{
 			for(var i:int = 0; i<stopedObjects.length; i++){
 		
 				if(dispatchedObjects[stopedObjects[i]] != null){
-			
-				dispatchedObjects[stopedObjects[i]].stopIndividual(suspendTime);//Останавливаем особь на нужное время
-				listenedSuspender = i;
+					switch(signalType){
+						case 'stop':		
+							dispatchedObjects[stopedObjects[i]].stopIndividual(suspendTime);//Останавливаем особь на нужное время
+						break;
+						case 'kill':
+							if(killStoped =='true'){//Если можно, убиваем всех особей из выборки
+								dispatchedObjects[stopedObjects[i]].killIndividual();
+							}else{
+								if(dispatchedObjects[stopedObjects[i]].indState()=='moved'){
+									dispatchedObjects[stopedObjects[i]].killIndividual();//А иначе убиваем только тех, кто движеться
+									}
+								}
+						break;
+						default:
+							messenger.message('wrong type of signal', 0);
+				}
 				
 				}
 				

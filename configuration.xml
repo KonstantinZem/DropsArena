@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
 	<main>
-		<debugLevel>2</debugLevel>
+		<debugLevel>1</debugLevel>
 		<pluginEnable>true</pluginEnable>
+		<!-- indQuntaty -- how many individuals must to be created at the start -->
 		<indQuntaty>35</indQuntaty>
 		<lifeTime>6880</lifeTime>
 		<lifeQuant>1</lifeQuant>
@@ -10,9 +11,10 @@
 		<maturingDeley>1170</maturingDeley>
 		<offspringsQuant>4</offspringsQuant>
 		<dropSize>12</dropSize>
+		<!-- initPosition of individual can be left-top, left-bottom,  right-top, right-bottom, center and random -->
 		<initPosition>center</initPosition>
 		<statRefreshTime>60</statRefreshTime>
-		<pluginsList>plugins/grass.swf;plugins/ground.swf;plugins/stones.swf;plugins/activity.swf;plugins/morisitaCounter.swf</pluginsList>
+		<pluginsList>plugins/grass.swf;plugins/ground.swf;plugins/stones.swf;plugins/activity.swf;plugins/death.swf;plugins/morisitaCounter.swf</pluginsList>
 	</main>
 	<plugins>
 		<grass>
@@ -34,6 +36,7 @@
 			<color>0xb4bc3c</color>
 		</stones>
                 <activity>
+					<signal>stop</signal>
                     <steps>3000</steps>
                     <debugLevel>1</debugLevel>
                     <data><![CDATA[
@@ -321,7 +324,17 @@
 <part day='16.04.12'>0</part>
 </activity>
 ]]></data>
-                </activity>
+    </activity>
+    <death>
+		<signal>kill</signal>
+		<!-- steps количество шагов -->
+        <steps>2000</steps>
+        <!-- killStoped: are unactive individuals will be killed to -->
+        <killStoped>true</killStoped>
+		<data><![CDATA[<activity>
+<part day='16.05.11'>40</part>
+        </activity> ]]></data>
+    </death>
     <morisitaCounter>
 		<debugLevel>1</debugLevel>
 		<refreshTime>20</refreshTime>

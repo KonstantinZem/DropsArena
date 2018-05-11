@@ -10,24 +10,22 @@
 		private var versionNunber:String;
 		private var debugLevel:String;
 		private var msg:String;
+		private var messenger:Messenger;
 		
-		function myVersion(vn:String='?', dbgLevel:String='true'){
-			this.versionNunber = vn;
-			this.debugLevel = dbgLevel;
+		function myVersion(vn:String='?', dbgLevel:String='3'):void{
+			versionNunber = vn;
+			debugLevel = dbgLevel;
+			messenger = new Messenger(debugLevel);
+			messenger.setMessageMark('Version');
 			versionText();
-			msg = 'Population dynamick model. Version ' + vn + '\n' + 'created by Konstantin Zemoglyadchuk. \n' + 'konstantinz@bk.ru \n'
-			debugMsg(msg)
+			msg = 'Population dynamick model. Version ' + vn + '\n' + 'created by Konstantin Zemoglyadchuk. \n' + 'konstantinz@bk.ru \n';
+			messenger.message(msg, 1);
 			}
  
         private function versionText():void{ 
             addChild(myTextBox); 
             myTextBox.htmlText = myText+ versionNunber;
 			myTextBox.autoSize = TextFieldAutoSize.LEFT;
+		}
         } 
-		private function debugMsg(msg:String):void{
-				if(debugLevel=='true'){
-					trace(msg);
-				}
-    } 
-}
-}
+    }

@@ -48,7 +48,7 @@ package konstantinz.community.comStage{
 		private var date:Date;
 		private var currentChessDeskI:int;//Номер строки текущего квадрата
 		private var currentChessDeskJ:int;//Номер столбца текущего квадрата
-		private var indStatus:String
+		private var indStatus:String;
 				
 		public var IndividualEvent:DispatchEvent;
 		
@@ -129,8 +129,8 @@ package konstantinz.community.comStage{
 			}
 		private function isIndividualAlong():Boolean{//Есть ли в заданном квадрате кто либо еще
 			//Функция платформонезависимая
-			var YSIGN:String = 'A';//Adult
-			var ASIGN:String = 'Y';//Young
+			var YSIGN:String = 'Y';//Young
+			var ASIGN:String = 'A';//Adult
 			
 			if(adultAge<0){
 				chessDesk[currentChessDeskI][currentChessDeskJ]['numberOfIndividuals']+=ASIGN;//Делаем в квадрате отметку своего присутсвия
@@ -366,6 +366,8 @@ package konstantinz.community.comStage{
 		}
 	
 		public function kill():void{
+			msgString = 'Individual ' + indNumber + 'has killed';
+			messanger.message(msgString, 2);
 			killIndividual();
 		}
 		

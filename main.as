@@ -19,7 +19,7 @@ package{
    
     public class main extends Sprite{
 		
-		private const IND_NUMB = 'ind_numb:';//Пометка сообщения о количестве особей
+		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
 		
 		private var stgHeight:int;
 		private var stgWidth:int;
@@ -59,7 +59,7 @@ package{
 			messenger.setMessageMark('Main');
 			messenger.addEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);
 						
-			versionText = new myVersion('0.44',debugLevel);
+			versionText = new myVersion('0.45',debugLevel);
 			
 			initPosition = configuration.getOption('main.initPosition');
 			model.addChild(versionText);
@@ -82,7 +82,7 @@ package{
 			
 			statusBar = new StatusBar();
 			addChild(statusBar);
-			statusBar.setBarAt(10,700);
+			statusBar.setBarAt(10,stgHeight - 20);
 						
 			switch(initPosition){//Помещаем первых особей по разным схемам, согласно конфигу
 				case 'left-top':
@@ -199,7 +199,7 @@ package{
 			    }
 		
 		private function removeIndividuals(e:Event):void{
-			var individual = e.target.individual;
+			var individual:int = e.target.individual;//Получаем номер особи, которую надо удалить
 			
 			individuals[individual].IndividualEvent.removeEventListener(ModelEvent.DEATH, removeIndividuals);
 			individuals[individual] = null;//Убираем из массива особей

@@ -26,23 +26,23 @@ public class Accumulator{
              throw new Error("Class is singleton.");
 		}else{
 		
-		debugLevel = '3';
-		messenger = new Messenger(debugLevel);
-		counter = 0;
-		messenger.setMessageMark('Accumulator');
-		msgString = "Acumulator loaded";
-		messenger.message(msgString, 1);
-		refreshTime = 0;
-		paramNamebuffer = new Array;
-		paramNamebuffer[0] = '№';
-		valueBuffer = new Array;
-		valueBuffer[0] = 0;
-		statTable = new Array;
-		statTable[0] = new Array;
-		paramPosition = 0;
-		statusBarText = ''
-				 }
-		}
+			debugLevel = '3';
+			messenger = new Messenger(debugLevel);
+			counter = 0;
+			messenger.setMessageMark('Accumulator');
+			msgString = "Acumulator loaded";
+			messenger.message(msgString, 1);
+			refreshTime = 0;
+			paramNamebuffer = new Array;
+			paramNamebuffer[0] = '№';
+			valueBuffer = new Array;
+			valueBuffer[0] = 0;
+			statTable = new Array;
+			statTable[0] = new Array;
+			paramPosition = 0;
+			statusBarText = ''
+			}
+	}
 	
 	public static function get instance():Accumulator{
             if (!_instance){
@@ -51,11 +51,11 @@ public class Accumulator{
             return _instance;
             }
 
-	public function setDebugLevel(dbgLevel){
+	public function setDebugLevel(dbgLevel):void{
 		debugLevel = dbgLevel;
 		}
 	
-	public function setRefreshTime(time:int){
+	public function setRefreshTime(time:int):void{
 		try{
 			if(time<=0){
 				throw new Error('Refresh time less then 0 sec or equial 0 sec');
@@ -71,7 +71,7 @@ public class Accumulator{
 			}
 
 		}
-	public function pushToBuffer(message:String){
+	public function pushToBuffer(message:String):void{
 		
 		try{
 			
@@ -147,9 +147,9 @@ public class Accumulator{
 					return tbody;
 				}
 			
-		private function emptySpace(pvalue:String, pname:String):String{//Печатает пустую строку для выравнивания 
-			var emptyString:String = ' ';
-			var elength:int = pname.length - pvalue.length;
+	private function emptySpace(pvalue:String, pname:String):String{//Печатает пустую строку для выравнивания 
+		var emptyString:String = ' ';
+		var elength:int = pname.length - pvalue.length;
 			
 			for(var i:int = 0; i<elength; i++){
 				emptyString  = emptyString + ' ';

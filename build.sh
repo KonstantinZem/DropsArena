@@ -12,9 +12,13 @@ mxmlc=$sdk'bin/mxmlc'
 
 "$mxmlc" activity.as -output ../bin/plugins/activity.swf -default-background-color 0xFFFFFF -default-size 1000 800 -use-network=false -strict=false
 
+"$mxmlc" morisitaCounter.as -output ../bin/plugins/morisitaCounter.swf -default-background-color 0xFFFFFF -default-size 1000 800 -use-network=false -strict=false
+
 cp ../bin/plugins/cover.swf ../bin/plugins/grass.swf
 cp ../bin/plugins/cover.swf ../bin/plugins/ground.swf
 cp ../bin/plugins/cover.swf ../bin/plugins/stones.swf
+cp ../bin/plugins/activity.swf ../bin/plugins/death.swf
+
 
 cp configuration.xml ../bin
  

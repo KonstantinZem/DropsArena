@@ -103,7 +103,7 @@ package konstantinz.plugins{
 				}
 			}
 		
-		private function countMorisita(e:TimerEvent){
+		private function countMorisita(e:TimerEvent):void{
 			var morisita:Number;
 		
 			if(plotsPosition.length == 0){//Если пречень координат  квадратов еще не составлялся
@@ -116,7 +116,7 @@ package konstantinz.plugins{
 				
 				clearStage();//Очищаем массив сцены от информации о прибывании там особе, так как отметка от пристутсвия особи часто остается в уже пустой ячейки
 				
-			for(var j = 0; j<individuals.length;j++){
+			for(var j:int = 0; j<individuals.length;j++){
 				individuals[j].markPresenceInPlot();//Даем особям команду обозначить те квадраты в которых они уже находятся
 				}
 				
@@ -165,7 +165,7 @@ package konstantinz.plugins{
 			var newX:int = 0;
 			var newY:int = 0;
 	
-			for (var i = 0; i<plotsPosition.length; i++){
+			for (var i:int = 0; i<plotsPosition.length; i++){
 				newX = plotsPosition[i][0];
 				newY = plotsPosition[i][1];
 				ind = countIndividuals(newX,newY,plotSize);

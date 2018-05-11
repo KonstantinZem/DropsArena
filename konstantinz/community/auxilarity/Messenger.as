@@ -14,7 +14,7 @@ package konstantinz.community.auxilarity{
 		public static const HAVE_EXT_DATA:String = 'have_ext_data';
 		public var msg:String;
 		
-		public function Messenger(dbgLevel:String = '3'){
+		public function Messenger(dbgLevel:String = '3'):void{
 			debugeLevel = dbgLevel;
 			messageMark = '';
 			}
@@ -38,7 +38,7 @@ package konstantinz.community.auxilarity{
 			messageMark = mark;
 			}
 		
-		public function setDebugLevel(dbgLevel:String){
+		public function setDebugLevel(dbgLevel:String):void{
 				debugeLevel = dbgLevel;
 			}
 		
