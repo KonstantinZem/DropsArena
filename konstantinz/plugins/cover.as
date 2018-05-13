@@ -27,31 +27,27 @@ package konstantinz.plugins{
 	
 public class cover extends Sprite{
 	
-	private var adeley:int = 1//Задержка при движении взрослых особей. Должна быть включена в интерфейс этого типа плагинов
-	private var YDELEY:int = 3//Задержка при движении молодых особей. Должна быть включена в интерфейс этого типа плагинов
+	private var aDeley:int = 1//Задержка при движении взрослых особей. Должна быть включена в интерфейс этого типа плагинов
+	private var yDeley:int = 3//Задержка при движении молодых особей. Должна быть включена в интерфейс этого типа плагинов
 	private var lifequant:int = 1; //Убыль жизни за ход. Должна быть включена в интерфейс этого типа плагинов
 	private var color:Number = 0x000000; //Должна быть включена в интерфейс этого типа плагинов. Определяет цвет участка с данными характеристиками
 	private var ct:ColorTransform;
-	private var BORDERCOLOR:Number = 0x000000;
 	private var debugeLevel:String;
-	private var msg:String;
-	private var imageName:String
+	private var msgString:String;
+	private var imageName:String;
 	private var image:Object; //Должна быть включена в интерфейс этого типа плагинов
 	private var loader:Loader;
 	private var errors:ModelErrors;
 	private var timer:Timer;
-	private var configuration:ConfigurationContainer //В эту переменную будет загружатся класс, содержащий настройки
+	private var configuration:ConfigurationContainer; //В эту переменную будет загружатся класс, содержащий настройки
 	
 	public var pluginName:String; //В эту переменную загрузчик плагина передает его имя
 	public var pluginEvent:Object;
 	public var messenger:Messenger;
 	
-function cover(){
+	function cover(){
 		
-		debugeLevel = '3';
 		messenger = new Messenger(debugeLevel);
-		//msg = 'Ground cover plugin. Version 0.3\n'
-		//debugMessage(msg);
 		
 		ct = new ColorTransform();
 		loader = new Loader();
@@ -64,11 +60,11 @@ function cover(){
 		timer.start();
 		}
 	
-private function initPlugin(e:TimerEvent):void{
-	timer.stop();
-	timer.removeEventListener(TimerEvent.TIMER, initPlugin);
+	private function initPlugin(e:TimerEvent):void{
+		timer.stop();
+		timer.removeEventListener(TimerEvent.TIMER, initPlugin);
 	
-	if(root != null && pluginName !=''){//Если клип запущен из главной программы и плагин знает свое имя
+		if(root != null && pluginName !=''){//Если клип запущен из главной программы и плагин знает свое имя
 		
 			var optionPath:String = 'plugins.'+ pluginName + '.';
 			configuration = root.configuration;
@@ -77,49 +73,49 @@ private function initPlugin(e:TimerEvent):void{
 			color = configuration.getOption(optionPath + 'color');
 			ct.color = this.color;
 			adeley = configuration.getOption(optionPath + 'stepDeley');
-			debugeLeval = configuration.getOption(optionPath + 'debugLevel');
-			messenger.setDebugLevel (debugeLevel);
+			
+			debugeLevel = configuration.getOption(optionPath + 'debugLevel');
+			messenger.setDebugLevel(debugeLevel);
 			messenger.setMessageMark(pluginName);
  
-			msg = 'Wating for start...';
-			messenger.message(msg, 3);
+			msgString = 'Wating for start...';
+			messenger.message(msgString, 3);
 	
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
    			loader.load(new URLRequest(imageName));
    				
-	}else{//Иначе просто выводим предупреждение о неправильном запуске
-		msg = errors.pluginStartAlong;
-		messenger.message(msg, 0);
-	}	
-}
-
-private function onIOError(error:IOErrorEvent):void{
-	 msg = "Unable to load picture: " + error.text; 
-	 messenger.message(msg, 0);
-	 loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onIOError);
-	 pluginEvent.ready();//Сообщаем о том, что все уже сделано, ведь другие плагины тоже хотят загрузится
+		}else{//Иначе просто выводим предупреждение о неправильном запуске
+			msgString = errors.pluginStartAlong;
+			messenger.message(msgString, 0);
+		}	
 	}
 
-private function onLoadComplete(e:Event):void{
-   image = loader.contentLoaderInfo.content;
-   addChild(image);
-   loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, onLoadComplete);
-   modifyTable();//Запускаем функционал, изменяющий структуры внутри этой программы 
-}
+	private function onIOError(error:IOErrorEvent):void{
+		msgString = "Unable to load picture: " + error.text; 
+		messenger.message(msgString, 0);
+		loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onIOError);
+		pluginEvent.ready();//Сообщаем о том, что все уже сделано, ведь другие плагины тоже хотят загрузится
+	}
 
-private function modifyTable():void{
-	var controllX:int;
-	var controllY:int;
-	var bmd:BitmapData = image.bitmapData;
+	private function onLoadComplete(e:Event):void{
+		image = loader.contentLoaderInfo.content;
+		addChild(image);
+		loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, onLoadComplete);
+		modifyTable();//Запускаем функционал, изменяющий структуры внутри этой программы 
+	}
+
+	private function modifyTable():void{
+		var controllX:int;
+		var controllY:int;
+		var bmd:BitmapData = image.bitmapData;
 	
-	image.x = root.commStage.x;
-   	image.y = root.commStage.y;
-   	image.height = root.commStage.height
-   	image.width = root.commStage.width
-			
-   			
-   	var tableRoot:Array = root.commStage.chessDesk;
+		image.x = root.commStage.x;
+		image.y = root.commStage.y;
+		image.height = root.commStage.height;
+		image.width = root.commStage.width;
+				
+		var tableRoot:Array = root.commStage.chessDesk;
 			
 		for(var i:int = 0; i<tableRoot.length; i++){
 				
@@ -128,8 +124,8 @@ private function modifyTable():void{
 		
 					if(pixelValue!='ffffff'){//Если участок картинки не белый
 						root.commStage.chessDesk[i][j].picture.transform.colorTransform = ct;
-						root.commStage.chessDesk[i][j]['speedDeleyA'] += adeley//Переопределяем скорость взрослых
-						root.commStage.chessDesk[i][j]['speedDeleyY'] += YDELEY//И молодых особей
+						root.commStage.chessDesk[i][j]['speedDeleyA'] += aDeley//Переопределяем скорость взрослых
+						root.commStage.chessDesk[i][j]['speedDeleyY'] += yDeley//И молодых особей
 						root.commStage.chessDesk[i][j]['lifeQuant'] += lifequant;//Переопределяем время жизни особи за ход
 						controllX = i;
 						controllY =j;
@@ -139,13 +135,13 @@ private function modifyTable():void{
 		
 	    //По окончанию работы плагина
 		//Выводим результат работы
-		msg = 'Individuals speed now is ' + root.commStage.chessDesk[controllX][controllY]['speedDeleyA'];
-		messenger.message(msg, 2);
-	    msg = 'Individuals life decriasing now is ' + root.commStage.chessDesk[controllX][controllY]['lifeQuant'] + ' points after step';
-	    messenger.message(msg, 2);
+		msgString = 'Individuals speed now is ' + root.commStage.chessDesk[controllX][controllY]['speedDeleyA'];
+		messenger.message(msgString, 2);
+	    msgString = 'Individuals life decriasing now is ' + root.commStage.chessDesk[controllX][controllY]['lifeQuant'] + ' points after step';
+	    messenger.message(msgString, 2);
 		removeChild(image);//Удаляем вспомогательную картинку с рисунком напочвенного покрова
 		pluginEvent.ready();//Сообщаем о том, что все уже сделано,
-}
+	}
 	
 }
 }

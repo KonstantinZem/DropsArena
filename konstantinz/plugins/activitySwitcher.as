@@ -28,6 +28,7 @@ public class activitySwitcher extends Sprite{
 	private var statMessageHead:String;
 	private var killStoped:String;//Будудт ли подвержены случайной смерти неактивные особи
 	private var errorType:ModelErrors;
+	
 	public var messenger:Messenger;
 	public var pluginName:String; //В эту переменную загрузчик плагина передает его имя
 	public var pluginEvent:Object;
@@ -61,12 +62,15 @@ public class activitySwitcher extends Sprite{
 				messenger.setMessageMark(pluginName);
 				
 				signalType = configuration.getOption(optionPath + 'signal');
-				killStoped = configuration.getOption(optionPath + 'killStoped');
 				
-				if(killStoped !='true'&& killStoped !='false'){
-					messenger.message('killStoped: ' + errorType.varIsIncorrect, 0);//
-					killStoped = 'false';
+				if(signalType=='kill'){//Если плагин настроен чтобы убивать особей
+					killStoped = configuration.getOption(optionPath + 'killStoped');//Узнаем, должны ли мы убивать всех подряд или только активных осоей
+				
+					if(killStoped !='true'&& killStoped !='false'){
+						messenger.message('killStoped: ' + killStoped + '. ' + errorType.varIsIncorrect, 0);//
+						killStoped = 'false';
 					}
+				}
 				
 				switch(signalType){
 						case 'stop':		
@@ -162,7 +166,7 @@ public class activitySwitcher extends Sprite{
 				
 				
 			}catch(e:Error){
-				messenger.message(e, 0);
+				messenger.message(e.message, 0);
 				}
 		}
 			
@@ -229,15 +233,15 @@ public class activitySwitcher extends Sprite{
 								}
 						break;
 						default:
-							messenger.message('wrong type of signal', 0);
-				}
+							messenger.message('Wrong type of signal', 0);
+					}
 				
 				}
 				
 			}
 		}
 		catch(e:Error){
-
+			messenger.message(e.message, 0)
 		}
 	
 	

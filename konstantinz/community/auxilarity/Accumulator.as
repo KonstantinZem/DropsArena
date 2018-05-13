@@ -40,7 +40,7 @@ public class Accumulator{
 			statTable = new Array;
 			statTable[0] = new Array;
 			paramPosition = 0;
-			statusBarText = ''
+			statusBarText = '';
 			}
 	}
 	
@@ -100,15 +100,17 @@ public class Accumulator{
 		}
 		
 		private function prepareStatTable(event:TimerEvent):void{
-		
+			statTable[0].length = 0;//Очищаем заголовок таблицы перед его заполнением
 			counter++;
-			statTable[statTable.length] = new Array
+			statTable[statTable.length] = new Array;
 		
 			for(var i:int = 0; i < paramNamebuffer.length; i++){ 
-				if(statTable[0].length<paramNamebuffer.length){
+				if(statTable[0].length<paramNamebuffer.length){//Если в буфере есть новые параметры
+				
 					statTable[0].push(paramNamebuffer[i]);
 				}
-			statTable[statTable.length-1].push(valueBuffer[i]);
+				statTable[statTable.length-1].push(valueBuffer[i]);
+			
 			}
 				
 				valueBuffer[0]=counter;
@@ -140,12 +142,12 @@ public class Accumulator{
 					spacer = emptySpace(statTable[i][j], statTable[0][j]);
 					trow = trow + statTable[i][j] + spacer;
 					}
-					trow = trow + '|\n';
-					tbody = tbody + trow;
+				trow = trow + '|\n';
+				tbody = tbody + trow;
 					}
-					statTable[0][0] = '№';
-					return tbody;
-				}
+			statTable[0][0] = '№';
+			return tbody;
+		}
 			
 	private function emptySpace(pvalue:String, pname:String):String{//Печатает пустую строку для выравнивания 
 		var emptyString:String = ' ';
@@ -160,7 +162,7 @@ public class Accumulator{
 	private function setStatusText():void{
          statusBarText = '';
          for(var i:int = 1; i<statTable[0].length; i++){
-            statusBarText = statusBarText + (statTable[0][i] + ": " + statTable[statTable.length - 1][i] + "    ");
+            statusBarText = statusBarText + (statTable[0][i] + ': ' + statTable[statTable.length - 1][i] + '    ');
          }
       }
 

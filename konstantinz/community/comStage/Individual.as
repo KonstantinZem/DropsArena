@@ -96,7 +96,7 @@ package konstantinz.community.comStage{
 			
 			}
 			catch(error:ArgumentError){
-				msgString = "<Error> " +  error.message;
+				msgString = error.message;
 				messanger.message(msgString, 0);
 				}
 			}

@@ -64,7 +64,7 @@
 					individual.stop();
 				}
 			}catch(e:Error){//Если что то пошло не так
-				msgString = 'Error: Can not stop individual ' + individual.getName() + ': ' + errorType.indExemplarNotExist;
+				msgString = 'Can not stop individual ' + individual.getName() + ': ' + errorType.indExemplarNotExist;
 				messanger.message(msgString, 0);
 				suspendTime.stop();//Сбрасываем паузу
 				indStepPulsor.stop();//И вообще отключаем подачу сигналов к этой особи
@@ -74,7 +74,8 @@
 			if(individualState=='moved'){
 				individualState = 'stoped';
 				}
-				indStepPulsor.stop();
+				indStepPulsor.stop();//Останавливаем отсылку команд на совершение новых ходов
+				suspendTime.stop();//Останавливаем ожидание команды на запуск тем особям которые в данный момент приостановлены
 				individual.kill();
 			}
 		public function getTimeQuant():int{
@@ -95,7 +96,7 @@
 					indStepPulsor.start();
 					SuspenderEvent.done();//Говорим о том что особи вновь запущены тому компоненту, который просил приостановить особей
 			}catch(e:Error){
-				trace(e)
+				messanger.message(e..message, 0);
 				indStepPulsor.stop();
 				}
 			}
@@ -110,14 +111,12 @@
 					}
 				else{
 					
-					//individual.markIndividual('nothing');
 					individual.doStep();
-					
 					}
 				}
 			}catch(e:Error){
 				indStepPulsor.stop();
-				msgString = 'Error: Can not drive individual ' + individual.getName() + ': ' + errorType.indExemplarNotExist;
+				msgString = 'Can not drive individual ' + individual.getName() + ': ' + errorType.indExemplarNotExist;
 				messanger.message(msgString, 0);
 				}
 			
