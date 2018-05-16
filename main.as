@@ -20,6 +20,7 @@ package{
     public class main extends Sprite{
 		
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
+		private const CRITIAL_IND_NUMBER:int = 3;//Минимально подходящие для отслеживания статистики количество особей
 		
 		private var stgHeight:int;
 		private var stgWidth:int;
@@ -59,7 +60,7 @@ package{
 			messenger.setMessageMark('Main');
 			messenger.addEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);
 						
-			versionText = new myVersion('0.45',debugLevel);
+			versionText = new myVersion('0.47',debugLevel);
 			
 			initPosition = configuration.getOption('main.initPosition');
 			model.addChild(versionText);
@@ -216,6 +217,11 @@ package{
 			messenger.message(msgString, 2);
 			msgString = IND_NUMB + individuals.length;
 			messenger.message(msgString, 10);//Сохраняем количество особей для статистики
+			
+			if(individuals.length < CRITIAL_IND_NUMBER){//Если особей слишком мало
+				messenger.removeEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);//Перестаем за ними следить
+				Accumulator.instance.stopRefresh();//И выключаем таймер
+				}
 			}
 
     }

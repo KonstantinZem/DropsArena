@@ -96,7 +96,7 @@
 					indStepPulsor.start();
 					SuspenderEvent.done();//Говорим о том что особи вновь запущены тому компоненту, который просил приостановить особей
 			}catch(e:Error){
-				messanger.message(e..message, 0);
+				messanger.message(e.message, 0);
 				indStepPulsor.stop();
 				}
 			}

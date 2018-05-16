@@ -71,6 +71,11 @@ public class Accumulator{
 			}
 
 		}
+	public function stopRefresh(){
+		refreshTimer.stop();
+		msgString = 'Accumulator has stoping refreshing statistical data';
+		messenger.message(msgString, 2);
+		}
 	public function pushToBuffer(message:String):void{
 		
 		try{

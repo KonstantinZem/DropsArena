@@ -27,10 +27,10 @@ package konstantinz.community.comStage{
 		private var messanger:Messenger;
 		
 		//**************************** Colors ************************************************//
-		private var BORDERCOLOR:Number = 0x000000;
-		private var INDCOLOR:Number = 0x990000;
-		private var COLLISIONCOLOR:Number = 0xFFFF00;
-		private var STOPEDCOLOR:Number = 0x808080; 
+		private const BORDERCOLOR:Number = 0x000000;
+		private const INDCOLOR:Number = 0x990000;
+		private const COLLISIONCOLOR:Number = 0xFFFF00;
+		private const STOPEDCOLOR:Number = 0x808080; 
 		
 		//************************************************************************************//
 		private var indSize:int;//Размер квадрата особи
@@ -175,7 +175,7 @@ package konstantinz.community.comStage{
 					
 					 case 'stoped':
 					
-					ct.color = STOPEDCOLOR
+					ct.color = STOPEDCOLOR;
 					individual.transform.colorTransform = ct;
 					
 					break;

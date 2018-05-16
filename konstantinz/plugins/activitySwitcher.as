@@ -3,6 +3,7 @@
 import flash.events.Event
 
 	import flash.display.Sprite;
+	import flash.errors.IllegalOperationError;
 	import flash.events.TimerEvent; 
 	import flash.utils.*;
 	import konstantinz.community.auxilarity.*;
@@ -10,24 +11,26 @@ import flash.events.Event
 	import flash.xml.*
     
 public class activitySwitcher extends Sprite{
-	private var stopingTimer:Timer;
-	private var timerStatement:String;
+	private const CRITIAL_IND_NUMBER:int = 3;//До какого количество особей плагин будет работать
+	
 	private var dispatchedObjects:Array//Ссылка на массив с управляемыми объектами
-	private var configuration:ConfigurationContainer;
 	private var objectsRange:Array;
-	private var suspendTime:int;//Время на которое нужно остановить особь
-	private var activityData:XMLDocument;//Здесь будет хранится массив данных с информацией об активности
 	private var stopedObjects:Array;//Список остановленных в данный момент особей
+	private var suspendTime:int;//Время на которое нужно остановить особь
 	private var stopedNumber:int;
 	private var currentActivitIndNumber:int = 0;//Позиция в таблице активности где надо искать текущее число особей, которых необходимо остановить
 	private var debugeLevel:String;
+	private var timerStatement:String;
 	private var msgString:String;
-	private var timer:Timer;
 	private var signalType:String;
 	private var optionPath:String;
 	private var statMessageHead:String;
 	private var killStoped:String;//Будудт ли подвержены случайной смерти неактивные особи
 	private var errorType:ModelErrors;
+	private var configuration:ConfigurationContainer;
+	private var activityData:XMLDocument;//Здесь будет хранится массив данных с информацией об активности
+	private var timer:Timer;
+	private var stopingTimer:Timer;
 	
 	public var messenger:Messenger;
 	public var pluginName:String; //В эту переменную загрузчик плагина передает его имя
@@ -105,7 +108,7 @@ public class activitySwitcher extends Sprite{
 			dataXML.parseXML(dataString);
 			return dataXML;
 		}catch(e:Error){
-			msgString = 'Error: data file is corruped';
+			msgString = 'Data file is corruped';
 			messenger.message(msgString, 0);
 			}
 		}
@@ -118,7 +121,7 @@ public class activitySwitcher extends Sprite{
 			var timeQant:int;
 		
 			if(dispatchedObjects[0] == undefined){
-				throw new Error('Can not find dispatchedObjects');
+				throw new ReferenceError('Can not find dispatchedObjects');
 				}else{
 					timeQant = dispatchedObjects[0].getTimeQuant();//Получаем время переключения активности из первого драйвера особи
 					}
@@ -130,14 +133,14 @@ public class activitySwitcher extends Sprite{
 					}
 		
 			}catch(e:ArgumentError){
-	
 				messenger.message(e, 0)
-				numberOfSteps = int(configuration.getOption('main.lifeTime'));//Есл особии количество шагов не заданно, принимаем его как время жизн
+				numberOfSteps = int(configuration.getOption('main.lifeTime'));//Если для особии количество шагов не заданно, принимаем его как время жизн
 				}
-			catch(e:Error){
+			
+			catch(e:ReferenceError){
 				msgString = e;
 				messenger.message(msgString, 0);
-				timeQant =20;
+				timeQant =20;//Если не удалось получить информацию о частоте срабатывания таймера от драйвера особи, задаем таймер сами
 				}
 			
 			return numberOfSteps;
@@ -147,14 +150,17 @@ public class activitySwitcher extends Sprite{
 		//Узнать размер таймера у особи, посмотреть число ходов в конфиге, запускать паузы по таймеру и не ждать ответа от драйверов особей
 		try{
 			var currentActivity:int;
+			var currentDay:String;
 			
 			if(currentActivitIndNumber > activityData.firstChild.childNodes.length - 1){
 				msgString = 'New cycle: ' + currentActivitIndNumber;
-				messenger.message(msgString, 3) 
+				messenger.message(msgString, 3);
 				currentActivitIndNumber = 0;
 					
 				}else{
 				currentActivity = int(activityData.firstChild.childNodes[currentActivitIndNumber].firstChild);
+				currentDay = activityData.firstChild.childNodes[currentActivitIndNumber].attributes.day;//Берем из аттрибутов дату наблюдения
+				
 				currentActivitIndNumber++;
 			}
 				stopOnly(currentActivity, 'percents');
@@ -163,6 +169,8 @@ public class activitySwitcher extends Sprite{
 				messenger.message(msgString, 3);
 				msgString = statMessageHead + ':' + currentActivity;
 				messenger.message(msgString, 10);//Посылаем данные о количестве неактивных особей как статистику
+				msgString = 'calendar_data' + ':' + currentDay;//Передаем в статистику дату наблюдения
+				messenger.message(msgString, 10);
 				
 				
 			}catch(e:Error){
@@ -202,6 +210,7 @@ public class activitySwitcher extends Sprite{
 			messenger.message('wrong unit type', 0);
 		}
 	}
+	
 	private function setObjRange():int{//поиск случайной особи
 		var stopedObjPosition:int = 0;
 		
@@ -216,20 +225,34 @@ public class activitySwitcher extends Sprite{
 
 	private function sendStop():void{
 		try{
+			if(dispatchedObjects.length < CRITIAL_IND_NUMBER){
+				throw new IllegalOperationError('Number of individals less then critical');
+				}
+			
 			for(var i:int = 0; i<stopedObjects.length; i++){
-		
+				
 				if(dispatchedObjects[stopedObjects[i]] != null){
 					switch(signalType){
-						case 'stop':		
-							dispatchedObjects[stopedObjects[i]].stopIndividual(suspendTime);//Останавливаем особь на нужное время
+						case 'stop':	
+							if(dispatchedObjects[stopedObjects[i]].hasOwnProperty('stopIndividual')){
+								dispatchedObjects[stopedObjects[i]].stopIndividual(suspendTime);//Останавливаем особь на нужное время
+							}
+							else{
+								throw new ReferenceError('Can not find function stopIndividual. It seems, that individual now not exist');
+								}
 						break;
 						case 'kill':
-							if(killStoped =='true'){//Если можно, убиваем всех особей из выборки
-								dispatchedObjects[stopedObjects[i]].killIndividual();
-							}else{
-								if(dispatchedObjects[stopedObjects[i]].indState()=='moved'){
-									dispatchedObjects[stopedObjects[i]].killIndividual();//А иначе убиваем только тех, кто движеться
+							if(dispatchedObjects[stopedObjects[i]].hasOwnProperty('killIndividual')){
+								if(killStoped =='true'){//Если можно, убиваем всех особей из выборки
+									dispatchedObjects[stopedObjects[i]].killIndividual();
+									}else{
+										if(dispatchedObjects[stopedObjects[i]].indState()=='moved'){
+											dispatchedObjects[stopedObjects[i]].killIndividual();//А иначе убиваем только тех, кто движеться
+										}
 									}
+								}
+								else{
+									throw new ReferenceError('Can not find function killIndividual. It seems, that individual now not exist');
 								}
 						break;
 						default:
@@ -240,11 +263,17 @@ public class activitySwitcher extends Sprite{
 				
 			}
 		}
-		catch(e:Error){
-			messenger.message(e.message, 0)
+		catch(e:IllegalOperationError){
+			messenger.message(e.message, 0);
+			stopingTimer.stop();//Прекращаем работу плагина
+			messenger.message('Activity switcher plugin has finished working', 2);
 		}
-	
-	
+		catch(e:ReferenceError){
+			messenger.message(e.message, 0);
+			}
+		catch(e:Error){
+			messenger.message(e.message, 0);
+			}
 	}
 }
 }

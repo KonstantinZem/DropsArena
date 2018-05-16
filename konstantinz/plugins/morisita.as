@@ -20,7 +20,6 @@ package konstantinz.plugins{
 		private var plotsPosition:Array;//Координаты площадок (чтобы не высчитывать их каждый раз заново)
 		private var plotsCells:Array;
 		private var cellSize:int;
-		
 		private var config:Object;
 		private var communityStage:Object;
 		private var indDrivers:Array
@@ -62,7 +61,6 @@ package konstantinz.plugins{
 				
 				plotsXQuantaty = communityStage.chessDesk[0].length/plotSize;
 				plotsYQuantaty = communityStage.chessDesk.length/plotSize;
-				//trace(plotsXQuantaty + ':' + plotsYQuantaty)
 				drawMorisitaPlot();
 				
 				msgString = 'Morisita counter plugin';
@@ -121,7 +119,16 @@ package konstantinz.plugins{
 				}
 				
 			morisita = morisitaIndex();//Высчитываем индекс Мориситы
-			msgString = 'morisita_index:' + morisita;//Посылаем результат для дальнейшей обработки сторонними компонентами
+			
+			if(isNaN(morisita)){//Проверяем, можем ли мы расчитать индекс
+				msgString = 'morisita_index:-';//И если индекс уже не может быть расчитан (особей слишком мало)
+				refreshTimer.stop();//Перестаем расчитывать индекс
+				messenger.message('Stoping to count Morisita index',2);
+				}
+				else{//Если индекс расчитан
+					msgString = 'morisita_index:' + morisita;//Посылаем результат для дальнейшей обработки сторонними компонентами
+					}
+			
 			messenger.message(msgString,10);
 		}
 		
