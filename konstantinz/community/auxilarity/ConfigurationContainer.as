@@ -6,6 +6,7 @@
    import flash.net.*
 	
 	public class ConfigurationContainer extends EventDispatcher{
+		
 		public static var LOADED:String = 'loaded';//Так мы говорим, что загрузка файла окнчена и программа может к нему обращаться
 		public static var LOADING_ERROR:String = 'loading_error';//Так говорим, что произошла какая то ошибка
 		
@@ -17,18 +18,51 @@
 		private var msgStreeng:String;
 		private var messenger:Messenger;
 		
-		function ConfigurationContainer(loadedFileName:String, dbg:String){
-			cfgFileName = loadedFileName;
-			debugLevel = dbg
+		private static var _instance:ConfigurationContainer;
+		private static var _okToCreate:Boolean = false;//Переменная сигнализирует существует ли уже экземпляр данного класса
+		
+		public function ConfigurationContainer(){
+		
+			if ((!_okToCreate)){//Singleton realisation
+				throw new Error("Class is singleton. Use method instance() to get it");
+			}else{
+				debugLevel = '3';
+			}	
+			}
+			
+		public static function get instance():ConfigurationContainer{
+            if (!_instance){
+				_okToCreate = true;
+				_instance = new ConfigurationContainer();
+				_okToCreate = false;
+				}
+            return _instance;
+            }
+			
+		public function setConfigFileName(fileName:String):void{
+			cfgFileName = fileName;
+
 			myXML = new XML(); 
 			myXMLURL = new URLRequest(cfgFileName); 
 			myLoader = new URLLoader(myXMLURL);
 			
 			myLoader.addEventListener(Event.COMPLETE, xmlLoaded);  
 			myLoader.addEventListener(IOErrorEvent.IO_ERROR, onError)
+			}
+		
+		public function setDebugLevel(dbgLevel:String):void{
+			debugLevel = dbgLevel;
+			}
 			
-			debugLevel = 'true';
+		public function getOption(optionPath:String):String{//С помощью этого вызова программа будет получать от класса запрашиваемые опции
+			var parsedPath:Array;
+			var optionValue:String;
 			
+			parsedPath = parsePathString(optionPath)//Разбираем переданную строку на массив из слов
+			
+			optionValue = searchValue(myXML, 0, parsedPath)//Ищем нужное значение в XML 
+					
+			return optionValue
 			}
 		
 		private function xmlLoaded(event:Event):void { //Загружаем файл
@@ -40,11 +74,9 @@
 			messenger = new Messenger(debugLevel);
 			messenger.setMessageMark('Options container');
 			
-				msgStreeng = 'Configuration file ' + cfgFileName + ' has loaded';
-				messenger.message(msgStreeng, 1)
-			
-			
-		}
+			msgStreeng = 'Configuration file ' + cfgFileName + ' has loaded';
+			messenger.message(msgStreeng, 1);
+			}
 		
 		
 		private function onError(event:IOErrorEvent):void{//Если загрузить XML файл не удалось
@@ -57,25 +89,14 @@
 			myLoader.removeEventListener(IOErrorEvent.IO_ERROR, onError)
 			}
 		
-		public function getOption(optionPath:String):String{//С помощью этого вызова программа будет получать от класса запрашиваемые опции
-			var parsedPath:Array;
-			var optionValue:String;
-			
-			parsedPath = parsePathString(optionPath)//Разбираем переданную строку на массив из слов
-			
-			optionValue = displayXML(myXML, 0, parsedPath)//Ищем нужное значение в XML 
-					
-			return optionValue
-			}
-		
 		private function parsePathString(optionPath:String):Array{
 			var parsedPath:Array
-			parsedPath = optionPath.split('.')
+			parsedPath = optionPath.split('.');
 	
-			return parsedPath
+			return parsedPath;
 			}
 				 
-		private function displayXML(node:XML, indentLevel:int, elementsList:Array):String {//Функция взята из кники Рич Шуп, Зеван Россер Изучаем ActionScript 3.0.
+		private function searchValue(node:XML, indentLevel:int, elementsList:Array):String {//Функция взята из книги Рич Шуп, Зеван Россер Изучаем ActionScript 3.0.
 			var optionValueString:String = 'Error';//По умолчанию опция не найдена
 						
 			for each (var element:XML in node.elements()) {
@@ -86,7 +107,7 @@
 							optionValueString = element;//Возвращаем этот элемент
 							}
 							else{//Иначе рекурсивно опускаемся на следующий уровень 
-								optionValueString = displayXML(element, indentLevel + 1, elementsList);
+								optionValueString = searchValue(element, indentLevel + 1, elementsList);
 							}
 				
 				}

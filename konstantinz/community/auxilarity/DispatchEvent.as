@@ -9,6 +9,9 @@
 		public var currentChessDeskJ:int;
 		public var pluginName:String;//Передаем плагину его имя так как сам он его не узнает. А это надо для загрузки, например, конфига
 		public var individual:int;//Передаем номер особи в массиве
+		public var scrollerPosition:Number;
+		public var scrollingDirection:String
+		
 		public function DispatchEvent(){
 		}		
 		public function maturing():void{
@@ -18,9 +21,7 @@
 		}
 		
 		public function death():void{
-			dispatchEvent(new ModelEvent(ModelEvent.DEATH));
-			//indName = myName
-			
+			dispatchEvent(new ModelEvent(ModelEvent.DEATH));	
 		}
 		
 		public function ready():void{
@@ -36,5 +37,14 @@
 			dispatchEvent(new ModelEvent(ModelEvent.DONE));
 			
 		}
+		
+		public function clicking():void{
+			dispatchEvent(new ModelEvent(ModelEvent.CLICKING));
+			}
+		
+		public function scrolling(){
+			dispatchEvent(new ModelEvent(ModelEvent.SCROLLER_DATA));
+		}	
+			
 	}
 }

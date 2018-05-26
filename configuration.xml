@@ -4,11 +4,11 @@
 <debugLevel>1</debugLevel>
 <pluginEnable>true</pluginEnable>
 <!-- indQuntaty -- how many individuals must to be created at the start -->
-<indQuntaty>400</indQuntaty>
+<indQuntaty>40</indQuntaty>
 <lifeTime>6880</lifeTime>
 <lifeQuant>1</lifeQuant>
 <adultAge>2340</adultAge>
-<maturingDeley>117</maturingDeley>
+<maturingDeley>1170</maturingDeley>
 <offspringsQuant>30</offspringsQuant>
 <dropSize>12</dropSize>
 <!-- initPosition of individual can be left-top, left-bottom,  right-top, right-bottom, center and random -->

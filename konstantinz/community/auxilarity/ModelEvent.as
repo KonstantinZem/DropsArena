@@ -7,6 +7,8 @@
 		 public static const PLUGIN_LOADED:String = 'plugin_loaded';
 		 public static const DEATH:String = 'death';
 		 public static const DONE:String = 'done';//Так мы говорим, что какой либо компонент сделал то что от него требовалось
+		 public static const SCROLLER_DATA:String = 'scroller_data';
+		 public static const CLICKING:String = 'clicking';
 		 
 		 public function ModelEvent(type:String) {
              super(type);

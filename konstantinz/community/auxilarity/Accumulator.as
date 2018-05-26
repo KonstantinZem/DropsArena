@@ -20,10 +20,13 @@ public class Accumulator{
 	public var statusBarText:String;
 	
 	private static var _instance:Accumulator;
+	private static var _okToCreate:Boolean = false;//Переменная сигнализирует существует ли уже экземпляр данного класса
+
 
 	public function Accumulator(){
-		if (_instance){//Singleton realisation
-             throw new Error("Class is singleton.");
+	
+		if ((!_okToCreate)){//Singleton realisation
+             throw new Error("Class is singleton. Use method instance() to get it");
 		}else{
 		
 			debugLevel = '3';
@@ -46,7 +49,9 @@ public class Accumulator{
 	
 	public static function get instance():Accumulator{
             if (!_instance){
+				_okToCreate = true;
 				_instance = new Accumulator();
+				_okToCreate = false;
 				}
             return _instance;
             }
@@ -104,6 +109,15 @@ public class Accumulator{
 				paramPosition = 0;
 		}
 		
+		public function getStatistic():String{
+			try{
+				var statText = tableToString();
+			}catch(e:Error){
+				
+				}
+			return statText;
+			}
+		
 		private function prepareStatTable(event:TimerEvent):void{
 			statTable[0].length = 0;//Очищаем заголовок таблицы перед его заполнением
 			counter++;
@@ -155,11 +169,11 @@ public class Accumulator{
 		}
 			
 	private function emptySpace(pvalue:String, pname:String):String{//Печатает пустую строку для выравнивания 
-		var emptyString:String = ' ';
+		var emptyString:String = '\u0020';
 		var elength:int = pname.length - pvalue.length;
 			
 			for(var i:int = 0; i<elength; i++){
-				emptyString  = emptyString + ' ';
+				emptyString  = emptyString + '\u0020';//Символ пробела
 				}
 			return emptyString;
 			}

@@ -21,6 +21,7 @@ package{
 		
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
 		private const CRITIAL_IND_NUMBER:int = 3;//Минимально подходящие для отслеживания статистики количество особей
+		private const STAT_MSG_MARK:int = 10;
 		
 		private var stgHeight:int;
 		private var stgWidth:int;
@@ -30,6 +31,7 @@ package{
 		private var messenger:Messenger;
 		private var statRefreshTime:String;//Время обновления статистической информации
 		private var statusBar:StatusBar;
+		private var msgWindow:TextWindow;
 		
 		public var indSuspender:Array//Структура, через которую особей можно на нужное время останавливать
 		public var configuration:ConfigurationContainer;
@@ -42,9 +44,12 @@ package{
 			
 			stgHeight = parent.stage.stageHeight;
 			stgWidth = parent.stage.stageWidth;
-			configuration = new ConfigurationContainer('configuration.xml', 'true');
-			configuration.addEventListener(ConfigurationContainer.LOADED, init);//
-			configuration.addEventListener(ConfigurationContainer.LOADING_ERROR, init)//Если не найдем конфигурационного файла, все равно загружаем программу дальше
+			
+			ConfigurationContainer.instance.setConfigFileName('configuration.xml');
+			ConfigurationContainer.instance.addEventListener(ConfigurationContainer.LOADED, init);//
+			ConfigurationContainer.instance.addEventListener(ConfigurationContainer.LOADING_ERROR, init)//Если не найдем конфигурационного файла, все равно загружаем программу дальше
+			
+			configuration = ConfigurationContainer.instance;
 			
 			model = new Sprite();
 			this.addChild(model);
@@ -60,7 +65,7 @@ package{
 			messenger.setMessageMark('Main');
 			messenger.addEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);
 						
-			versionText = new myVersion('0.47',debugLevel);
+			versionText = new myVersion('0.5',debugLevel);
 			
 			initPosition = configuration.getOption('main.initPosition');
 			model.addChild(versionText);
@@ -135,6 +140,8 @@ package{
 					
 			configuration.removeEventListener(ConfigurationContainer.LOADED, init);
 			messenger.message(msgString, 2);
+			
+			
 		}
 		
 		private function addInitIndividuals(indX:int, indY:int):void{//Добавляем первых особей
@@ -148,7 +155,8 @@ package{
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
 			}
 			msgString = IND_NUMB + individuals.length;
-			messenger.message(msgString, 10);//Сохраняем количество особей для статистики
+			messenger.message(msgString, STAT_MSG_MARK);//Сохраняем количество особей для статистики
+			
 			}
 			
 		private function rndAddInitIndividuals():void{//Добавляем первых особей в случайных позициях
@@ -171,7 +179,7 @@ package{
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
 			}
 			msgString = IND_NUMB + individuals.length;
-			messenger.message(msgString, 10);//Сохраняем количество особей для статистики
+			messenger.message(msgString, STAT_MSG_MARK);//Сохраняем количество особей для статистики
 			}
 		
 		private function addNewIndividuals(e:Event):void {
@@ -191,7 +199,7 @@ package{
 					individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
 				}
 				msgString = IND_NUMB + individuals.length;
-			    messenger.message(msgString, 10);//Сохраняем количество особей для статистики
+			    messenger.message(msgString, STAT_MSG_MARK);//Сохраняем количество особей для статистики
 		}
 		
 		public function getNewStatistics(e:Event):void{
@@ -216,12 +224,21 @@ package{
 			msgString = 'Now number of individuals is ' + individuals.length;
 			messenger.message(msgString, 2);
 			msgString = IND_NUMB + individuals.length;
-			messenger.message(msgString, 10);//Сохраняем количество особей для статистики
+			messenger.message(msgString, STAT_MSG_MARK);//Сохраняем количество особей для статистики
 			
 			if(individuals.length < CRITIAL_IND_NUMBER){//Если особей слишком мало
 				messenger.removeEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);//Перестаем за ними следить
 				Accumulator.instance.stopRefresh();//И выключаем таймер
+				showMessageWindow();
 				}
+			}
+		
+		private function showMessageWindow():void{
+			
+			msgWindow = new TextWindow(400,600, Accumulator.instance.getStatistic());
+			addChild(msgWindow)
+			msgWindow.x = 100;
+			msgWindow.y = 100;
 			}
 
     }
