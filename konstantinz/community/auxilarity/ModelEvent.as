@@ -9,6 +9,8 @@
 		 public static const DONE:String = 'done';//Так мы говорим, что какой либо компонент сделал то что от него требовалось
 		 public static const SCROLLER_DATA:String = 'scroller_data';
 		 public static const CLICKING:String = 'clicking';
+		 public static const FIRST_CLICK:String = 'ferstClick';
+		 public static const SECOND_CLICK:String = 'secondClick';
 		 
 		 public function ModelEvent(type:String) {
              super(type);

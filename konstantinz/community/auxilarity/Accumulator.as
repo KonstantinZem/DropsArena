@@ -6,15 +6,15 @@ import konstantinz.community.auxilarity.*;
 
 public class Accumulator{
 	
-	private var refreshTime:int;
 	private var debugLevel:String;
 	private var msgString:String;
 	private var paramNamebuffer:Array//Здесь хранится информация для формирования таблицы статистики
 	private var valueBuffer:Array//
-	private var refreshTimer:Timer;
 	private var counter:int;
-	private var messenger:Messenger;
 	private var paramPosition:int;
+	private var refreshTime:int;
+	private var refreshTimer:Timer;
+	private var messenger:Messenger;
 	
 	public var statTable:Array;//Здесь будет хранится собираемая статистика
 	public var statusBarText:String;
@@ -56,7 +56,7 @@ public class Accumulator{
             return _instance;
             }
 
-	public function setDebugLevel(dbgLevel):void{
+	public function setDebugLevel(dbgLevel:String):void{
 		debugLevel = dbgLevel;
 		}
 	
@@ -76,11 +76,18 @@ public class Accumulator{
 			}
 
 		}
-	public function stopRefresh(){
+	public function stopRefresh():void{
 		refreshTimer.stop();
 		msgString = 'Accumulator has stoping refreshing statistical data';
 		messenger.message(msgString, 2);
 		}
+		
+	public function startRefresh():void{
+		refreshTimer.start();
+		msgString = 'Accumulator has starting refreshing statistical data';
+		messenger.message(msgString, 2);
+		}
+	
 	public function pushToBuffer(message:String):void{
 		
 		try{
@@ -93,7 +100,7 @@ public class Accumulator{
 					valueBuffer.push(parsedMessage[1]);
 					}
 				else{
-					paramPosition = paramNamebuffer.indexOf(parsedMessage[0])
+					paramPosition = paramNamebuffer.indexOf(parsedMessage[0]);
 					valueBuffer[paramPosition] = parsedMessage[1];//Заносим в соответсвующую позицию буфера значений переданное значение
 					}
 				
@@ -110,10 +117,11 @@ public class Accumulator{
 		}
 		
 		public function getStatistic():String{
+			var statText:String
 			try{
-				var statText = tableToString();
-			}catch(e:Error){
-				
+				statText = tableToString();
+				}catch(e:Error){
+					statText ='Table is empty yet';//Если таблица еще не сформирована, посылаем в ответ эту строку
 				}
 			return statText;
 			}
@@ -127,10 +135,10 @@ public class Accumulator{
 				if(statTable[0].length<paramNamebuffer.length){//Если в буфере есть новые параметры
 				
 					statTable[0].push(paramNamebuffer[i]);
-				}
+					}
 				statTable[statTable.length-1].push(valueBuffer[i]);
 			
-			}
+				}
 				
 				valueBuffer[0]=counter;
 				msgString = tableToString();
@@ -139,7 +147,7 @@ public class Accumulator{
 				
 		}
 		private function tableToString():String{//Готовит таблицу для печати в консоли отладки
-			var tbody:String;//Таблица, отформатированная для печати
+			var tbody:String='';//Таблица, отформатированная для печати
 			var thead:String = ''//Строка загаловка таблицы
 			var trow:String;//Строки таблицы
 			var spacer:String;//Строка пробелов выравнивающая ширину столбца с заголовком столбца
@@ -182,7 +190,7 @@ public class Accumulator{
          statusBarText = '';
          for(var i:int = 1; i<statTable[0].length; i++){
             statusBarText = statusBarText + (statTable[0][i] + ': ' + statTable[statTable.length - 1][i] + '    ');
-         }
+			}
       }
 
 }

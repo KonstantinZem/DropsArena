@@ -371,7 +371,7 @@ package konstantinz.community.comStage{
 			killIndividual();
 		}
 		
-		public function markPresenceInPlot(){
+		public function markPresenceInPlot():void{
 			chessDesk[currentChessDeskI][currentChessDeskJ]['numberOfIndividuals'] += indStatus;
 			}
 	

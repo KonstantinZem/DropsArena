@@ -1,34 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
 <main>
-<debugLevel>1</debugLevel>
-<pluginEnable>true</pluginEnable>
-<!-- indQuntaty -- how many individuals must to be created at the start -->
-<indQuntaty>40</indQuntaty>
-<lifeTime>6880</lifeTime>
-<lifeQuant>1</lifeQuant>
-<adultAge>2340</adultAge>
-<maturingDeley>1170</maturingDeley>
-<offspringsQuant>30</offspringsQuant>
-<dropSize>12</dropSize>
-<!-- initPosition of individual can be left-top, left-bottom,  right-top, right-bottom, center and random -->
-<initPosition>left-top</initPosition>
-<statRefreshTime>10</statRefreshTime>
-<pluginsList>plugins/ground.swf;plugins/grass.swf;plugins/grass2.swf;plugins/grass3.swf;plugins/grass4.swf;plugins/activity.swf;plugins/death.swf;plugins/morisitaCounter.swf</pluginsList>
+	<debugLevel>1</debugLevel>
+	<pluginEnable>true</pluginEnable>
+	<!-- indQuntaty -- how many individuals must to be created at the start -->
+	<indQuntaty>40</indQuntaty>
+	<lifeTime>6880</lifeTime>
+	<lifeQuant>1</lifeQuant>
+	<adultAge>2340</adultAge>
+	<maturingDeley>1170</maturingDeley>
+	<offspringsQuant>30</offspringsQuant>
+	<dropSize>12</dropSize>
+	<!-- initPosition of individual can be left-top, left-bottom,  right-top, right-bottom, center and random -->
+	<initPosition>left-top</initPosition>
+	<statRefreshTime>10</statRefreshTime>
+	<pluginsList>plugins/ground.swf;plugins/grass.swf;plugins/grass2.swf;plugins/grass3.swf;plugins/grass4.swf;plugins/activity.swf;plugins/death.swf;plugins/morisitaCounter.swf</pluginsList>
+	<arePluginsActiveOnLoading>false</arePluginsActiveOnLoading>
 </main>
 <plugins>
-<grass>
-<picture>pictures/park/aegopodium.png</picture>
-<stepDeley>6</stepDeley>
-<debugLevel>1</debugLevel>
-<color>0x007100</color>
-</grass>
-<ground>
-<picture>pictures/park/ground.png</picture>
-<stepDeley>0</stepDeley>
-<debugLevel>1</debugLevel>
-<color>0xf4e17f</color>
-</ground>
+	<grass>
+		<picture>pictures/park/aegopodium.png</picture>
+		<stepDeley>6</stepDeley>
+		<debugLevel>1</debugLevel>
+		<color>0x007100</color>
+	</grass>
+	<ground>
+		<picture>pictures/park/ground.png</picture>
+		<stepDeley>0</stepDeley>
+		<debugLevel>1</debugLevel>
+		<color>0xf4e17f</color>
+	</ground>
 <grass2>
 <picture>pictures/park/lamium.png</picture>
 <stepDeley>2</stepDeley>
@@ -47,12 +48,12 @@
 <debugLevel>1</debugLevel>
 <color>0xb4e53c</color>
 </grass4>
-                <activity>
-<signal>stop</signal>
-                    <steps>6500</steps>
-                    <debugLevel>1</debugLevel>
-                    <data><![CDATA[
-                        <activity state='unactive'>
+<activity>
+	<signal>stop</signal>
+    <steps>6500</steps>
+     <debugLevel>2</debugLevel>
+     <data><![CDATA[
+<activity state='unactive'>
 <part day='07.09.10'>48</part>
 <part day='08.09.10'>0</part>
 <part day='09.09.10'>0</part>
@@ -337,12 +338,13 @@
 </activity>
 ]]></data>
     </activity>
-    <death>
-<signal>kill</signal>
+  <death>
+	<signal>kill</signal>
 <!-- individuals will have been killed une time per this number of steps -->
-        <steps>6500</steps>
+     <steps>6500</steps>
+     <debugLevel>1</debugLevel>
         <!-- killStoped: are unactive individuals will be killed to -->
-        <killStoped>true</killStoped>
+     <killStoped>true</killStoped>
 <data><![CDATA[<activity>
 <part day='07.09.10'>0</part>
 <part day='08.09.10'>0</part>

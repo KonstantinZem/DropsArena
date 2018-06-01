@@ -57,7 +57,7 @@
 			createWindowArea();
 			createTextArea(msgString);
 			createScroller(scrollerY);
-			createBitmapCloseButton()
+			createBitmapCloseButton();
 			
 			windowEvent = new DispatchEvent();
 			
@@ -67,7 +67,7 @@
 			
 			}
 		
-		private function countWindowProportion(){//Исходя из размеров рамки окна, расчитывается положение в окне его других элементов
+		private function countWindowProportion():void{//Исходя из размеров рамки окна, расчитывается положение в окне его других элементов
 			windowProportions = windowHeight/windowWidth;
 			textAreaWidth = windowWidth - WINDOW_BORDER*2 - SCROLLERW;
 			textAreaY = WINDOW_BORDER*2 + BUTTON_SIZE;
@@ -78,9 +78,9 @@
 			scrollerY = textAreaY;
 			}
 		
-		private function createBitmapCloseButton(){//Если скачалась иконка кнопки, вставляем иконку в кнопку
-			closeButton = new KzSimpleButton()
-			closeButton.setButtonSkins(CLOSE_BTN_URL)
+		private function createBitmapCloseButton():void{//Если скачалась иконка кнопки, вставляем иконку в кнопку
+			closeButton = new KzSimpleButton();
+			closeButton.setButtonSkins(CLOSE_BTN_URL);
 			closeButton.height = BUTTON_SIZE;
 			closeButton.width = BUTTON_SIZE;
 			closeButton.x = buttonX;
@@ -129,14 +129,14 @@
 			
 		private function destroyWindow(event:MouseEvent):void{//По нажатии на кнопку посылаем закрываем окно
 			try{
-			removeChild(textArea);
-			removeChild(windowArea);
-			removeChild(closeButton);
-			removeChild(scroller);
-			windowEvent.done();//Посылаем главной программе 
-		}catch(e:Error){
-			messenger.message(e.message, 0)
-			}
+				removeChild(textArea);
+				removeChild(windowArea);
+				removeChild(closeButton);
+				removeChild(scroller);
+				windowEvent.done();//Посылаем главной программе 
+				}catch(e:Error){
+					messenger.message(e.message, 0)
+					}
 			}
 		
 		

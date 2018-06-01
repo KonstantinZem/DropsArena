@@ -11,21 +11,21 @@
 	import konstantinz.community.auxilarity.*;
 	
 	public class BitmapElement extends Sprite{
-		private const BUTTON_BORDER_COLOR = 0xFF3333;
-		private const BUTTONE_COLOR = 0xFF0000;
+		private const BUTTON_BORDER_COLOR:Number = 0xFF3333;
+		private const BUTTONE_COLOR:Number = 0xFF0000;
 		
-		private var imageLoader:Loader
-		private var btnIcon:Bitmap
-		private var bmp:Bitmap
-		private var elementHeight:Number
-		private var elementWidth:Number
-		private var messenger:Messenger;
+		private var imageLoader:Loader;
+		private var btnIcon:Bitmap;
+		private var bmp:Bitmap;
+		private var elementHeight:Number;
+		private var elementWidth:Number;
 		private var msgString:String;
 		private var debugeLevel:String;
+		private var loadedImageName:String;
 		private var BitmampErrors:ModelErrors;
-		private var loadedImageName:String
+		private var messenger:Messenger;
 	
-	public function BitmapElement(imageName:String,elH:Number,elW:Number){
+	public function BitmapElement(imageName:String,elH:Number,elW:Number):void{
 		loadedImageName = imageName
 		BitmampErrors = new ModelErrors();
 		debugeLevel = '3';
@@ -38,7 +38,7 @@
 		imageLoader.load(new URLRequest(imageName));
 		}
 	
-	private function onComplite(e:Event){
+	private function onComplite(e:Event):void{
 		bmp = imageLoader.content as Bitmap;
 		btnIcon = new Bitmap(bmp.bitmapData);
 		addChild(btnIcon)

@@ -11,8 +11,6 @@ package konstantinz.plugins{
 		private const BORDERCOLOR:Number = 0x000000;
 		private var debugeLevel:String;
 		private var msgString:String;
-		private var initTimer:Timer;
-		private var refreshTimer:Timer;
 		private var refreshTime:int;//Время обновления
 		private var plotSize:int;//Количество пробных площадок
 		private var plotsXQuantaty:int//Колиство квадратов в ряду
@@ -22,16 +20,20 @@ package konstantinz.plugins{
 		private var cellSize:int;
 		private var config:Object;
 		private var communityStage:Object;
-		private var indDrivers:Array
-		private var individuals:Array
+		private var indDrivers:Array;
+		private var individuals:Array;
+		private var initTimer:Timer;
+		private var refreshTimer:Timer;
 		
 		public var messenger:Messenger;
+		public var activeOnLoad:String
 		public var pluginName:String; //Должна быть включена в интерфейс этого типа плагинов
 		public var pluginEvent:Object; //Дает возможность плагину общатся с главной программой с помощью отсылки сообщений
 	
 		public function morisita (){
 			
 			debugeLevel = '3';
+			activeOnLoad = 'true';
 			pluginEvent = new DispatchEvent();
 			messenger = new Messenger(debugeLevel);
 			messenger.setMessageMark('Morisita counter');
@@ -39,6 +41,14 @@ package konstantinz.plugins{
 			initTimer.addEventListener(TimerEvent.TIMER, initPlugin);// потом запускаем программу
 			initTimer.start();
 			
+			}
+			
+		public function suspendPlugin(e:ModelEvent):void{
+			refreshTimer.stop();
+			}
+	
+		public function startPlugin(e:ModelEvent):void{
+			refreshTimer.start();
 			}
 	
 		private function initPlugin(e:TimerEvent):void{
@@ -69,7 +79,9 @@ package konstantinz.plugins{
 				if(refreshTime>0){
 					refreshTimer = new Timer(refreshTime);
 					refreshTimer.addEventListener(TimerEvent.TIMER, countMorisita);
-					refreshTimer.start();
+					if(activeOnLoad=='true'){
+						refreshTimer.start();
+					}
 				}else{
 					msgString = 'Refresh time not set';
 					messenger.message(msgString, 0);
@@ -102,6 +114,8 @@ package konstantinz.plugins{
 			}
 		
 		private function countMorisita(e:TimerEvent):void{
+			msgString = 'Counting Morisita index';
+			messenger.message(msgString, 3);
 			var morisita:Number;
 		
 			if(plotsPosition.length == 0){//Если пречень координат  квадратов еще не составлялся

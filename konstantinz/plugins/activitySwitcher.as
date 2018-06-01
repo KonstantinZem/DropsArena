@@ -14,10 +14,8 @@ public class activitySwitcher extends Sprite{
 	private const CRITIAL_IND_NUMBER:int = 3;//До какого количество особей плагин будет работать
 	
 	private var dispatchedObjects:Array//Ссылка на массив с управляемыми объектами
-	private var objectsRange:Array;
 	private var stopedObjects:Array;//Список остановленных в данный момент особей
 	private var suspendTime:int;//Время на которое нужно остановить особь
-	private var stopedNumber:int;
 	private var currentActivitIndNumber:int = 0;//Позиция в таблице активности где надо искать текущее число особей, которых необходимо остановить
 	private var debugeLevel:String;
 	private var timerStatement:String;
@@ -30,22 +28,36 @@ public class activitySwitcher extends Sprite{
 	private var configuration:ConfigurationContainer;
 	private var activityData:XMLDocument;//Здесь будет хранится массив данных с информацией об активности
 	private var timer:Timer;
-	private var stopingTimer:Timer;
+	private var stopingTimer:Timer;//Этот таймер включается сразу после запуска плагина и заставляет особей останавливаться через заданный промежуток времени
 	
 	public var messenger:Messenger;
 	public var pluginName:String; //В эту переменную загрузчик плагина передает его имя
-	public var pluginEvent:Object;
+	public var pluginEvent:DispatchEvent;
+	public var activeOnLoad:String;
 	
 	function activitySwitcher(){
 		debugeLevel = '3';
 		pluginName = '';
 		killStoped = 'false';
+		activeOnLoad = 'true';
 		pluginEvent = new DispatchEvent();
 		timer = new Timer(1000, 1);//Ждем некоторое время, пока в главная программа не передаст нужные плагину параметры
 		timer.addEventListener(TimerEvent.TIMER, initPlugin);// потом запускаем программу
 		timer.start();
 		suspendTime = 5000;
 		messenger = new Messenger(debugeLevel);
+		}
+		
+	public function suspendPlugin(e:ModelEvent):void{
+		msgString = 'Suspend plugin';
+		messenger.message(msgString, 2);
+		stopingTimer.stop();
+		}
+	
+	public function startPlugin(e:ModelEvent):void{
+		msgString = 'Restart plugin';
+		messenger.message(msgString, 2);
+		stopingTimer.start();
 		}
 	
 	private function initPlugin(e:TimerEvent):void{
@@ -69,7 +81,7 @@ public class activitySwitcher extends Sprite{
 				if(signalType=='kill'){//Если плагин настроен чтобы убивать особей
 					killStoped = configuration.getOption(optionPath + 'killStoped');//Узнаем, должны ли мы убивать всех подряд или только активных осоей
 				
-					if(killStoped !='true'&& killStoped !='false'){
+					if(killStoped !='true'&& killStoped !='false'){//Если опция killStoped напсиана неправильно
 						messenger.message('killStoped: ' + killStoped + '. ' + errorType.varIsIncorrect, 0);//
 						killStoped = 'false';
 					}
@@ -95,7 +107,9 @@ public class activitySwitcher extends Sprite{
 				time = setTimingQant();
 				stopingTimer = new Timer(time);
 				stopingTimer.addEventListener(TimerEvent.TIMER, stopInd);
-				stopingTimer.start();
+				if(activeOnLoad=='true'){
+					stopingTimer.start();
+				}
 			}
 		pluginEvent.ready();
 		}

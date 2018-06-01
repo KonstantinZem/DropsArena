@@ -3,24 +3,22 @@
 	import konstantinz.community.auxilarity.*
 
 	public class CommunityStage extends Sprite{
-		private var CRITICAL_LEVEL:int = 8; //Размер элемента, слишком мал для стабильной работы класса
-		private var RECTCOLOR:Number = 0xFFFFFF //Цвет квадратика
-		private var BORDERCOLOR:Number = 0x000000;
-		//0xCCCCCC - темносерый
+		private const CRITICAL_LEVEL:int = 8; //Размер элемента, слишком мал для стабильной работы класса
+		private const RECTCOLOR:Number = 0xFFFFFF //Цвет квадратика
+		private const BORDERCOLOR:Number = 0x000000;
+		
 		private var squSize:int;
 		private var stgHeight:int;//Высота сцены
 		private var stgWidth:int;
 		private var sqrQantH:int; //Количество квадратов в столбце
 		private var sqrQantW:int; //Количество квадратов в ряду
+		private var lifeQuant:int//Убыль жизни за ход
 		private var errorType:Object;//Контейнер для ошибок
 		private var debugLevel:String;
-		private var lifeQuant:int//Убыль жизни за ход
 		private var msgString:String
 		private var messenger:Messenger;
 		
 		public var chessDesk:Array;
-		public var envParams:Object;
-		
 		
 		function CommunityStage(stgh:int,stgw:int,extOptions:Object){
 			

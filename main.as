@@ -20,25 +20,30 @@ package{
     public class main extends Sprite{
 		
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
-		private const CRITIAL_IND_NUMBER:int = 3;//Минимально подходящие для отслеживания статистики количество особей
+		private const CRITIAL_IND_NUMBER:int = 5;//Минимально подходящие для отслеживания статистики количество особей
 		private const STAT_MSG_MARK:int = 10;
 		
 		private var stgHeight:int;
 		private var stgWidth:int;
-		private var versionText:Sprite;
 		private var debugLevel:String;
 		private var msgString:String;
-		private var messenger:Messenger;
 		private var statRefreshTime:String;//Время обновления статистической информации
+		private var versionText:Sprite;
 		private var statusBar:StatusBar;
 		private var msgWindow:TextWindow;
+		private var messenger:Messenger;
+		public var startStopButton:KzSimpleButton;
+		
+		private var eventsForPlugins:Object;
+		private var eventsForPluginsList:Array;
 		
 		public var indSuspender:Array//Структура, через которую особей можно на нужное время останавливать
-		public var configuration:ConfigurationContainer;
-		public var commStage:CommunityStage;
-		public var plugins:Sprite;
 		public var individuals:Array;
 		public var model:Sprite;
+		public var plugins:PluginLoader;
+		public var configuration:ConfigurationContainer;
+		public var commStage:CommunityStage;
+		public var startStopButtonEvent
 
 		public function main(){
 			
@@ -55,17 +60,16 @@ package{
 			this.addChild(model);
         }
         
-
 		private function init(e:Event):void{
 			var initPosition:String;//Каким образом будут добавлятся первые особи
-			var intX:int = 0//Первоначальная координата по x
-			var intY:int = 0//Первоначальная координата по y
+			var intX:int = 0;//Первоначальная координата по x
+			var intY:int = 0;//Первоначальная координата по y
 			debugLevel = configuration.getOption('main.debugLevel'); //Нужно ли отображать отладочную информацию
 			messenger = new Messenger(debugLevel);
 			messenger.setMessageMark('Main');
 			messenger.addEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);
 						
-			versionText = new myVersion('0.5',debugLevel);
+			versionText = new myVersion('0.6',debugLevel);
 			
 			initPosition = configuration.getOption('main.initPosition');
 			model.addChild(versionText);
@@ -86,9 +90,20 @@ package{
 			Accumulator.instance.setDebugLevel(debugLevel);
 			Accumulator.instance.setRefreshTime(int(statRefreshTime));//Устанавливаем время обновления статистики
 			
+			startStopButton = new KzSimpleButton();
+			startStopButton.setButtonSkins('pictures/interface/start.png','pictures/interface/stop.png');
+			startStopButton.x = 10;
+			startStopButton.y = commStage.height + 30;
+			startStopButton.height = 30;
+			startStopButton.width = 30;
+			startStopButtonEvent = startStopButton.buttonEvent;
+			
+			startStopButtonEvent.addEventListener(ModelEvent.FIRST_CLICK, onStartClick);
+			startStopButtonEvent.addEventListener(ModelEvent.SECOND_CLICK, onStopClick);
+			
 			statusBar = new StatusBar();
 			addChild(statusBar);
-			statusBar.setBarAt(10,stgHeight - 20);
+			statusBar.setBarAt(40 + startStopButton.width, startStopButton.y);
 						
 			switch(initPosition){//Помещаем первых особей по разным схемам, согласно конфигу
 				case 'left-top':
@@ -130,19 +145,48 @@ package{
 				}
 			
 			if(configuration.getOption('main.pluginEnable')=='true'){
-				plugins = new PluginLoader(configuration);
-				model.addChild(plugins);
-				msgString = 'Plugins are enabled';
+				try{
+				if(configuration.getOption('main.pluginsList') =='Error'){//Если в конфигурационном файле нет списка плагинов
+					throw new ArgumentError('Plugins are enabled but plugins list not set');//Прекращаем загрузку
+				}
+					eventsForPluginsList = new Array();
+	
+					eventsForPluginsList = [{//Перечисляем при помощи массива каким структурам плагина на какие события надо реагирывать
+						sendToRootObject:'getNewStatistics',//Какая структура в главной программе должна реагирывать на событие плагина
+						sendFromPluginObject:'messenger',//Какая структура плагина должна посылать событие
+						pluginEventHandler:Messenger.HAVE_EXT_DATA
+						},
+						{
+						sendFromRootObject:'startStopButtonEvent',
+						sendToPluginObject:'suspendPlugin',
+						rootEventHandler:ModelEvent.SECOND_CLICK
+						},
+						{
+						sendFromRootObject:'startStopButtonEvent',
+						sendToPluginObject:'startPlugin',
+						rootEventHandler:ModelEvent.FIRST_CLICK
+						}];
+				
+					plugins = new PluginLoader(configuration);//Загружае плагины
+					plugins.setPluginsEventsList(eventsForPluginsList);
+					plugins.loaderEvent.addEventListener(ModelEvent.PLUGIN_LOADED, onPluginsLoading);//После загрузки плагинов даем команду на загрузку элементов интерфейса
+					model.addChild(plugins);
+					msgString = 'Plugins are enabled';
+				}catch(e:ArgumentError){
+					msgString = e.message;
+					messenger.message(msgString, 0);
+					addChild(startStopButton);//Просто добавляем кнопку пуск
+					}
 				
 			}else{
 				msgString = 'Plugins are disabled';
+				addChild(startStopButton);
 				}
 					
 			configuration.removeEventListener(ConfigurationContainer.LOADED, init);
 			messenger.message(msgString, 2);
-			
-			
-		}
+				
+			}
 		
 		private function addInitIndividuals(indX:int, indY:int):void{//Добавляем первых особей
 			
@@ -150,9 +194,11 @@ package{
 				individuals[i] = new Individual(this,commStage.chessDesk,configuration,i,indX,indY);
 				indSuspender[i] = new Suspender(individuals[i],commStage.chessDesk,configuration)
 				
-				commStage.addChild(individuals[i])
+				commStage.addChild(individuals[i]);
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
+				
+				indSuspender[i].stopIndividual(0);//Останавливаем особей. Потом они запустятся кнопкой Старт
 			}
 			msgString = IND_NUMB + individuals.length;
 			messenger.message(msgString, STAT_MSG_MARK);//Сохраняем количество особей для статистики
@@ -231,6 +277,38 @@ package{
 				Accumulator.instance.stopRefresh();//И выключаем таймер
 				showMessageWindow();
 				}
+			}
+		private function onPluginsLoading(e:ModelEvent):void{
+			if(plugins.loaderEvent.pluginName=='last'){
+				addChild(startStopButton);//Когда плагины загрузились, показываем кнопку старта. Иначе могут случатся ошибки, когда плагин еще не загрузился а юзер уже пытается его остановить кнопкой
+				plugins.loaderEvent.removeEventListener(ModelEvent.PLUGIN_LOADED, onPluginsLoading);
+			}
+		}
+			
+		private function onStartClick(e:ModelEvent):void{//Действия по нажатию на кнопку старт
+			
+			if(msgWindow){//Если окно статистики уже было открыто
+				removeChild(msgWindow);//Закрываем его
+				}
+			
+			for(var i:int = 0; i<individuals.length; i++){
+				indSuspender[i].stopIndividual(1);
+				}
+			msgString = 'Individuals begin to move';
+			messenger.message(msgString, 2);
+			Accumulator.instance.startRefresh();
+			}
+		
+		private function onStopClick(e:ModelEvent):void{//Действия по нажатию на кнопку стоп
+			
+			for(var i:int = 0; i<individuals.length; i++){
+				indSuspender[i].stopIndividual(0);
+				}
+			msgString = 'Individuals has stoped';
+			messenger.message(msgString, 2);
+			
+			showMessageWindow();//Показываем статистику в окне
+			Accumulator.instance.stopRefresh();//Останавливаем сбор статистики
 			}
 		
 		private function showMessageWindow():void{
