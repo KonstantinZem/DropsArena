@@ -55,6 +55,18 @@ public class Accumulator{
 				}
             return _instance;
             }
+            
+    public function clear():void{
+		counter = 0;
+		stopRefresh();
+		paramNamebuffer = new Array;
+		paramNamebuffer[0] = '№';
+		valueBuffer = new Array;
+		valueBuffer[0] = 0;
+		statTable = new Array();
+		statTable[0] = new Array;
+		statusBarText = '';
+		}
 
 	public function setDebugLevel(dbgLevel:String):void{
 		debugLevel = dbgLevel;
@@ -68,7 +80,7 @@ public class Accumulator{
 			refreshTime = time*1000;
 			refreshTimer = new Timer(refreshTime);
 			refreshTimer.addEventListener(TimerEvent.TIMER, prepareStatTable);
-			refreshTimer.start();
+			//refreshTimer.start();
 		}catch(err:Error){
 			msgString = err.message;
 			messenger.message(msgString, 0);

@@ -47,6 +47,35 @@ public class KzSimpleButton extends Sprite{
 		currentState = 'first_click';
 	}
 	
+	public function clear():void{//Выполняется перед тем как убрать кнопку с экрана
+
+		buttonMask.removeEventListener(MouseEvent.ROLL_OVER, btnMouseRollover);
+		buttonMask.removeEventListener(MouseEvent.ROLL_OUT, btnMouseRollout);
+		buttonMask.removeEventListener(MouseEvent.MOUSE_DOWN, btnMouseDown);
+		buttonMask.removeEventListener(MouseEvent.MOUSE_UP, btnMouseUp);
+		
+		removeChild(buttonMask);
+		removeChild(inactiveBtnF);
+		removeChild(activeBtnF);
+		removeChild(pushedBtnF);
+		
+		buttonMask = null;
+		inactiveBtnF = null;
+		activeBtnF = null;
+		pushedBtnF = null;
+		
+		if(inactiveBtnS){//Если загруженно изображение второго состояния
+			removeChild(inactiveBtnS);
+			removeChild(activeBtnS);
+			removeChild(pushedBtnS);
+			
+			inactiveBtnS = null;
+		    activeBtnS = null;
+		    pushedBtnS = null;
+		}
+		
+		}
+	
 	private function parseFileName(fileName:String):Array{
 		var image:Array = new Array;
 		var parsedFileName:Array = fileName.split('.');
@@ -115,7 +144,7 @@ public class KzSimpleButton extends Sprite{
 		    buttonMask.graphics.beginFill(BUTTONE_COLOR);
 			buttonMask.graphics.drawRect(0,0,BUTTON_SIZE,BUTTON_SIZE);
 			addChild(buttonMask);
-			buttonMask.height = this.height;//Высота и ширина области на д кнопкой будут раны высоте кнопки заданной в главной программе
+			buttonMask.height = this.height;//Высота и ширина области над кнопкой будут раны высоте кнопки заданной в главной программе
 			buttonMask.width = this.width;
 			buttonMask.alpha = 0;//Делаем область над кнопкой прозрачной
 			
@@ -185,7 +214,7 @@ public class KzSimpleButton extends Sprite{
 		}
 	
 	private function btnMouseDown(e:MouseEvent):void{
-		
+		try{
 		
 		if(actionType=='two_states'){//Если у кнопки есть два состояния
 			if(currentState=='first_click'){
@@ -193,20 +222,21 @@ public class KzSimpleButton extends Sprite{
 				}else{
 					currentState='first_click';
 					}
-		
+		}
 		if(actionType == 'one_state'){
+			
 			inactiveBtnF.alpha = 0;
 			activeBtnF.alpha = 0;
 			pushedBtnF.alpha = 1;
 			
-			buttonEvent.clicking('single_click');//Посылаем сообщение об нажатии
+			doClick();//Посылаем сообщение об нажатии
 			}else{
 				switch(currentState){
 					case 'first_click':
 						inactiveBtnF.alpha = 0;
 						activeBtnF.alpha = 0;
 						pushedBtnF.alpha = 0;
-						buttonEvent.clicking('second_click');
+						doClick('second_click');
 				
 						inactiveBtnS.alpha = 0;
 						activeBtnS.alpha = 0;
@@ -220,13 +250,26 @@ public class KzSimpleButton extends Sprite{
 						inactiveBtnS.alpha = 0;
 						activeBtnS.alpha = 0;
 						pushedBtnS.alpha = 0;
-						buttonEvent.clicking('first_click');
+						doClick('first_click');
 					break;
 				}
 			}
+		messanger.message(currentState, 3);//Говорим, в каком сотоянии находится кнопка
+		}catch(e:Error){
+			messanger.message(e.message, 0);
+			}
 		}
 		
-		messanger.message(currentState, 3);//Говорим, в каком сотоянии находится кнопка
+	private function doClick(clickType:String='single_click'):void{
+		try{
+			if(buttonEvent){
+				buttonEvent.clicking(clickType);
+				}else{
+					throw new Error('Imposible to click becuase EventDispatcher not exist');
+					}
+			}catch(e:Error){
+				messanger.message(e.message, 0);
+				}
 		}
 	private function btnMouseUp(e:MouseEvent):void{
 		if(actionType == 'one_state'){

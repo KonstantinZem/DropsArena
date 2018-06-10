@@ -26,6 +26,11 @@
 			texSource = ts;
 			statusBarText.htmlText = texSource;
 			}
+		
+		public function clear():void{
+			statusBarText.text = '...';
+			removeChild(statusBarText);
+			}
 
 	}
 

@@ -51,7 +51,7 @@
 					dispatchEvent(new ModelEvent(ModelEvent.CLICKING));
 				break;
 				default:
-					trace('Wrong signal')
+					trace('Wrong signal');
 				}
 			
 			}

@@ -33,6 +33,7 @@ package{
 		private var msgWindow:TextWindow;
 		private var messenger:Messenger;
 		public var startStopButton:KzSimpleButton;
+		public var reloadButton:KzSimpleButton;
 		
 		private var eventsForPlugins:Object;
 		private var eventsForPluginsList:Array;
@@ -43,27 +44,68 @@ package{
 		public var plugins:PluginLoader;
 		public var configuration:ConfigurationContainer;
 		public var commStage:CommunityStage;
-		public var startStopButtonEvent
+		public var startStopButtonEvent:DispatchEvent;
+		public var reloadButtonEvent:DispatchEvent;
 
 		public function main(){
 			
 			stgHeight = parent.stage.stageHeight;
 			stgWidth = parent.stage.stageWidth;
+			initConfig();
 			
-			ConfigurationContainer.instance.setConfigFileName('configuration.xml');
-			ConfigurationContainer.instance.addEventListener(ConfigurationContainer.LOADED, init);//
-			ConfigurationContainer.instance.addEventListener(ConfigurationContainer.LOADING_ERROR, init)//Если не найдем конфигурационного файла, все равно загружаем программу дальше
+        }
+        
+        private function removeAllObjects():void{//Очищает все объекты программы перед ее перезапуском
+			Accumulator.instance.clear();
 			
+			startStopButtonEvent.removeEventListener(ModelEvent.FIRST_CLICK, onStartClick);
+			startStopButtonEvent.removeEventListener(ModelEvent.SECOND_CLICK, onStopClick);
+			reloadButtonEvent.removeEventListener(ModelEvent.CLICKING, onReloadClick);
+			
+			messenger.removeEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);
+			messenger = null;
+				
+			for(var i:int = 0;i<individuals.length;i++){//Полностью останавливаем особей и убираем их со сцены
+				indSuspender[i].stopIndividual(0);
+				commStage.removeChild(individuals[i]);
+			}
+			indSuspender.length = 0;
+
+			model.removeChild(commStage);
+			model.removeChild(plugins);
+			
+			statusBar.clear();
+			startStopButton.clear();
+			reloadButton.clear();
+			model.removeChild(versionText);
+			model.removeChild(statusBar);
+			
+			removeChild(model);
+			
+			configuration = null;
+			commStage = null;
+			reloadButton = null;
+			startStopButton = null;
+			}
+        
+        private function initConfig():void{
 			configuration = ConfigurationContainer.instance;
+			configuration.setConfigFileName('configuration.xml');
+			configuration.addEventListener(ConfigurationContainer.LOADED, init);//
+			configuration.addEventListener(ConfigurationContainer.LOADING_ERROR, init);//Если не найдем конфигурационного файла, все равно загружаем программу дальше
 			
 			model = new Sprite();
-			this.addChild(model);
-        }
+			addChild(model);
+			}
         
 		private function init(e:Event):void{
 			var initPosition:String;//Каким образом будут добавлятся первые особи
 			var intX:int = 0;//Первоначальная координата по x
 			var intY:int = 0;//Первоначальная координата по y
+			
+			configuration.removeEventListener(ConfigurationContainer.LOADED, init);//Эти листенеры уже отработали и не неужны
+			configuration.removeEventListener(ConfigurationContainer.LOADING_ERROR, init);
+			
 			debugLevel = configuration.getOption('main.debugLevel'); //Нужно ли отображать отладочную информацию
 			messenger = new Messenger(debugLevel);
 			messenger.setMessageMark('Main');
@@ -90,20 +132,7 @@ package{
 			Accumulator.instance.setDebugLevel(debugLevel);
 			Accumulator.instance.setRefreshTime(int(statRefreshTime));//Устанавливаем время обновления статистики
 			
-			startStopButton = new KzSimpleButton();
-			startStopButton.setButtonSkins('pictures/interface/start.png','pictures/interface/stop.png');
-			startStopButton.x = 10;
-			startStopButton.y = commStage.height + 30;
-			startStopButton.height = 30;
-			startStopButton.width = 30;
-			startStopButtonEvent = startStopButton.buttonEvent;
-			
-			startStopButtonEvent.addEventListener(ModelEvent.FIRST_CLICK, onStartClick);
-			startStopButtonEvent.addEventListener(ModelEvent.SECOND_CLICK, onStopClick);
-			
-			statusBar = new StatusBar();
-			addChild(statusBar);
-			statusBar.setBarAt(40 + startStopButton.width, startStopButton.y);
+			initGUIElements();
 						
 			switch(initPosition){//Помещаем первых особей по разным схемам, согласно конфигу
 				case 'left-top':
@@ -176,16 +205,48 @@ package{
 					msgString = e.message;
 					messenger.message(msgString, 0);
 					addChild(startStopButton);//Просто добавляем кнопку пуск
+					addChild(reloadButton);
 					}
 				
 			}else{
 				msgString = 'Plugins are disabled';
 				addChild(startStopButton);
+				addChild(reloadButton);
 				}
 					
-			configuration.removeEventListener(ConfigurationContainer.LOADED, init);
 			messenger.message(msgString, 2);
 				
+			}
+			
+		private function initGUIElements():void{
+			try{
+				startStopButton = new KzSimpleButton();
+				startStopButton.setButtonSkins('pictures/interface/start.png','pictures/interface/stop.png');
+				startStopButton.x = 10;
+				startStopButton.y = commStage.height + 30;
+				startStopButton.height = 30;
+				startStopButton.width = 30;
+				startStopButtonEvent = startStopButton.buttonEvent;
+			
+				startStopButtonEvent.addEventListener(ModelEvent.FIRST_CLICK, onStartClick);
+				startStopButtonEvent.addEventListener(ModelEvent.SECOND_CLICK, onStopClick);
+			
+				reloadButton = new KzSimpleButton();//Кнопка перезагрузки модели
+				reloadButton.setButtonSkins('pictures/interface/reload.png');
+				reloadButton.x = 20 + startStopButton.height;
+				reloadButton.y = commStage.height + 30;
+				reloadButton.height = 30;
+				reloadButton.width = 30;
+			
+				reloadButtonEvent = reloadButton.buttonEvent;
+				reloadButtonEvent.addEventListener(ModelEvent.CLICKING, onReloadClick);
+			
+				statusBar = new StatusBar();
+				model.addChild(statusBar);
+				statusBar.setBarAt((70 + startStopButton.width + reloadButton.width), startStopButton.y);
+				}catch(e:Error){
+					
+					}
 			}
 		
 		private function addInitIndividuals(indX:int, indY:int):void{//Добавляем первых особей
@@ -281,7 +342,8 @@ package{
 		private function onPluginsLoading(e:ModelEvent):void{
 			if(plugins.loaderEvent.pluginName=='last'){
 				addChild(startStopButton);//Когда плагины загрузились, показываем кнопку старта. Иначе могут случатся ошибки, когда плагин еще не загрузился а юзер уже пытается его остановить кнопкой
-				plugins.loaderEvent.removeEventListener(ModelEvent.PLUGIN_LOADED, onPluginsLoading);
+				addChild(reloadButton);
+				plugins.loaderEvent.removeEventListener(ModelEvent.PLUGIN_LOADED, onPluginsLoading);//Когда плагины загрузились, больше не нужно ждать сообщений об окончании загрузки
 			}
 		}
 			
@@ -289,6 +351,7 @@ package{
 			
 			if(msgWindow){//Если окно статистики уже было открыто
 				removeChild(msgWindow);//Закрываем его
+				msgWindow = null;
 				}
 			
 			for(var i:int = 0; i<individuals.length; i++){
@@ -309,6 +372,11 @@ package{
 			
 			showMessageWindow();//Показываем статистику в окне
 			Accumulator.instance.stopRefresh();//Останавливаем сбор статистики
+			}
+		
+		private function onReloadClick(e:ModelEvent):void{//При нажатии на кнопку перезагрузки модели
+			removeAllObjects();//Очищаем все объекты модели
+			initConfig();//Запускаем программу с самого начала
 			}
 		
 		private function showMessageWindow():void{
