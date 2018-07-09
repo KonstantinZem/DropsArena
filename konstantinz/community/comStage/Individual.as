@@ -19,6 +19,9 @@ package konstantinz.community.comStage{
 
 	public class Individual extends Sprite{
 		//Класс, описывающий поведение отдельного организма в сообществе
+		
+		private const ERROR_MARK:int = 0;//Сообщение об ошибке помечаются в messanger помечаеся цифрой 0
+		
 		private var tickInterval:int = 20;//Интервал между тиками таймера
 		private var individual:Sprite;
 		private var indNumber:int
@@ -97,7 +100,7 @@ package konstantinz.community.comStage{
 			}
 			catch(error:ArgumentError){
 				msgString = error.message;
-				messanger.message(msgString, 0);
+				messanger.message(msgString, ERROR_MARK);
 				}
 			}
 		/////////////////////////Private//////////////////////////////////////////////////////////////////////

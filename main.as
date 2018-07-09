@@ -22,6 +22,7 @@ package{
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
 		private const CRITIAL_IND_NUMBER:int = 5;//Минимально подходящие для отслеживания статистики количество особей
 		private const STAT_MSG_MARK:int = 10;
+		private const ERROR_MARK:int = 0;//Сообщение об ошибке помечаются в messanger помечаеся цифрой 0
 		
 		private var stgHeight:int;
 		private var stgWidth:int;
@@ -51,9 +52,13 @@ package{
 			
 			stgHeight = parent.stage.stageHeight;
 			stgWidth = parent.stage.stageWidth;
-			initConfig();
-			
-        }
+			initConfig();	
+			}
+        
+        public function getNewStatistics(e:Event):void{
+				Accumulator.instance.pushToBuffer(e.target.msg);
+				statusBar.setTexSource(Accumulator.instance.statusBarText);
+			    }
         
         private function removeAllObjects():void{//Очищает все объекты программы перед ее перезапуском
 			Accumulator.instance.clear();
@@ -203,7 +208,7 @@ package{
 					msgString = 'Plugins are enabled';
 				}catch(e:ArgumentError){
 					msgString = e.message;
-					messenger.message(msgString, 0);
+					messenger.message(msgString, ERROR_MARK);
 					addChild(startStopButton);//Просто добавляем кнопку пуск
 					addChild(reloadButton);
 					}
@@ -308,11 +313,6 @@ package{
 				msgString = IND_NUMB + individuals.length;
 			    messenger.message(msgString, STAT_MSG_MARK);//Сохраняем количество особей для статистики
 		}
-		
-		public function getNewStatistics(e:Event):void{
-				Accumulator.instance.pushToBuffer(e.target.msg);
-				statusBar.setTexSource(Accumulator.instance.statusBarText);
-			    }
 		
 		private function removeIndividuals(e:Event):void{
 			var individual:int = e.target.individual;//Получаем номер особи, которую надо удалить

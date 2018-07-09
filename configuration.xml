@@ -4,13 +4,13 @@
 	<debugLevel>1</debugLevel>
 	<pluginEnable>true</pluginEnable>
 	<!-- indQuntaty -- how many individuals must to be created at the start -->
-	<indQuntaty>40</indQuntaty>
+	<indQuntaty>200</indQuntaty>
 	<lifeTime>6880</lifeTime>
 	<lifeQuant>1</lifeQuant>
 	<adultAge>2340</adultAge>
 	<maturingDeley>1170</maturingDeley>
-	<offspringsQuant>30</offspringsQuant>
-	<dropSize>12</dropSize>
+	<offspringsQuant>20</offspringsQuant>
+	<dropSize>12</dropSize>>
 	<!-- initPosition of individual can be left-top, left-bottom,  right-top, right-bottom, center and random -->
 	<initPosition>left-top</initPosition>
 	<statRefreshTime>10</statRefreshTime>
@@ -52,587 +52,870 @@
 	<signal>stop</signal>
     <steps>6500</steps>
      <debugLevel>2</debugLevel>
-     <data><![CDATA[
-<activity state='unactive'>
-<part day='07.09.10'>48</part>
-<part day='08.09.10'>0</part>
-<part day='09.09.10'>0</part>
-<part day='09.09.10'>25</part>
-<part day='10.09.10'>8</part>
-<part day='15.09.10'>90</part>
-<part day='17.09.10'>50</part>
-<part day='20.09.10'>0</part>
-<part day='20.09.10'>83</part>
-<part day='21.09.10'>64</part>
-<part day='21.09.10'>45</part>
-<part day='24.09.10'>8</part>
-<part day='24.09.10'>64</part>
-<part day='25.09.10'>14</part>
-<part day='27.09.10'>38</part>
-<part day='27.09.10'>100</part>
-<part day='27.09.10'>100</part>
-<part day='27.09.10'>91</part>
-<part day='29.09.10'>50</part>
-<part day='29.09.10'>92</part>
-<part day='29.09.10'>100</part>
-<part day='01.10.10'>90</part>
-<part day='01.10.10'>73</part>
-<part day='01.10.10'>11</part>
-<part day='04.10.10'>0</part>
-<part day='04.10.10'>7</part>
-<part day='05.10.10'>0</part>
-<part day='05.10.10'>0</part>
-<part day='06.10.10'>0</part>
-<part day='06.10.10'>0</part>
-<part day='13.10.10'>6</part>
-<part day='20.10.10'>59</part>
-<part day='20.10.10'>100</part>
-<part day='25.10.10'>0</part>
-<part day='02.11.10'>0</part>
-<part day='10.11.10'>25</part>
-<part day='10.11.10'>50</part>
-<part day='13.11.10'>100</part>
-<part day='15.11.10'>25</part>
-<part day='15.11.10'>22</part>
-<part day='18.11.10'>17</part>
-<part day='23.03.11'>3</part>
-<part day='03.04.11'>10</part>
-<part day='04.04.11'>16</part>
-<part day='05.04.11'>100</part>
-<part day='05.04.11'>43</part>
-<part day='06.04.11'>23</part>
-<part day='07.04.11'>45</part>
-<part day='07.04.11'>76</part>
-<part day='07.04.11'>100</part>
-<part day='11.04.11'>22</part>
-<part day='12.04.11'>67</part>
-<part day='13.04.11'>0</part>
-<part day='13.04.11'>12</part>
-<part day='14.04.11'>0</part>
-<part day='14.04.11'>26</part>
-<part day='15.04.11'>0</part>
-<part day='18.04.11'>21</part>
-<part day='18.04.11'>0</part>
-<part day='19.04.11'>11</part>
-<part day='20.04.11'>25</part>
-<part day='22.04.11'>0</part>
-<part day='22.04.11'>3</part>
-<part day='23.04.11'>30</part>
-<part day='26.04.11'>39</part>
-<part day='26.04.11'>44</part>
-<part day='27.04.11'>81</part>
-<part day='27.04.11'>0</part>
-<part day='27.04.11'>78</part>
-<part day='02.05.11'>65</part>
-<part day='04.05.11'>100</part>
-<part day='04.05.11'>100</part>
-<part day='04.05.11'>100</part>
-<part day='04.05.11'>89</part>
-<part day='04.05.11'>60</part>
-<part day='05.05.11'>50</part>
-<part day='06.05.11'>56</part>
-<part day='11.05.11'>61</part>
-<part day='11.05.11'>0</part>
-<part day='11.05.11'>88</part>
-<part day='12.05.11'>28</part>
-<part day='14.05.11'>56</part>
-<part day='14.05.11'>0</part>
-<part day='16.05.11'>0</part>
-<part day='16.05.11'>91</part>
-<part day='16.05.11'>84</part>
-<part day='16.05.11'>91</part>
-<part day='16.05.11'>94</part>
-<part day='17.05.11'>0</part>
-<part day='17.05.11'>42</part>
-<part day='18.05.11'>43</part>
-<part day='18.05.11'>0</part>
-<part day='18.05.11'>88</part>
-<part day='19.05.11'>58</part>
-<part day='24.05.11'>68</part>
-<part day='25.05.11'>100</part>
-<part day='25.05.11'>50</part>
-<part day='27.05.11'>11</part>
-<part day='27.05.11'>0</part>
-<part day='27.05.11'>0</part>
-<part day='06.06.11'>0</part>
-<part day='14.06.11'>0</part>
-<part day='15.06.11'>0</part>
-<part day='15.06.11'>18</part>
-<part day='16.06.11'>0</part>
-<part day='16.06.11'>0</part>
-<part day='17.06.11'>0</part>
-<part day='18.06.11'>62</part>
-<part day='22.06.11'>50</part>
-<part day='22.06.11'>61</part>
-<part day='22.06.11'>100</part>
-<part day='22.06.11'>50</part>
-<part day='03.07.11'>81</part>
-<part day='03.07.11'>85</part>
-<part day='05.07.11'>33</part>
-<part day='05.07.11'>22</part>
-<part day='23.07.11'>67</part>
-<part day='23.07.11'>84</part>
-<part day='18.08.11'>0</part>
-<part day='19.08.11'>12</part>
-<part day='21.08.11'>46</part>
-<part day='22.08.11'>100</part>
-<part day='22.08.11'>63</part>
-<part day='23.08.11'>48</part>
-<part day='26.09.11'>0</part>
-<part day='26.09.11'>0</part>
-<part day='26.09.11'>0</part>
-<part day='26.09.11'>0</part>
-<part day='27.09.11'>0</part>
-<part day='27.09.11'>100</part>
-<part day='28.09.11'>76</part>
-<part day='29.09.11'>0</part>
-<part day='01.10.11'>0</part>
-<part day='03.10.11'>16</part>
-<part day='04.10.11'>31</part>
-<part day='05.10.11'>6</part>
-<part day='06.10.11'>0</part>
-<part day='07.10.11'>53</part>
-<part day='08.10.11'>21</part>
-<part day='08.10.11'>33</part>
-<part day='10.10.11'>62</part>
-<part day='11.10.11'>64</part>
-<part day='12.10.11'>92</part>
-<part day='12.10.11'>100</part>
-<part day='13.10.11'>48</part>
-<part day='14.10.11'>33</part>
-<part day='17.10.11'>32</part>
-<part day='19.10.11'>29</part>
-<part day='19.10.11'>0</part>
-<part day='20.10.11'>88</part>
-<part day='20.10.11'>70</part>
-<part day='22.10.11'>22</part>
-<part day='23.10.11'>35</part>
-<part day='24.10.11'>38</part>
-<part day='24.10.11'>68</part>
-<part day='25.10.11'>100</part>
-<part day='25.10.11'>88</part>
-<part day='26.10.11'>13</part>
-<part day='26.10.11'>16</part>
-<part day='27.10.11'>17</part>
-<part day='28.10.11'>40</part>
-<part day='30.10.11'>69</part>
-<part day='01.11.11'>100</part>
-<part day='01.11.11'>100</part>
-<part day='02.11.11'>71</part>
-<part day='02.11.11'>88</part>
-<part day='03.11.11'>9</part>
-<part day='04.11.11'>71</part>
-<part day='08.11.11'>0</part>
-<part day='11.11.11'>0</part>
-<part day='12.11.11'>0</part>
-<part day='14.11.11'>0</part>
-<part day='28.03.12'>0</part>
-<part day='30.03.12'>57</part>
-<part day='01.04.12'>56</part>
-<part day='01.04.12'>27</part>
-<part day='03.04.12'>0</part>
-<part day='04.04.12'>19</part>
-<part day='05.04.12'>84</part>
-<part day='05.04.12'>43</part>
-<part day='06.04.12'>13</part>
-<part day='16.04.12'>96</part>
-<part day='16.04.12'>100</part>
-<part day='16.04.12'>78</part>
-<part day='16.04.12'>100</part>
-<part day='17.04.12'>71</part>
-<part day='17.04.12'>92</part>
-<part day='17.04.12'>12</part>
-<part day='17.04.12'>28</part>
-<part day='18.04.12'>0</part>
-<part day='18.04.12'>0</part>
-<part day='19.04.12'>92</part>
-<part day='19.04.12'>85</part>
-<part day='20.04.12'>34</part>
-<part day='20.04.12'>40</part>
-<part day='20.04.12'>40</part>
-<part day='20.04.12'>11</part>
-<part day='20.04.12'>13</part>
-<part day='20.04.12'>90</part>
-<part day='25.04.12'>78</part>
-<part day='25.04.12'>10</part>
-<part day='25.04.12'>11</part>
-<part day='25.04.12'>88</part>
-<part day='25.04.12'>100</part>
-<part day='26.04.12'>67</part>
-<part day='26.04.12'>91</part>
-<part day='26.04.12'>16</part>
-<part day='26.04.12'>100</part>
-<part day='26.04.12'>96</part>
-<part day='29.04.12'>93</part>
-<part day='29.04.12'>100</part>
-<part day='29.04.12'>69</part>
-<part day='29.04.12'>5</part>
-<part day='29.04.12'>0</part>
-<part day='29.04.12'>57</part>
-<part day='29.04.12'>0</part>
-<part day='29.04.12'>24</part>
-<part day='30.04.12'>100</part>
-<part day='30.04.12'>61</part>
-<part day='30.04.12'>86</part>
-<part day='30.04.12'>0</part>
-<part day='30.04.12'>78</part>
-<part day='30.04.12'>0</part>
-<part day='30.04.12'>12</part>
-<part day='02.05.12'>63</part>
-<part day='03.05.12'>70</part>
-<part day='06.05.12'>96</part>
-<part day='06.05.12'>47</part>
-<part day='07.05.12'>100</part>
-<part day='07.05.12'>93</part>
-<part day='07.05.12'>20</part>
-<part day='07.05.12'>71</part>
-<part day='09.05.12'>32</part>
-<part day='10.05.12'>0</part>
-<part day='10.05.12'>26</part>
-<part day='11.05.12'>17</part>
-<part day='11.05.12'>0</part>
-<part day='11.05.12'>0</part>
-<part day='11.05.12'>7</part>
-<part day='14.05.12'>90</part>
-<part day='14.05.12'>32</part>
-<part day='21.05.12'>89</part>
-<part day='21.05.12'>44</part>
-<part day='21.05.12'>0</part>
-<part day='22.05.12'>100</part>
-<part day='22.05.12'>0</part>
-<part day='22.05.12'>36</part>
-<part day='02.06.12'>20</part>
-<part day='02.06.12'>0</part>
-<part day='04.06.12'>73</part>
-<part day='06.06.12'>100</part>
-<part day='06.06.12'>71</part>
-<part day='06.06.12'>0</part>
-<part day='07.06.12'>48</part>
-<part day='07.06.12'>0</part>
-<part day='07.06.12'>0</part>
-<part day='08.06.12'>59</part>
-<part day='11.06.12'>94</part>
-<part day='11.06.12'>100</part>
-<part day='11.06.12'>0</part>
-<part day='11.06.12'>68</part>
-<part day='11.06.12'>0</part>
-<part day='11.06.12'>6</part>
-<part day='11.06.12'>11</part>
-<part day='12.06.12'>96</part>
-<part day='12.06.12'>50</part>
-<part day='14.06.12'>100</part>
-<part day='14.06.12'>0</part>
-<part day='14.06.12'>50</part>
-<part day='16.06.12'>77</part>
-<part day='18.06.12'>48</part>
-<part day='18.06.12'>0</part>
-<part day='18.06.12'>6</part>
-<part day='19.06.12'>13</part>
-<part day='21.06.12'>92</part>
-<part day='21.06.12'>94</part>
-<part day='24.06.12'>13</part>
-<part day='01.08.12'>0</part>
-<part day='01.08.12'>21</part>
-<part day='02.08.12'>64</part>
-<part day='02.08.12'>14</part>
+     <data>
+		<activity state='unactive'>
+			<part>48</part>
+			<day>20.09.10</day>
+			<part>0</part>
+			<day>08.09.10</day>
+			<part>0</part>
+			<day>09.09.10</day>
+			<part>25</part>
+			<day>09.09.10</day>
+			<part>8</part>
+			<day>10.09.10</day>
+			<part>90</part>
+			<day>15.09.10</day>
+			<part>50</part>
+			<day>17.09.10</day>
+			<part>0</part>
+			<day>20.09.10</day>
+			<part>83</part>
+			<day>20.09.10</day>
+			<part>64</part>
+			<day>21.09.10</day>
+			<part>45</part>
+			<day>21.09.10</day>
+			<part>8</part>
+			<day>24.09.10</day>
+			<part>64</part>
+			<day>24.09.10</day>
+			<part>14</part>
+			<day>25.09.10</day>
+			<part>38</part>
+			<day>27.09.10</day>
+			<part>100</part>
+			<day>27.09.10</day>
+			<part>100</part>
+			<day>27.09.10</day>
+			<part>91</part>
+			<day>27.09.10</day>
+			<part>50</part>
+			<day>29.09.10</day>
+			<part>92</part>
+			<day>29.09.10</day>
+			<part>100</part>
+			<day>29.09.10</day>
+			<part>90</part>
+			<day>01.10.10</day>
+			<part>73</part>
+			<day>01.10.10</day>
+			<part>11</part>
+			<day>01.10.10</day>
+			<part>0</part>
+			<day>04.10.10</day>
+			<part>7</part>
+			<day>04.10.10</day>
+			<part>0</part>
+			<day>05.10.10</day>
+			<part>0</part>
+			<day>05.10.10</day>
+			<part>0</part>
+			<day>06.10.10</day>
+			<part>0</part>
+			<day>06.10.10</day>
+			<part>6</part>
+			<day>13.10.10</day>
+			<part>59</part>
+			<day>20.10.10</day>
+			<part>100</part>
+			<day>20.10.10</day>
+			<part>0</part>
+			<day>25.10.10</day>
+			<part>0</part>
+			<day>02.11.10</day>
+			<part>25</part>
+			<day>10.11.10</day>
+			<part>50</part>
+			<day>10.11.10</day>
+			<part>100</part>
+			<day>13.11.10</day>
+			<part>25</part>
+			<day>15.11.10</day>
+			<part>22</part>
+			<day>15.11.10</day>
+			<part>17</part>
+			<day>18.11.10</day>
+			<part>3</part>
+			<day>23.03.11</day>
+			<part>10</part>
+			<day>03.04.11</day>
+			<part>16</part>
+			<day>04.04.11</day>
+			<part>100</part>
+			<day>05.04.11</day>
+			<part>43</part>
+			<day>05.04.11</day>
+			<part>23</part>
+			<day>06.04.11</day>
+			<part>45</part>
+			<day>07.04.11</day>
+			<part>76</part>
+			<day>07.04.11</day>
+			<part>100</part>
+			<day>07.04.11</day>
+			<part>22</part>
+			<day>11.04.11</day>
+			<part>67</part>
+			<day>12.04.11</day>
+			<part>0</part>
+			<day>13.04.11</day>
+			<part>12</part>
+			<day>13.04.11</day>
+			<part>0</part>
+			<day>14.04.11</day>
+			<part>26</part>
+			<day>14.04.11</day>
+			<part>0</part>
+			<day>15.04.11</day>
+			<part>21</part>
+			<day>18.04.11</day>
+			<part>0</part>
+			<day>18.04.11</day>
+			<part>11</part>
+			<day>19.04.11</day>
+			<part>25</part>
+			<day>20.04.11</day>
+			<part>0</part>
+			<day>22.04.11</day>
+			<part>3</part>
+			<day>22.04.11</day>
+			<part>30</part>
+			<day>23.04.11</day>
+			<part>39</part>
+			<day>26.04.11</day>
+			<part>44</part>
+			<day>26.04.11</day>
+			<part>81</part>
+			<day>27.04.11</day>
+			<part>0</part>
+			<day>27.04.11</day>
+			<part>78</part>
+			<day>27.04.11</day>
+			<part>65</part>
+			<day>02.05.11</day>
+			<part>100</part>
+			<day>04.05.11</day>
+			<part>100</part>
+			<day>04.05.11</day>
+			<part>100</part>
+			<day>04.05.11</day>
+			<part>89</part>
+			<day>04.05.11</day>
+			<part>60</part>
+			<day>04.05.11</day>
+			<part>50</part>
+			<day>05.05.11</day>
+			<part>56</part>
+			<day>06.05.11</day>
+			<part>61</part>
+			<day>11.05.11</day>
+			<part>0</part>
+			<day>11.05.11</day>
+			<part>88</part>
+			<day>11.05.11</day>
+			<part>28</part>
+			<day>12.05.11</day>
+			<part>56</part>
+			<day>14.05.11</day>
+			<part>0</part>
+			<day>14.05.11</day>
+			<part>0</part>
+			<day>16.05.11</day>
+			<part>91</part>
+			<day>16.05.11</day>
+			<part>84</part>
+			<day>16.05.11</day>
+			<part>91</part>
+			<day>16.05.11</day>
+			<part>94</part>
+			<day>16.05.11</day>
+			<part>0</part>
+			<day>17.05.11</day>
+			<part>42</part>
+			<day>17.05.11</day>
+			<part>43</part>
+			<day>18.05.11</day>
+			<part>0</part>
+			<day>18.05.11</day>
+			<part>88</part>
+			<day>18.05.11</day>
+			<part>58</part>
+			<day>19.05.11</day>
+			<part>68</part>
+			<day>24.05.11</day>
+			<part>100</part>
+			<day>25.05.11</day>
+			<part>50</part>
+			<day>25.05.11</day>
+			<part>11</part>
+			<day>27.05.11</day>
+			<part>0</part>
+			<day>27.05.11</day>
+			<part>0</part>
+			<day>27.05.11</day>
+			<part>0</part>
+			<day>06.06.11</day>
+			<part>0</part>
+			<day>14.06.11</day>
+			<part>0</part>
+			<day>15.06.11</day>
+			<part>18</part>
+			<day>15.06.11</day>
+			<part>0</part>
+			<day>16.06.11</day>
+			<part>0</part>
+			<day>16.06.11</day>
+			<part>0</part>
+			<day>17.06.11</day>
+			<part>62</part>
+			<day>18.06.11</day>
+			<part>50</part>
+			<day>22.06.11</day>
+			<part>61</part>
+			<day>22.06.11</day>
+			<part>100</part>
+			<day>22.06.11</day>
+			<part>50</part>
+			<day>22.06.11</day>
+			<part>81</part>
+			<day>03.07.11</day>
+			<part>85</part>
+			<day>03.07.11</day>
+			<part>33</part>
+			<day>05.07.11</day>
+			<part>22</part>
+			<day>05.07.11</day>
+			<part>67</part>
+			<day>23.07.11</day>
+			<part>84</part>
+			<day>23.07.11</day>
+			<part>0</part>
+			<day>18.08.11</day>
+			<part>12</part>
+			<day>19.08.11</day>
+			<part>46</part>
+			<day>21.08.11</day>
+			<part>100</part>
+			<day>22.08.11</day>
+			<part>63</part>
+			<day>22.08.11</day>
+			<part>48</part>
+			<day>23.08.11</day>
+			<part>0</part>
+			<day>26.09.11</day>
+			<part>0</part>
+			<day>26.09.11</day>
+			<part>0</part>
+			<day>26.09.11</day>
+			<part>0</part>
+			<day>26.09.11</day>
+			<part>0</part>
+			<day>27.09.11</day>
+			<part>100</part>
+			<day>27.09.11</day>
+			<part>76</part>
+			<day>28.09.11</day>
+			<part>0</part>
+			<day>29.09.11</day>
+			<part>0</part>
+			<day>01.10.11</day>
+			<part>16</part>
+			<day>03.10.11</day>
+			<part>31</part>
+			<day>04.10.11</day>
+			<part>6</part>
+			<day>05.10.11</day>
+			<part>0</part>
+			<day>06.10.11</day>
+			<part>53</part>
+			<day>07.10.11</day>
+			<part>21</part>
+			<day>08.10.11</day>
+			<part>33</part>
+			<day>08.10.11</day>
+			<part>62</part>
+			<day>10.10.11</day>
+			<part>64</part>
+			<day>11.10.11</day>
+			<part>92</part>
+			<day>12.10.11</day>
+			<part>100</part>
+			<day>12.10.11</day>
+			<part>48</part>
+			<day>13.10.11</day>
+			<part>33</part>
+			<day>14.10.11</day>
+			<part>32</part>
+			<day>17.10.11</day>
+			<part>29</part>
+			<day>19.10.11</day>
+			<part>0</part>
+			<day>19.10.11</day>
+			<part>88</part>
+			<day>20.10.11</day>
+			<part>70</part>
+			<day>20.10.11</day>
+			<part>22</part>
+			<day>22.10.11</day>
+			<part>35</part>
+			<day>23.10.11</day>
+			<part>38</part>
+			<day>24.10.11</day>
+			<part>68</part>
+			<day>24.10.11</day>
+			<part>100</part>
+			<day>25.10.11</day>
+			<part>88</part>
+			<day>25.10.11</day>
+			<part>13</part>
+			<day>26.10.11</day>
+			<part>16</part>
+			<day>26.10.11</day>
+			<part>17</part>
+			<day>27.10.11</day>
+			<part>40</part>
+			<day>28.10.11</day>
+			<part>69</part>
+			<day>30.10.11</day>
+			<part>100</part>
+			<day>01.11.11</day>
+			<part>100</part>
+			<day>01.11.11</day>
+			<part>71</part>
+			<day>02.11.11</day>
+			<part>88</part>
+			<day>02.11.11</day>
+			<part>9</part>
+			<day>03.11.11</day>
+			<part>71</part>
+			<day>04.11.11</day>
+			<part>0</part>
+			<day>08.11.11</day>
+			<part>0</part>
+			<day>11.11.11</day>
+			<part>0</part>
+			<day>12.11.11</day>
+			<part>0</part>
+			<day>14.11.11</day>
+			<part>0</part>
+			<day>28.03.12</day>
+			<part>57</part>
+			<day>30.03.12</day>
+			<part>56</part>
+			<day>01.04.12</day>
+			<part>27</part>
+			<day>01.04.12</day>
+			<part>0</part>
+			<day>03.04.12</day>
+			<part>19</part>
+			<day>04.04.12</day>
+			<part>84</part>
+			<day>05.04.12</day>
+			<part>43</part>
+			<day>05.04.12</day>
+			<part>13</part>
+			<day>06.04.12</day>
+			<part>96</part>
+			<day>16.04.12</day>
+			<part>100</part>
+			<day>16.04.12</day>
+			<part>78</part>
+			<day>16.04.12</day>
+			<part>100</part>
+			<day>16.04.12</day>
+			<part>71</part>
+			<day>17.04.12</day>
+			<part>92</part>
+			<day>17.04.12</day>
+			<part>12</part>
+			<day>17.04.12</day>
+			<part>28</part>
+			<day>17.04.12</day>
+			<part>0</part>
+			<day>18.04.12</day>
+			<part>0</part>
+			<day>18.04.12</day>
+			<part>92</part>
+			<day>19.04.12</day>
+			<part>85</part>
+			<day>19.04.12</day>
+			<part>34</part>
+			<day>20.04.12</day>
+			<part>40</part>
+			<day>20.04.12</day>
+			<part>40</part>
+			<day>20.04.12</day>
+			<part>11</part>
+			<day>20.04.12</day>
+			<part>13</part>
+			<day>20.04.12</day>
+			<part>90</part>
+			<day>20.04.12</day>
+			<part>78</part>
+			<day>25.04.12</day>
+			<part>10</part>
+			<day>25.04.12</day>
+			<part>11</part>
+			<day>25.04.12</day>
+			<part>88</part>
+			<day>25.04.12</day>
+			<part>100</part>
+			<day>25.04.12</day>
+			<part>67</part>
+			<day>26.04.12</day>
+			<part>91</part>
+			<day>26.04.12</day>
+			<part>16</part>
+			<day>26.04.12</day>
+			<part>100</part>
+			<day>26.04.12</day>
+			<part>96</part>
+			<day>26.04.12</day>
+			<part>93</part>
+			<day>29.04.12</day>
+			<part>100</part>
+			<day>29.04.12</day>
+			<part>69</part>
+			<day>29.04.12</day>
+			<part>5</part>
+			<day>29.04.12</day>
+			<part>0</part>
+			<day>29.04.12</day>
+			<part>57</part>
+			<day>29.04.12</day>
+			<part>0</part>
+			<day>29.04.12</day>
+			<part>24</part>
+			<day>29.04.12</day>
+			<part>100</part>
+			<day>30.04.12</day>
+			<part>61</part>
+			<day>30.04.12</day>
+			<part>86</part>
+			<day>30.04.12</day>
+			<part>0</part>
+			<day>30.04.12</day>
+			<part>78</part>
+			<day>30.04.12</day>
+			<part>0</part>
+			<day>30.04.12</day>
+			<part>12</part>
+			<day>30.04.12</day>
+			<part>63</part>
+			<day>02.05.12</day>
+			<part>70</part>
+			<day>03.05.12</day>
+			<part>96</part>
+			<day>06.05.12</day>
+			<part>47</part>
+			<day>06.05.12</day>
+			<part>100</part>
+			<day>07.05.12</day>
+			<part>93</part>
+			<day>07.05.12</day>
+			<part>20</part>
+			<day>07.05.12</day>
+			<part>71</part>
+			<day>07.05.12</day>
+			<part>32</part>
+			<day>09.05.12</day>
+			<part>0</part>
+			<day>10.05.12</day>
+			<part>26</part>
+			<day>10.05.12</day>
+			<part>17</part>
+			<day>11.05.12</day>
+			<part>0</part>
+			<day>11.05.12</day>
+			<part>0</part>
+			<day>11.05.12</day>
+			<part>7</part>
+			<day>11.05.12</day>
+			<part>90</part>
+			<day>14.05.12</day>
+			<part>32</part>
+			<day>14.05.12</day>
+			<part>89</part>
+			<day>21.05.12</day>
+			<part>44</part>
+			<day>21.05.12</day>
+			<part>0</part>
+			<day>21.05.12</day>
+			<part>100</part>
+			<day>22.05.12</day>
+			<part>0</part>
+			<day>22.05.12</day>
+			<part>36</part>
+			<day>22.05.12</day>
+			<part>20</part>
+			<day>02.06.12</day>
+			<part>0</part>
+			<day>02.06.12</day>
+			<part>73</part>
+			<day>04.06.12</day>
+			<part>100</part>
+			<day>06.06.12</day>
+			<part>71</part>
+			<day>06.06.12</day>
+			<part>0</part>
+			<day>06.06.12</day>
+			<part>48</part>
+			<day>07.06.12</day>
+			<part>0</part>
+			<day>07.06.12</day>
+			<part>0</part>
+			<day>07.06.12</day>
+			<part>59</part>
+			<day>08.06.12</day>
+			<part>94</part>
+			<day>11.06.12</day>
+			<part>100</part>
+			<day>11.06.12</day>
+			<part>0</part>
+			<day>11.06.12</day>
+			<part>68</part>
+			<day>11.06.12</day>
+			<part>0</part>
+			<day>11.06.12</day>
+			<part>6</part>
+			<day>11.06.12</day>
+			<part>11</part>
+			<day>11.06.12</day>
+			<part>96</part>
+			<day>12.06.12</day>
+			<part>50</part>
+			<day>12.06.12</day>
+			<part>100</part>
+			<day>14.06.12</day>
+			<part>0</part>
+			<day>14.06.12</day>
+			<part>50</part>
+			<day>14.06.12</day>
+			<part>77</part>
+			<day>16.06.12</day>
+			<part>48</part>
+			<day>18.06.12</day>
+			<part>0</part>
+			<day>18.06.12</day>
+			<part>6</part>
+			<day>18.06.12</day>
+			<part>13</part>
+			<day>19.06.12</day>
+			<part>92</part>
+			<day>21.06.12</day>
+			<part>94</part>
+			<day>21.06.12</day>
+			<part>13</part>
+			<day>24.06.12</day>
+			<part>0</part>
+			<day>01.08.12</day>
+			<part>21</part>
+			<day>01.08.12</day>
+			<part>64</part>
+			<day>02.08.12</day>
+			<part>14</part>
+			<day>02.08.12</day>
+		</activity>
+	</data>
 </activity>
-]]></data>
-    </activity>
   <death>
 	<signal>kill</signal>
-<!-- individuals will have been killed une time per this number of steps -->
+	<!-- individuals will have been killed une time per this number of steps -->
      <steps>6500</steps>
      <debugLevel>1</debugLevel>
-        <!-- killStoped: are unactive individuals will be killed to -->
+     <!-- killStoped: are unactive individuals will be killed to -->
      <killStoped>true</killStoped>
-<data><![CDATA[<activity>
-<part day='07.09.10'>0</part>
-<part day='08.09.10'>0</part>
-<part day='09.09.10'>0</part>
-<part day='09.09.10'>0</part>
-<part day='10.09.10'>0</part>
-<part day='15.09.10'>0</part>
-<part day='17.09.10'>0</part>
-<part day='20.09.10'>0</part>
-<part day='20.09.10'>0</part>
-<part day='21.09.10'>0</part>
-<part day='21.09.10'>0</part>
-<part day='24.09.10'>0</part>
-<part day='24.09.10'>0</part>
-<part day='25.09.10'>0</part>
-<part day='27.09.10'>0</part>
-<part day='27.09.10'>0</part>
-<part day='27.09.10'>0</part>
-<part day='27.09.10'>0</part>
-<part day='29.09.10'>0</part>
-<part day='29.09.10'>0</part>
-<part day='29.09.10'>0</part>
-<part day='01.10.10'>0</part>
-<part day='01.10.10'>0</part>
-<part day='01.10.10'>0</part>
-<part day='04.10.10'>0</part>
-<part day='04.10.10'>0</part>
-<part day='05.10.10'>0</part>
-<part day='05.10.10'>0</part>
-<part day='06.10.10'>0</part>
-<part day='06.10.10'>0</part>
-<part day='13.10.10'>0</part>
-<part day='20.10.10'>0</part>
-<part day='20.10.10'>0</part>
-<part day='25.10.10'>0</part>
-<part day='02.11.10'>0</part>
-<part day='10.11.10'>0</part>
-<part day='10.11.10'>0</part>
-<part day='13.11.10'>0</part>
-<part day='15.11.10'>0</part>
-<part day='15.11.10'>0</part>
-<part day='18.11.10'>0</part>
-<part day='23.03.11'>0</part>
-<part day='03.04.11'>0</part>
-<part day='04.04.11'>0</part>
-<part day='05.04.11'>0</part>
-<part day='05.04.11'>0</part>
-<part day='06.04.11'>0</part>
-<part day='07.04.11'>0</part>
-<part day='07.04.11'>0</part>
-<part day='07.04.11'>0</part>
-<part day='11.04.11'>0</part>
-<part day='12.04.11'>0</part>
-<part day='13.04.11'>0</part>
-<part day='13.04.11'>0</part>
-<part day='14.04.11'>0</part>
-<part day='14.04.11'>0</part>
-<part day='15.04.11'>0</part>
-<part day='18.04.11'>0</part>
-<part day='18.04.11'>0</part>
-<part day='19.04.11'>0</part>
-<part day='20.04.11'>0</part>
-<part day='22.04.11'>0</part>
-<part day='22.04.11'>0</part>
-<part day='23.04.11'>0</part>
-<part day='26.04.11'>0</part>
-<part day='26.04.11'>0</part>
-<part day='27.04.11'>0</part>
-<part day='27.04.11'>0</part>
-<part day='27.04.11'>0</part>
-<part day='02.05.11'>0</part>
-<part day='04.05.11'>0</part>
-<part day='04.05.11'>0</part>
-<part day='04.05.11'>0</part>
-<part day='04.05.11'>0</part>
-<part day='04.05.11'>0</part>
-<part day='05.05.11'>0</part>
-<part day='06.05.11'>0</part>
-<part day='11.05.11'>0</part>
-<part day='11.05.11'>0</part>
-<part day='11.05.11'>0</part>
-<part day='12.05.11'>0</part>
-<part day='14.05.11'>0</part>
-<part day='14.05.11'>0</part>
-<part day='16.05.11'>0</part>
-<part day='16.05.11'>0</part>
-<part day='16.05.11'>0</part>
-<part day='16.05.11'>0</part>
-<part day='16.05.11'>0</part>
-<part day='17.05.11'>0</part>
-<part day='17.05.11'>0</part>
-<part day='18.05.11'>0</part>
-<part day='18.05.11'>0</part>
-<part day='18.05.11'>0</part>
-<part day='19.05.11'>0</part>
-<part day='24.05.11'>0</part>
-<part day='25.05.11'>0</part>
-<part day='25.05.11'>0</part>
-<part day='27.05.11'>0</part>
-<part day='27.05.11'>0</part>
-<part day='27.05.11'>0</part>
-<part day='06.06.11'>0</part>
-<part day='14.06.11'>0</part>
-<part day='15.06.11'>0</part>
-<part day='15.06.11'>0</part>
-<part day='16.06.11'>0</part>
-<part day='16.06.11'>0</part>
-<part day='17.06.11'>0</part>
-<part day='18.06.11'>0</part>
-<part day='22.06.11'>0</part>
-<part day='22.06.11'>0</part>
-<part day='22.06.11'>0</part>
-<part day='22.06.11'>0</part>
-<part day='03.07.11'>0</part>
-<part day='03.07.11'>0</part>
-<part day='05.07.11'>0</part>
-<part day='05.07.11'>0</part>
-<part day='23.07.11'>0</part>
-<part day='23.07.11'>0</part>
-<part day='18.08.11'>20</part>
-<part day='19.08.11'>0</part>
-<part day='21.08.11'>0</part>
-<part day='22.08.11'>0</part>
-<part day='22.08.11'>0</part>
-<part day='23.08.11'>0</part>
-<part day='26.09.11'>0</part>
-<part day='26.09.11'>0</part>
-<part day='26.09.11'>0</part>
-<part day='26.09.11'>0</part>
-<part day='27.09.11'>0</part>
-<part day='27.09.11'>0</part>
-<part day='28.09.11'>0</part>
-<part day='29.09.11'>0</part>
-<part day='01.10.11'>0</part>
-<part day='03.10.11'>0</part>
-<part day='04.10.11'>0</part>
-<part day='05.10.11'>0</part>
-<part day='06.10.11'>0</part>
-<part day='07.10.11'>0</part>
-<part day='08.10.11'>0</part>
-<part day='08.10.11'>0</part>
-<part day='10.10.11'>0</part>
-<part day='11.10.11'>0</part>
-<part day='12.10.11'>0</part>
-<part day='12.10.11'>0</part>
-<part day='13.10.11'>0</part>
-<part day='14.10.11'>0</part>
-<part day='17.10.11'>0</part>
-<part day='19.10.11'>0</part>
-<part day='19.10.11'>0</part>
-<part day='20.10.11'>0</part>
-<part day='20.10.11'>0</part>
-<part day='22.10.11'>0</part>
-<part day='23.10.11'>0</part>
-<part day='24.10.11'>0</part>
-<part day='24.10.11'>0</part>
-<part day='25.10.11'>0</part>
-<part day='25.10.11'>0</part>
-<part day='26.10.11'>0</part>
-<part day='26.10.11'>0</part>
-<part day='27.10.11'>0</part>
-<part day='28.10.11'>0</part>
-<part day='30.10.11'>0</part>
-<part day='01.11.11'>0</part>
-<part day='01.11.11'>0</part>
-<part day='02.11.11'>0</part>
-<part day='02.11.11'>0</part>
-<part day='03.11.11'>0</part>
-<part day='04.11.11'>0</part>
-<part day='08.11.11'>0</part>
-<part day='11.11.11'>0</part>
-<part day='12.11.11'>0</part>
-<part day='14.11.11'>0</part>
-<part day='28.03.12'>0</part>
-<part day='30.03.12'>0</part>
-<part day='01.04.12'>0</part>
-<part day='01.04.12'>0</part>
-<part day='03.04.12'>0</part>
-<part day='04.04.12'>0</part>
-<part day='05.04.12'>0</part>
-<part day='05.04.12'>0</part>
-<part day='06.04.12'>0</part>
-<part day='16.04.12'>0</part>
-<part day='16.04.12'>0</part>
-<part day='16.04.12'>0</part>
-<part day='16.04.12'>0</part>
-<part day='17.04.12'>0</part>
-<part day='17.04.12'>0</part>
-<part day='17.04.12'>0</part>
-<part day='17.04.12'>0</part>
-<part day='18.04.12'>0</part>
-<part day='18.04.12'>0</part>
-<part day='19.04.12'>0</part>
-<part day='19.04.12'>0</part>
-<part day='20.04.12'>0</part>
-<part day='20.04.12'>0</part>
-<part day='20.04.12'>0</part>
-<part day='20.04.12'>0</part>
-<part day='20.04.12'>0</part>
-<part day='20.04.12'>0</part>
-<part day='25.04.12'>0</part>
-<part day='25.04.12'>0</part>
-<part day='25.04.12'>0</part>
-<part day='25.04.12'>0</part>
-<part day='25.04.12'>0</part>
-<part day='26.04.12'>0</part>
-<part day='26.04.12'>0</part>
-<part day='26.04.12'>0</part>
-<part day='26.04.12'>0</part>
-<part day='26.04.12'>0</part>
-<part day='29.04.12'>0</part>
-<part day='29.04.12'>0</part>
-<part day='29.04.12'>0</part>
-<part day='29.04.12'>0</part>
-<part day='29.04.12'>0</part>
-<part day='29.04.12'>0</part>
-<part day='29.04.12'>0</part>
-<part day='29.04.12'>0</part>
-<part day='30.04.12'>0</part>
-<part day='30.04.12'>0</part>
-<part day='30.04.12'>0</part>
-<part day='30.04.12'>0</part>
-<part day='30.04.12'>0</part>
-<part day='30.04.12'>0</part>
-<part day='30.04.12'>0</part>
-<part day='02.05.12'>0</part>
-<part day='03.05.12'>0</part>
-<part day='06.05.12'>0</part>
-<part day='06.05.12'>0</part>
-<part day='07.05.12'>0</part>
-<part day='07.05.12'>0</part>
-<part day='07.05.12'>0</part>
-<part day='07.05.12'>0</part>
-<part day='09.05.12'>0</part>
-<part day='10.05.12'>0</part>
-<part day='10.05.12'>0</part>
-<part day='11.05.12'>0</part>
-<part day='11.05.12'>0</part>
-<part day='11.05.12'>0</part>
-<part day='11.05.12'>0</part>
-<part day='14.05.12'>0</part>
-<part day='14.05.12'>0</part>
-<part day='21.05.12'>0</part>
-<part day='21.05.12'>0</part>
-<part day='21.05.12'>0</part>
-<part day='22.05.12'>0</part>
-<part day='22.05.12'>0</part>
-<part day='22.05.12'>0</part>
-<part day='02.06.12'>0</part>
-<part day='02.06.12'>0</part>
-<part day='04.06.12'>0</part>
-<part day='06.06.12'>0</part>
-<part day='06.06.12'>0</part>
-<part day='06.06.12'>0</part>
-<part day='07.06.12'>0</part>
-<part day='07.06.12'>0</part>
-<part day='07.06.12'>0</part>
-<part day='08.06.12'>0</part>
-<part day='11.06.12'>0</part>
-<part day='11.06.12'>0</part>
-<part day='11.06.12'>0</part>
-<part day='11.06.12'>0</part>
-<part day='11.06.12'>0</part>
-<part day='11.06.12'>0</part>
-<part day='11.06.12'>0</part>
-<part day='12.06.12'>0</part>
-<part day='12.06.12'>0</part>
-<part day='14.06.12'>0</part>
-<part day='14.06.12'>0</part>
-<part day='14.06.12'>0</part>
-<part day='16.06.12'>0</part>
-<part day='18.06.12'>0</part>
-<part day='18.06.12'>0</part>
-<part day='18.06.12'>0</part>
-<part day='19.06.12'>0</part>
-<part day='21.06.12'>0</part>
-<part day='21.06.12'>0</part>
-<part day='24.06.12'>0</part>
-<part day='01.08.12'>20</part>
-<part day='01.08.12'>0</part>
-<part day='02.08.12'>0</part>
-<part day='02.08.12'>0</part>
-        </activity> ]]></data>
+	<data>
+		<activity>
+			<part day='07.09.10'>0</part><day></day>
+			<part day='08.09.10'>0</part><day></day>
+			<part day='09.09.10'>0</part><day></day>
+			<part day='09.09.10'>0</part><day></day>
+			<part day='10.09.10'>0</part><day></day>
+			<part day='15.09.10'>0</part><day></day>
+			<part day='17.09.10'>0</part><day></day>
+			<part day='20.09.10'>0</part><day></day>
+			<part day='20.09.10'>0</part><day></day>
+			<part day='21.09.10'>0</part><day></day>
+			<part day='21.09.10'>0</part><day></day>
+			<part day='24.09.10'>0</part><day></day>
+			<part day='24.09.10'>0</part><day></day>
+			<part day='25.09.10'>0</part><day></day>
+			<part day='27.09.10'>0</part><day></day>
+			<part day='27.09.10'>0</part><day></day>
+			<part day='27.09.10'>0</part><day></day>
+			<part day='27.09.10'>0</part><day></day>
+			<part day='29.09.10'>0</part><day></day>
+			<part day='29.09.10'>0</part><day></day>
+			<part day='29.09.10'>0</part><day></day>
+			<part day='01.10.10'>0</part><day></day>
+			<part day='01.10.10'>0</part><day></day>
+			<part day='01.10.10'>0</part><day></day>
+			<part day='04.10.10'>0</part><day></day>
+			<part day='04.10.10'>0</part><day></day>
+			<part day='05.10.10'>0</part><day></day>
+			<part day='05.10.10'>0</part><day></day>
+			<part day='06.10.10'>0</part><day></day>
+			<part day='06.10.10'>0</part><day></day>
+			<part day='13.10.10'>0</part><day></day>
+			<part day='20.10.10'>0</part><day></day>
+			<part day='20.10.10'>0</part><day></day>
+			<part day='25.10.10'>0</part><day></day>
+			<part day='02.11.10'>0</part><day></day>
+			<part day='10.11.10'>0</part><day></day>
+			<part day='10.11.10'>0</part><day></day>
+			<part day='13.11.10'>0</part><day></day>
+			<part day='15.11.10'>0</part><day></day>
+			<part day='15.11.10'>0</part><day></day>
+			<part day='18.11.10'>0</part><day></day>
+			<part day='23.03.11'>0</part><day></day>
+			<part day='03.04.11'>0</part><day></day>
+			<part day='04.04.11'>0</part><day></day>
+			<part day='05.04.11'>0</part><day></day>
+			<part day='05.04.11'>0</part><day></day>
+			<part day='06.04.11'>0</part><day></day>
+			<part day='07.04.11'>0</part><day></day>
+			<part day='07.04.11'>0</part><day></day>
+			<part day='07.04.11'>0</part><day></day>
+			<part day='11.04.11'>0</part><day></day>
+			<part day='12.04.11'>0</part><day></day>
+			<part day='13.04.11'>0</part><day></day>
+			<part day='13.04.11'>0</part><day></day>
+			<part day='14.04.11'>0</part><day></day>
+			<part day='14.04.11'>0</part><day></day>
+			<part day='15.04.11'>0</part><day></day>
+			<part day='18.04.11'>0</part><day></day>
+			<part day='18.04.11'>0</part><day></day>
+			<part day='19.04.11'>0</part><day></day>
+			<part day='20.04.11'>0</part><day></day>
+			<part day='22.04.11'>0</part><day></day>
+			<part day='22.04.11'>0</part><day></day>
+			<part day='23.04.11'>0</part><day></day>
+			<part day='26.04.11'>0</part><day></day>
+			<part day='26.04.11'>0</part><day></day>
+			<part day='27.04.11'>0</part><day></day>
+			<part day='27.04.11'>0</part><day></day>
+			<part day='27.04.11'>0</part><day></day>
+			<part day='02.05.11'>0</part><day></day>
+			<part day='04.05.11'>0</part><day></day>
+			<part day='04.05.11'>0</part><day></day>
+			<part day='04.05.11'>0</part><day></day>
+			<part day='04.05.11'>0</part><day></day>
+			<part day='04.05.11'>0</part><day></day>
+			<part day='05.05.11'>0</part><day></day>
+			<part day='06.05.11'>0</part><day></day>
+			<part day='11.05.11'>0</part><day></day>
+			<part day='11.05.11'>0</part><day></day>
+			<part day='11.05.11'>0</part><day></day>
+			<part day='12.05.11'>0</part><day></day>
+			<part day='14.05.11'>0</part><day></day>
+			<part day='14.05.11'>0</part><day></day>
+			<part day='16.05.11'>0</part><day></day>
+			<part day='16.05.11'>0</part><day></day>
+			<part day='16.05.11'>0</part><day></day>
+			<part day='16.05.11'>0</part><day></day>
+			<part day='16.05.11'>0</part><day></day>
+			<part day='17.05.11'>0</part><day></day>
+			<part day='17.05.11'>0</part><day></day>
+			<part day='18.05.11'>0</part><day></day>
+			<part day='18.05.11'>0</part><day></day>
+			<part day='18.05.11'>0</part><day></day>
+			<part day='19.05.11'>0</part><day></day>
+			<part day='24.05.11'>0</part><day></day>
+			<part day='25.05.11'>0</part><day></day>
+			<part day='25.05.11'>0</part><day></day>
+			<part day='27.05.11'>0</part><day></day>
+			<part day='27.05.11'>0</part><day></day>
+			<part day='27.05.11'>0</part><day></day>
+			<part day='06.06.11'>0</part><day></day>
+			<part day='14.06.11'>0</part><day></day>
+			<part day='15.06.11'>0</part><day></day>
+			<part day='15.06.11'>0</part><day></day>
+			<part day='16.06.11'>0</part><day></day>
+			<part day='16.06.11'>0</part><day></day>
+			<part day='17.06.11'>0</part><day></day>
+			<part day='18.06.11'>0</part><day></day>
+			<part day='22.06.11'>0</part><day></day>
+			<part day='22.06.11'>0</part><day></day>
+			<part day='22.06.11'>0</part><day></day>
+			<part day='22.06.11'>0</part><day></day>
+			<part day='03.07.11'>0</part><day></day>
+			<part day='03.07.11'>0</part><day></day>
+			<part day='05.07.11'>0</part><day></day>
+			<part day='05.07.11'>0</part><day></day>
+			<part day='23.07.11'>0</part><day></day>
+			<part day='23.07.11'>0</part><day></day>
+			<part day='18.08.11'>20</part><day></day>
+			<part day='19.08.11'>0</part><day></day>
+			<part day='21.08.11'>0</part><day></day>
+			<part day='22.08.11'>0</part><day></day>
+			<part day='22.08.11'>0</part><day></day>
+			<part day='23.08.11'>0</part><day></day>
+			<part day='26.09.11'>0</part><day></day>
+			<part day='26.09.11'>0</part><day></day>
+			<part day='26.09.11'>0</part><day></day>
+			<part day='26.09.11'>0</part><day></day>
+			<part day='27.09.11'>0</part><day></day>
+			<part day='27.09.11'>0</part><day></day>
+			<part day='28.09.11'>0</part><day></day>
+			<part day='29.09.11'>0</part><day></day>
+			<part day='01.10.11'>0</part><day></day>
+			<part day='03.10.11'>0</part><day></day>
+			<part day='04.10.11'>0</part><day></day>
+			<part day='05.10.11'>0</part><day></day>
+			<part day='06.10.11'>0</part><day></day>
+			<part day='07.10.11'>0</part><day></day>
+			<part day='08.10.11'>0</part><day></day>
+			<part day='08.10.11'>0</part><day></day>
+			<part day='10.10.11'>0</part><day></day>
+			<part day='11.10.11'>0</part><day></day>
+			<part day='12.10.11'>0</part><day></day>
+			<part day='12.10.11'>0</part><day></day>
+			<part day='13.10.11'>0</part><day></day>
+			<part day='14.10.11'>0</part><day></day>
+			<part day='17.10.11'>0</part><day></day>
+			<part day='19.10.11'>0</part><day></day>
+			<part day='19.10.11'>0</part><day></day>
+			<part day='20.10.11'>0</part><day></day>
+			<part day='20.10.11'>0</part><day></day>
+			<part day='22.10.11'>0</part><day></day>
+			<part day='23.10.11'>0</part><day></day>
+			<part day='24.10.11'>0</part><day></day>
+			<part day='24.10.11'>0</part><day></day>
+			<part day='25.10.11'>0</part><day></day>
+			<part day='25.10.11'>0</part><day></day>
+			<part day='26.10.11'>0</part><day></day>
+			<part day='26.10.11'>0</part><day></day>
+			<part day='27.10.11'>0</part><day></day>
+			<part day='28.10.11'>0</part><day></day>
+			<part day='30.10.11'>0</part><day></day>
+			<part day='01.11.11'>0</part><day></day>
+			<part day='01.11.11'>0</part><day></day>
+			<part day='02.11.11'>0</part><day></day>
+			<part day='02.11.11'>0</part><day></day>
+			<part day='03.11.11'>0</part><day></day>
+			<part day='04.11.11'>0</part><day></day>
+			<part day='08.11.11'>0</part><day></day>
+			<part day='11.11.11'>0</part><day></day>
+			<part day='12.11.11'>0</part><day></day>
+			<part day='14.11.11'>0</part><day></day>
+			<part day='28.03.12'>0</part><day></day>
+			<part day='30.03.12'>0</part><day></day>
+			<part day='01.04.12'>0</part><day></day>
+			<part day='01.04.12'>0</part><day></day>
+			<part day='03.04.12'>0</part><day></day>
+			<part day='04.04.12'>0</part><day></day>
+			<part day='05.04.12'>0</part><day></day>
+			<part day='05.04.12'>0</part><day></day>
+			<part day='06.04.12'>0</part><day></day>
+			<part day='16.04.12'>0</part><day></day>
+			<part day='16.04.12'>0</part><day></day>
+			<part day='16.04.12'>0</part><day></day>
+			<part day='16.04.12'>0</part><day></day>
+			<part day='17.04.12'>0</part><day></day>
+			<part day='17.04.12'>0</part><day></day>
+			<part day='17.04.12'>0</part><day></day>
+			<part day='17.04.12'>0</part><day></day>
+			<part day='18.04.12'>0</part><day></day>
+			<part day='18.04.12'>0</part><day></day>
+			<part day='19.04.12'>0</part><day></day>
+			<part day='19.04.12'>0</part><day></day>
+			<part day='20.04.12'>0</part><day></day>
+			<part day='20.04.12'>0</part><day></day>
+			<part day='20.04.12'>0</part><day></day>
+			<part day='20.04.12'>0</part><day></day>
+			<part day='20.04.12'>0</part><day></day>
+			<part day='20.04.12'>0</part><day></day>
+			<part day='25.04.12'>0</part><day></day>
+			<part day='25.04.12'>0</part><day></day>
+			<part day='25.04.12'>0</part><day></day>
+			<part day='25.04.12'>0</part><day></day>
+			<part day='25.04.12'>0</part><day></day>
+			<part day='26.04.12'>0</part><day></day>
+			<part day='26.04.12'>0</part><day></day>
+			<part day='26.04.12'>0</part><day></day>
+			<part day='26.04.12'>0</part><day></day>
+			<part day='26.04.12'>0</part><day></day>
+			<part day='29.04.12'>0</part><day></day>
+			<part day='29.04.12'>0</part><day></day>
+			<part day='29.04.12'>0</part><day></day>
+			<part day='29.04.12'>0</part><day></day>
+			<part day='29.04.12'>0</part><day></day>
+			<part day='29.04.12'>0</part><day></day>
+			<part day='29.04.12'>0</part><day></day>
+			<part day='29.04.12'>0</part><day></day>
+			<part day='30.04.12'>0</part><day></day>
+			<part day='30.04.12'>0</part><day></day>
+			<part day='30.04.12'>0</part><day></day>
+			<part day='30.04.12'>0</part><day></day>
+			<part day='30.04.12'>0</part><day></day>
+			<part day='30.04.12'>0</part><day></day>
+			<part day='30.04.12'>0</part><day></day>
+			<part day='02.05.12'>0</part><day></day>
+			<part day='03.05.12'>0</part><day></day>
+			<part day='06.05.12'>0</part><day></day>
+			<part day='06.05.12'>0</part><day></day>
+			<part day='07.05.12'>0</part><day></day>
+			<part day='07.05.12'>0</part><day></day>
+			<part day='07.05.12'>0</part><day></day>
+			<part day='07.05.12'>0</part><day></day>
+			<part day='09.05.12'>0</part><day></day>
+			<part day='10.05.12'>0</part><day></day>
+			<part day='10.05.12'>0</part><day></day>
+			<part day='11.05.12'>0</part><day></day>
+			<part day='11.05.12'>0</part><day></day>
+			<part day='11.05.12'>0</part><day></day>
+			<part day='11.05.12'>0</part><day></day>
+			<part day='14.05.12'>0</part><day></day>
+			<part day='14.05.12'>0</part><day></day>
+			<part day='21.05.12'>0</part><day></day>
+			<part day='21.05.12'>0</part><day></day>
+			<part day='21.05.12'>0</part><day></day>
+			<part day='22.05.12'>0</part><day></day>
+			<part day='22.05.12'>0</part><day></day>
+			<part day='22.05.12'>0</part><day></day>
+			<part day='02.06.12'>0</part><day></day>
+			<part day='02.06.12'>0</part><day></day>
+			<part day='04.06.12'>0</part><day></day>
+			<part day='06.06.12'>0</part><day></day>
+			<part day='06.06.12'>0</part><day></day>
+			<part day='06.06.12'>0</part><day></day>
+			<part day='07.06.12'>0</part><day></day>
+			<part day='07.06.12'>0</part><day></day>
+			<part day='07.06.12'>0</part><day></day>
+			<part day='08.06.12'>0</part><day></day>
+			<part day='11.06.12'>0</part><day></day>
+			<part day='11.06.12'>0</part><day></day>
+			<part day='11.06.12'>0</part><day></day>
+			<part day='11.06.12'>0</part><day></day>
+			<part day='11.06.12'>0</part><day></day>
+			<part day='11.06.12'>0</part><day></day>
+			<part day='11.06.12'>0</part><day></day>
+			<part day='12.06.12'>0</part><day></day>
+			<part day='12.06.12'>0</part><day></day>
+			<part day='14.06.12'>0</part><day></day>
+			<part day='14.06.12'>0</part><day></day>
+			<part day='14.06.12'>0</part><day></day>
+			<part day='16.06.12'>0</part><day></day>
+			<part day='18.06.12'>0</part><day></day>
+			<part day='18.06.12'>0</part><day></day>
+			<part day='18.06.12'>0</part><day></day>
+			<part day='19.06.12'>0</part><day></day>
+			<part day='21.06.12'>0</part><day></day>
+			<part day='21.06.12'>0</part><day></day>
+			<part day='24.06.12'>0</part><day></day>
+			<part day='01.08.12'>20</part><day></day>
+			<part day='01.08.12'>0</part><day></day>
+			<part day='02.08.12'>0</part><day></day>
+			<part day='02.08.12'>0</part><day></day>
+        </activity>
+    </data>
     </death>
-    <morisitaCounter>
-<debugLevel>1</debugLevel>
-<refreshTime>20</refreshTime>
-<plotSize>8</plotSize>
-    </morisitaCounter>
+<morisitaCounter>
+	<debugLevel>1</debugLevel>
+	<refreshTime>20</refreshTime>
+	<plotSize>8</plotSize>
+</morisitaCounter>
 </plugins>
 </configuration>

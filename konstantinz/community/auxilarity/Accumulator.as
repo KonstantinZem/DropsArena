@@ -1,10 +1,13 @@
-﻿package konstantinz.community.auxilarity{
+﻿//Предназначение этого класса - готовить для вывода на экран статистическую информацию в виде сводной таблицы
+package konstantinz.community.auxilarity{
 
 import flash.events.TimerEvent; 
 import flash.utils.*;
 import konstantinz.community.auxilarity.*;
 
 public class Accumulator{
+	
+	private const ERROR_MARK:int = 0;//Сообщение об ошибке помечаются в messanger помечаеся цифрой 0
 	
 	private var debugLevel:String;
 	private var msgString:String;
@@ -77,13 +80,13 @@ public class Accumulator{
 			if(time<=0){
 				throw new Error('Refresh time less then 0 sec or equial 0 sec');
 				}
-			refreshTime = time*1000;
+			refreshTime = time*1000;//Переводим время из секунд в миллисекунды
 			refreshTimer = new Timer(refreshTime);
 			refreshTimer.addEventListener(TimerEvent.TIMER, prepareStatTable);
 			//refreshTimer.start();
 		}catch(err:Error){
 			msgString = err.message;
-			messenger.message(msgString, 0);
+			messenger.message(msgString, ERROR_MARK);
 			refreshTime = 0;
 			}
 
@@ -123,7 +126,7 @@ public class Accumulator{
 					
 			}catch(err:Error){
 				msgString = err.message;
-				messenger.message(msgString, 0);
+				messenger.message(msgString, ERROR_MARK);
 			}
 				paramPosition = 0;
 		}

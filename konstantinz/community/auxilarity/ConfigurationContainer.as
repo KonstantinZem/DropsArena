@@ -7,11 +7,13 @@
 	
 	public class ConfigurationContainer extends EventDispatcher{
 		
+		private const 	DEFAULT_FILE_NAME:String = 'configuration.xml';
+		
 		public static var LOADED:String = 'loaded';//Так мы говорим, что загрузка файла окнчена и программа может к нему обращаться
 		public static var LOADING_ERROR:String = 'loading_error';//Так говорим, что произошла какая то ошибка
 		
-		private var cfgFileName:String = 'configuration.xml';
-		private var myXML:XML;
+		private var cfgFileName:String = DEFAULT_FILE_NAME;
+		private var myXML:XML;//Сюда будет загружаться внешний файл
 		private var myXMLURL:URLRequest;
 		private var myLoader:URLLoader;
 		private var debugLevel:String;
@@ -26,7 +28,7 @@
 			if ((!_okToCreate)){//Singleton realisation
 				throw new Error("Class is singleton. Use method instance() to get it");
 			}else{
-				debugLevel = '3';
+				debugLevel = '3';//По умолчанию показываем все сообщения, кроме тей что посыоаются из цикла
 			}	
 			}
 			
@@ -54,13 +56,19 @@
 			debugLevel = dbgLevel;
 			}
 			
-		public function getOption(optionPath:String):String{//С помощью этого вызова программа будет получать от класса запрашиваемые опции
+		public function getOption(optionPath:String, ...args):String{//С помощью этого вызова программа будет получать от класса запрашиваемые опции
 			var parsedPath:Array;
 			var optionValue:String;
+			var parsedPosition:Array = new Array();
 			
 			parsedPath = parsePathString(optionPath)//Разбираем переданную строку на массив из слов
-			
-			optionValue = searchValue(myXML, 0, parsedPath)//Ищем нужное значение в XML 
+            
+            if(args[0] is Array){//Если дополнительно была передана точная позиция опции
+				parsedPosition = args[0];
+				optionValue = searchValueByPosition(myXML, parsedPath, parsedPosition);
+				}else{			
+					optionValue = searchValue(myXML, 0, parsedPath)//Ищем нужное значение в XML 
+				}
 					
 			return optionValue
 			}
@@ -114,6 +122,38 @@
 			
 			}
 			return optionValueString;
+		}
+		
+		private function searchValueByPosition(config:XML, pathStrings:Array, pathNumbers:Array):String{
+			var auxXML:XML;
+			var resultValue:String = 'Error';
+			
+			try{
+				auxXML = config;
+				if(pathStrings.length != pathNumbers.length){
+					throw new ArgumentError('The number of elements in path and position  options are different');
+					}
+				for(var i:int = 0; i < pathStrings.length; i++){
+                    
+					auxXML = auxXML[pathStrings[i]][pathNumbers[i]];
+				
+				    if(auxXML != null && auxXML.hasSimpleContent() && auxXML != ''){//Если мы дошли до текста, передаем его переменной resultValue
+						resultValue = auxXML;
+						}
+					if(resultValue == null){
+						throw new Error('Value is null');
+						}
+					
+				}
+			}catch(e:ArgumentError){
+				msgStreeng = e.message;
+				messenger.message(msgStreeng, 0);
+				}
+			catch(e:Error){
+				msgStreeng = e.message;
+				messenger.message(msgStreeng, 0);
+				}
+			return resultValue;
 		}
 	
 	}

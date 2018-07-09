@@ -8,6 +8,7 @@
 	public class Suspender{
 		
 		private const INTERRUPT_MARK:int = 0;//Если подать функции stopIndividual это число, функция остановит всех особей не запуская таймер паузы
+		private const ERROR_MARK:int = 0;//Сообщение об ошибке помечаются в messanger помечаеся цифрой 0
 		
 		private static var tickInterval:int = 20;//Интервал между тиками таймера
 		
@@ -79,7 +80,7 @@
 				
 			}catch(e:Error){//Если что то пошло не так
 				msgString = 'Can not stop individual ' + individual.getName() + ': ' + errorType.indExemplarNotExist;
-				messanger.message(msgString, 0);
+				messanger.message(msgString, ERROR_MARK);
 				suspendTime.stop();//Сбрасываем паузу
 				indStepPulsor.stop();//И вообще отключаем подачу сигналов к этой особи
 				}
@@ -112,7 +113,7 @@
 				SuspenderEvent.done();//Говорим о том что особи вновь запущены тому компоненту, который просил приостановить особей
 				}
 			}catch(e:Error){
-				messanger.message(e.message, 0);
+				messanger.message(e.message, ERROR_MARK);
 				indStepPulsor.stop();
 				}
 			}
@@ -133,7 +134,7 @@
 			}catch(e:Error){
 				indStepPulsor.stop();
 				msgString = 'Can not drive individual ' + individual.getName() + ': ' + errorType.indExemplarNotExist;
-				messanger.message(msgString, 0);
+				messanger.message(msgString, ERROR_MARK);
 				}
 			
 			

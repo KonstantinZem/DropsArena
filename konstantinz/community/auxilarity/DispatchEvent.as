@@ -31,7 +31,6 @@
 		
 		public function pluginLoaded():void{
 			dispatchEvent(new ModelEvent(ModelEvent.PLUGIN_LOADED));
-			//pluginName = '';//Очищаем переменную после использования
 		}
 		
 		public function done():void{

@@ -1,4 +1,5 @@
-﻿package konstantinz.community.comStage{
+﻿//Предназначение этого класса - предоставлять особям информацию о их местоположении и об условиях окружающей среды
+package konstantinz.community.comStage{
 	import flash.display.Sprite;
 	import konstantinz.community.auxilarity.*
 
