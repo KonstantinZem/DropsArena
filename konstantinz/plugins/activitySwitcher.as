@@ -122,7 +122,7 @@ public class activitySwitcher extends Sprite{
 		try{
 			var stepsFromConfig:String = configuration.getOption(optionPath + 'steps');//Из конфига получаем количество шагов которые должен отработать плагин
 			var numberOfSteps:int;//Временной промежуток для таймера
-			dataPath = 'plugins.' + pluginName + '.data.activity';
+			dataPath = 'plugins.' + pluginName + '.data.observation';
 			activeIndividualsNumber = dataPath + '.part';
 			
 			var timeQant:int;
@@ -157,7 +157,7 @@ public class activitySwitcher extends Sprite{
 	
 	private function getNumberOfData(dataPath:String):int{
 		var numberOfData:int = 0;
-		var optionPosition:Array = new Array(0,0,0,0,numberOfData);
+		var optionPosition:Array = new Array(0,0,0,numberOfData,0);
 		var optionValue:String = 'empty';
 		
 		try{
@@ -174,7 +174,7 @@ public class activitySwitcher extends Sprite{
 					}
 			
 				numberOfData++;
-				optionPosition[4] = numberOfData;
+				optionPosition[3] = numberOfData;
 			}
 			
 		}catch(e:Error){
@@ -185,7 +185,7 @@ public class activitySwitcher extends Sprite{
 		}
 	
 	private function stopInd(e:TimerEvent):void{
-		var optionPosition:Array = new Array(0,0,0,0,currentActivitIndNumber);
+		var optionPosition:Array = new Array(0,0,0,currentActivitIndNumber,0);
 		//Узнать размер таймера у особи, посмотреть число ходов в конфиге, запускать паузы по таймеру и не ждать ответа от драйверов особей
 		try{
 			var currentActivity:int;

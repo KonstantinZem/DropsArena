@@ -2,6 +2,7 @@
 package konstantinz.community.auxilarity{
 
 import flash.events.TimerEvent; 
+import flash.errors.IllegalOperationError;
 import flash.utils.*;
 import konstantinz.community.auxilarity.*;
 
@@ -107,6 +108,10 @@ public class Accumulator{
 		
 		try{
 			
+			if(paramNamebuffer == null||valueBuffer == null){//Если массивы еще не инициированы
+				throw new ReferenceError('One or both buffers not initilased yet');
+				}
+			
 			var parsedMessage:Array = message.split(':');//Отделяем имя сообщения от ползной нагрузки
 			
 			if(parsedMessage.length==2){//Если параметр передан правильно и состоит из имени и значения
@@ -121,12 +126,20 @@ public class Accumulator{
 				
 				}
 				else{
-					throw new Error('Wrong message format');
+					throw new ArgumentError('Wrong message format');
 				}
 					
-			}catch(err:Error){
+			}catch(err:ReferenceError){
 				msgString = err.message;
 				messenger.message(msgString, ERROR_MARK);
+				paramNamebuffer = new Array();//ИНициируем массивы и ничего дальше не делаем, все равно на следующем выхове все сработает правильно
+				valueBuffer = new Array();
+				}
+			catch(err:ArgumentError){
+				
+				msgString = err.message;
+				messenger.message(msgString, ERROR_MARK);
+				
 			}
 				paramPosition = 0;
 		}
