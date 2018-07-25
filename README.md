@@ -15,11 +15,11 @@ The compiled in swf files version of model yoy can foun [here](http://konstantin
 
 The main model screen
 
-![Model screenshot 1](http://konstantinz.byethost32.com/pictures/fotos/screenshot1.png)
+![Model screenshot 1](https://raw.githubusercontent.com/KonstantinZem/DropsArena/variable_behaviour/pictures/screenshot1.png)
 
 Results screen
 
-![Model screenshot 1](http://konstantinz.byethost32.com/pictures/fotos/screenshot2.png)
+![Model screenshot 1](https://raw.githubusercontent.com/KonstantinZem/DropsArena/variable_behaviour/pictures/screenshot2.png)
 
 ### The plug-ins
 
