@@ -31,7 +31,7 @@ At the moment, the following types of plug-ins are developed for this model:
 
 Example of picture loading by cover plug-in
 
-![Cover plug-in picture](http://konstantinz.byethost32.com/pictures/park/aegopodium.png)
+![Cover plug-in picture](https://raw.githubusercontent.com/KonstantinZem/DropsArena/variable_behaviour/pictures/park/aegopodium.png)
 
 ## Russian
 
