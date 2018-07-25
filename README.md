@@ -1,4 +1,4 @@
-![Drops arena banner](http://konstantinz.byethost32.com/drops_arena_logo.png)
+![Drops arena banner](https://raw.githubusercontent.com/KonstantinZem/DropsArena/variable_behaviour/pictures/drops_arena_logo.png)
 
 # Drops' Arena population model
 
