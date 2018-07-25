@@ -18,7 +18,8 @@ public class activitySwitcher extends Sprite{
 	private var dispatchedObjects:Array//Ссылка на массив с управляемыми объектами
 	private var stopedObjects:Array;//Список остановленных в данный момент особей
 	private var suspendTime:int;//Время на которое нужно остановить особь
-	private var numberOfData:int
+	private var numberOfData:int;
+	private var cycleCounter:int;
 	private var activeIndividualsNumber:String;
 	private var currentActivitIndNumber:int = 0;//Позиция в таблице активности где надо искать текущее число особей, которых необходимо остановить
 	private var debugeLevel:String;
@@ -116,6 +117,9 @@ public class activitySwitcher extends Sprite{
 				}
 			}
 		pluginEvent.ready();
+		cycleCounter = 1;
+		msgString = 'cycle: ' + cycleCounter;
+		messenger.message(msgString, STATISTIC_MARK);
 		}
 	
 	private function setTimingQant():int{//Расчитываем время между переключениями
@@ -142,12 +146,12 @@ public class activitySwitcher extends Sprite{
 					}
 		
 			}catch(e:ArgumentError){
-				messenger.message(e, ERROR_MARK)
+				messenger.message(e, ERROR_MARK);
 				numberOfSteps = int(configuration.getOption('main.lifeTime'));//Если для особии количество шагов не заданно, принимаем его как время жизн
 				}
 			
 			catch(e:ReferenceError){
-				msgString = e;
+				msgString = e.message;
 				messenger.message(msgString, ERROR_MARK);
 				timeQant = 20;//Если не удалось получить информацию о частоте срабатывания таймера от драйвера особи, задаем таймер сами
 				}
@@ -193,8 +197,9 @@ public class activitySwitcher extends Sprite{
 			var calendarData:String = dataPath + '.day';
 			
 			if(currentActivitIndNumber > numberOfData - 1){
-				msgString = 'New cycle: ' + currentActivitIndNumber;
-				messenger.message(msgString, 3);
+				cycleCounter++;
+				msgString = 'cycle: ' + cycleCounter;
+				messenger.message(msgString, STATISTIC_MARK);
 				currentActivitIndNumber = 0;
 					
 				}else{
@@ -242,10 +247,10 @@ public class activitySwitcher extends Sprite{
 		break;
 
 		case 'items':
-			itemsNumber = 0
+			itemsNumber = 0;
 			itemsNumber = objNumber;
 			for(i = 0; i< itemsNumber; i++){
-				stopedObjects[i] = setObjRange()
+				stopedObjects[i] = setObjRange();
 			}
 			
 			sendStop();

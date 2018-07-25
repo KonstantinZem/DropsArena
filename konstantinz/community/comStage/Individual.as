@@ -15,6 +15,8 @@ package konstantinz.community.comStage{
 	import flash.events.TimerEvent; 
 	import flash.utils.*;
 	import flash.geom.ColorTransform;
+	import konstantinz.community.comStage.*;
+	import konstantinz.community.comStage.behaviour.*;
 	import konstantinz.community.auxilarity.*;
 
 	public class Individual extends Sprite{
@@ -36,27 +38,31 @@ package konstantinz.community.comStage{
 		private const STOPEDCOLOR:Number = 0x808080; 
 		
 		//************************************************************************************//
-		private var indSize:int;//Размер квадрата особи
 		private var lifeStart:Date
 		private var lifeEnd:Date;
+		private var date:Date;
+		private var indSize:int;//Размер квадрата особи
 		private var adultAge:int;//Время взросления. Передается из настроек
 		private var offspringsQuant:int;
-		private var chessDesk:Array; //Ссылка на внешний массив с координатами и условиями среды
-		private var errorType:Object;//Контейнер для ошибок;
-		private var indDirection:int;//Текущие направление
-		private var debugLevel:String;
-		private var deleySteps:int;//количество ходов, которые надо пропустить для замедления движения
-		private var timerForIndividuals:Timer; //Не самое удачное решение, снабдить каждую особь своим таймером, но сделать один из главного класса у меня не получается
-		private var msgString:String;
-		private var date:Date;
 		private var currentChessDeskI:int;//Номер строки текущего квадрата
 		private var currentChessDeskJ:int;//Номер столбца текущего квадрата
+		private var indDirection:int;//Текущие направление
+		private var deleySteps:int;//количество ходов, которые надо пропустить для замедления движения
+		private var chessDesk:Array; //Ссылка на внешний массив с координатами и условиями среды
+		private var errorType:Object;//Контейнер для ошибок;
+		private var timerForIndividuals:Timer; //Не самое удачное решение, снабдить каждую особь своим таймером, но сделать один из главного класса у меня не получается
+		private var msgString:String;
 		private var indStatus:String;
+		private var debugLevel:String;
+		private var currentBehaviourName:String;//Переключаться поведение будет только если название поведения из пришедшего сообщения будет отличаться от записанного сюда
+		private var myBehaviour:BaseMotionBehaviour;
 				
 		public var IndividualEvent:DispatchEvent;
+		public var motionBehaviour:MotionBehaviourSwitcher;
 		
 		
 		function Individual(mroot:Object, desk:Array, behaviour:Object, ...args){
+
 			IndividualEvent = new DispatchEvent();
 			errorType = new ModelErrors();
 			try{
@@ -78,6 +84,11 @@ package konstantinz.community.comStage{
 
 			indSize = int(indConfiguration.getOption('main.dropSize'));
 			chessDesk = desk;
+			
+			motionBehaviour = new MotionBehaviourSwitcher(chessDesk);
+			motionBehaviour.setViewDistance(int(indConfiguration.getOption('main.behaviourSwitching.viewDistance')));
+
+			myBehaviour = motionBehaviour.newBehaviour;
 			
 			if(args[1]==undefined||args[2]==undefined){
 				currentChessDeskI = 0;//Если не указано начальное положение особи, начинаем двигаться с верхнего левого угла (первый квадрат)
@@ -217,6 +228,7 @@ package konstantinz.community.comStage{
 		
 		
 		private function nextStep():void{
+		
 			markIndividual('nothing');
 			//функция платформонезавмсимая, при условии, что кто то будет читать переменную individual.x и individual.y и на изменять сведения о положении особи
 			deleySteps--;//Уменьшаем количество пропущеных ходов
@@ -224,7 +236,8 @@ package konstantinz.community.comStage{
 			var amIAdult:Boolean = isIndividualAdult();//Стоит здесь, так как взрослеть особь должна в не зависимости от того, стоит она на месте или движется
 			
 			if(deleySteps==0){//И если отстояли на месте положенное количество тиков таймера, двигаемся дальше
-				deleySteps = chessDesk[currentChessDeskI][currentChessDeskJ]['speedDeleyA'];//Смотрим на новой клетке число ходов
+				
+				deleySteps = myBehaviour.getPlaceQuality(currentChessDeskI,currentChessDeskJ);//Смотрим на новой клетке число ходов
 			
 				var amIAlong:Boolean = isIndividualAlong();
 			
@@ -235,73 +248,12 @@ package konstantinz.community.comStage{
 					}
 				}
 			}
-		
-			indDirection = Math.round(Math.random()*8);
 			
+			currentChessDeskI = myBehaviour.getNewPosition(currentChessDeskI,currentChessDeskJ)['x'];
+			currentChessDeskJ = myBehaviour.getNewPosition(currentChessDeskI,currentChessDeskJ)['y'];
 			
-			switch(indDirection){
-				case 0: //Стоим наместе
-				individual.x = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrX'];
-				individual.y = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrY'];
-				
-				break;
-				case 1://Идем вниз
-				
-				if(currentChessDeskI>chessDesk.length-2){
-					currentChessDeskI--;
-					individual.x = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrX'];
-					individual.y = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrY'];
-					}
-					else{
-						individual.x = chessDesk[currentChessDeskI+1][currentChessDeskJ]['sqrX'];
-						individual.y = chessDesk[currentChessDeskI+1][currentChessDeskJ]['sqrY'];
-						currentChessDeskI++;
-						}
-				break;
-				case 2://Идем вверх
-				
-				if(currentChessDeskI==0){
-					individual.x = chessDesk[0][currentChessDeskJ]['sqrX'];
-					individual.y = chessDesk[0][currentChessDeskJ]['sqrY'];
-					}
-					else{
-						individual.x = chessDesk[currentChessDeskI-1][currentChessDeskJ]['sqrX'];
-						individual.y = chessDesk[currentChessDeskI-1][currentChessDeskJ]['sqrY'];
-						currentChessDeskI--;
-					}
-				break;
-				case 3: //Направо
-				
-				if(currentChessDeskJ>chessDesk[0].length-2){
-					currentChessDeskJ--;
-					individual.x = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrX'];
-					individual.y = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrY'];
-					
-					}
-					else{
-						individual.x = chessDesk[currentChessDeskI][currentChessDeskJ+1]['sqrX'];
-						individual.y = chessDesk[currentChessDeskI][currentChessDeskJ+1]['sqrY'];
-						currentChessDeskJ++;
-						}
-				break;
-				case 4://Идем налево
-				
-				if (currentChessDeskJ==0){
-					individual.x = chessDesk[currentChessDeskI][0]['sqrX'];
-					individual.y = chessDesk[currentChessDeskI][0]['sqrY'];
-					}
-					else{
-						individual.x = chessDesk[currentChessDeskI][currentChessDeskJ-1]['sqrX'];
-						individual.y = chessDesk[currentChessDeskI][currentChessDeskJ-1]['sqrY'];
-						currentChessDeskJ--;
-						}
-				break;
-				default://Стоим на месте
-				
-				individual.x = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrX'];
-				individual.y = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrY'];
-				
-				}
+			individual.x = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrX'];
+			individual.y = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrY'];
 				
 			  }
 				
@@ -310,6 +262,7 @@ package konstantinz.community.comStage{
 			private function killIndividual():void{//Убирает особь со сцены
 			//функция относительно платформонезависимая, так как таймеры и слушатели событий есть и в других языках
 				var deltaTime:int;
+				
 				lifeEnd=new Date();
 			
 				timerForIndividuals.stop();//Выключаем таймер
@@ -319,9 +272,15 @@ package konstantinz.community.comStage{
 				msgString = 'Individual ' + indNumber + ' is dead. R.I.P. \n' + 'It lived ' +Math.round((deltaTime)*0.00006) + ' min';
 				messanger.message(msgString, 2);
 				messanger = null;
+				motionBehaviour = null;
+				indConfiguration = null;
+				lifeEnd = null;
+				lifeStart = null;
+				
 				IndividualEvent.individual = indNumber;//Посылаем сообщение о том что особь с этим номером
 				IndividualEvent.death();//Умерла
 				
+				errorType = null;
 				
 				if(parent.contains(individual)){//Перед тем как удалить особь со сцены 
 					removeChild(individual);//Проверяем, не была ли она уже удалена до этого

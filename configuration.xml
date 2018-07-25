@@ -1,21 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
+    <!--устойчиво-->
 <main>
 	<debugLevel>1</debugLevel>
 	<pluginEnable>true</pluginEnable>
 	<!-- indQuntaty -- how many individuals must to be created at the start -->
-	<indQuntaty>200</indQuntaty>
-	<lifeTime>6880</lifeTime>
+	<indQuntaty>100</indQuntaty>
+	<lifeTime>7000</lifeTime>
 	<lifeQuant>1</lifeQuant>
-	<adultAge>2340</adultAge>
-	<maturingDeley>1170</maturingDeley>
-	<offspringsQuant>20</offspringsQuant>
+	<adultAge>1500</adultAge>
+	<maturingDeley>1000</maturingDeley>
+	<offspringsQuant>10</offspringsQuant>
 	<dropSize>12</dropSize>>
 	<!-- initPosition of individual can be left-top, left-bottom,  right-top, right-bottom, center and random -->
 	<initPosition>left-top</initPosition>
 	<statRefreshTime>10</statRefreshTime>
 	<pluginsList>plugins/ground.swf;plugins/grass.swf;plugins/grass2.swf;plugins/grass3.swf;plugins/grass4.swf;plugins/activity.swf;plugins/death.swf;plugins/morisitaCounter.swf</pluginsList>
 	<arePluginsActiveOnLoading>false</arePluginsActiveOnLoading>
+	<behaviourSwitching>
+		<enable>true</enable>
+		<rule>
+			<condition>
+				<condition_name>inactive_ind_numb</condition_name>
+				<condition_max_value>30</condition_max_value>
+				<condition_min_value>0</condition_min_value>
+			</condition>
+			<behavior>BestConditionsWalker</behavior>
+		</rule>
+		<rule>
+			<condition>
+				<condition_name>inactive_ind_numb</condition_name>
+				<condition_max_value>100</condition_max_value>
+				<condition_min_value>31</condition_min_value>
+			</condition>
+			<behavior>RandomWalker</behavior>
+		</rule>
+		<viewDistance>5</viewDistance>
+	</behaviourSwitching>
 </main>
 <plugins>
 	<grass>
@@ -1371,7 +1392,7 @@
 			<observation><part day='16.04.12'>0</part><day></day></observation>
 			<observation><part day='16.04.12'>0</part><day></day></observation>
 			<observation><part day='16.04.12'>0</part><day></day></observation>
-			<observation><part day='17.04.12'>0</part><day></day></observation>
+			<observation><part day='17.04.12'>20</part><day></day></observation>
 			<observation><part day='17.04.12'>0</part><day></day></observation>
 			<observation><part day='17.04.12'>0</part><day></day></observation>
 			<observation><part day='17.04.12'>0</part><day></day></observation>
@@ -1463,7 +1484,7 @@
 			<observation><part day='21.06.12'>0</part><day></day></observation>
 			<observation><part day='21.06.12'>0</part><day></day></observation>
 			<observation><part day='24.06.12'>0</part><day></day></observation>
-			<observation><part day='01.08.12'>20</part><day></day></observation>
+			<observation><part day='01.08.12'>40</part><day></day></observation>
 			<observation><part day='01.08.12'>0</part><day></day></observation>
 			<observation><part day='02.08.12'>0</part><day></day></observation>
 			<observation><part day='02.08.12'>0</part><day></day></observation>

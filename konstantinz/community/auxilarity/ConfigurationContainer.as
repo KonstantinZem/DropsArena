@@ -46,7 +46,7 @@
 			
 		public function setConfigFileName(fileName:String):void{
 			cfgFileName = fileName;
-            XML.ignoreWhitespace = true
+            XML.ignoreWhitespace = true;
 			myXML = new XML(); 
 			myXMLURL = new URLRequest(cfgFileName); 
 			myLoader = new URLLoader(myXMLURL);
@@ -105,7 +105,7 @@
 			if(debugLevel=='Error'){
 				debugLevel = '3';
 				messenger.setDebugLevel(debugLevel);
-				msgStreeng = 'Debuge Level not found in the configuration file. It will be set in ' + debugLevel
+				msgStreeng = 'Debuge Level not found in the configuration file. It will be set in ' + debugLevel;
 				messenger.message(msgStreeng, 1);
 				}
 			}

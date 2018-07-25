@@ -14,6 +14,7 @@ package{
     import flash.display.Sprite;
 	import flash.events.Event; 
 	import konstantinz.community.comStage.*;
+	import konstantinz.community.comStage.behaviour.BehaviourChoicer;
 	import konstantinz.community.auxilarity.*;
 	import konstantinz.community.auxilarity.gui.*;
    
@@ -33,9 +34,7 @@ package{
 		private var statusBar:StatusBar;
 		private var msgWindow:TextWindow;
 		private var messenger:Messenger;
-		public var startStopButton:KzSimpleButton;
-		public var reloadButton:KzSimpleButton;
-		
+		private var behaviourChoicer:BehaviourChoicer;
 		private var eventsForPlugins:Object;
 		private var eventsForPluginsList:Array;
 		
@@ -47,6 +46,8 @@ package{
 		public var commStage:CommunityStage;
 		public var startStopButtonEvent:DispatchEvent;
 		public var reloadButtonEvent:DispatchEvent;
+		public var startStopButton:KzSimpleButton;
+		public var reloadButton:KzSimpleButton;
 
 		public function main(){
 			
@@ -55,9 +56,10 @@ package{
 			initConfig();	
 			}
         
-        public function getNewStatistics(e:Event):void{
-				Accumulator.instance.pushToBuffer(e.target.msg);
-				statusBar.setTexSource(Accumulator.instance.statusBarText);
+        public function getNewStatistics(e:Event):void{//При получении информации, которую нужно сохранить для дальнейшего анализа
+				Accumulator.instance.pushToBuffer(e.target.msg);//Передаем ее в копонент, формирующий таблицу
+				statusBar.setTexSource(Accumulator.instance.statusBarText);//А затем выводим текущую статистическую информацию в статусную строку
+				behaviourChoicer.getConditionsMeaning(e.target.msg);
 			    }
         
         private function removeAllObjects():void{//Очищает все объекты программы перед ее перезапуском
@@ -116,7 +118,13 @@ package{
 			messenger.setMessageMark('Main');
 			messenger.addEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);
 						
-			versionText = new myVersion('0.6',debugLevel);
+			versionText = new myVersion('0.6.2',debugLevel);
+			
+			if(configuration.getOption('main.behaviourSwitching.enable') == 'true'){
+			
+				behaviourChoicer = new BehaviourChoicer(configuration, debugLevel);
+				behaviourChoicer.addEventListener(BehaviourChoicer.BEHAVIOUR_HAS_FOUND, onConditionsChange)
+				}
 			
 			initPosition = configuration.getOption('main.initPosition');
 			model.addChild(versionText);
@@ -201,7 +209,7 @@ package{
 						rootEventHandler:ModelEvent.FIRST_CLICK
 						}];
 				
-					plugins = new PluginLoader(configuration);//Загружае плагины
+					plugins = new PluginLoader(configuration);//Загружаем плагины
 					plugins.setPluginsEventsList(eventsForPluginsList);
 					plugins.loaderEvent.addEventListener(ModelEvent.PLUGIN_LOADED, onPluginsLoading);//После загрузки плагинов даем команду на загрузку элементов интерфейса
 					model.addChild(plugins);
@@ -378,11 +386,18 @@ package{
 			removeAllObjects();//Очищаем все объекты модели
 			initConfig();//Запускаем программу с самого начала
 			}
+			
+		private function onConditionsChange(e:Event):void{
+			var condition:String = e.target.behaviourName;
+			for(var i :int = 0; i<individuals.length; i++){
+				individuals[i].motionBehaviour.switchBehaviour(condition)
+				}
+			}
 		
 		private function showMessageWindow():void{
 			
 			msgWindow = new TextWindow(400,600, Accumulator.instance.getStatistic());
-			addChild(msgWindow)
+			addChild(msgWindow);
 			msgWindow.x = 100;
 			msgWindow.y = 100;
 			}
