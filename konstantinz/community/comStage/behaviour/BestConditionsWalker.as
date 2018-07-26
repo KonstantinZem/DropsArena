@@ -10,7 +10,7 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 	override public function getNewPosition(currentX:int, currentY:int):Array{//Класс на основе выбранного алгоритма поведения определяет новую позицию особи
 			var newPosition:Array = new Array();
 			
-			currentPlaceQuality = populationArea[currentX][currentY]['speedDeleyA'];
+			currentPlaceQuality = populationArea[currentX][currentY].speedDeleyA;
 			
 			newPosition['x'] = currentX;
 			newPosition['y'] = currentY;
@@ -30,7 +30,7 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 				
 				if(currentX > populationArea.length-2){
 					
-					if((currentX - viewDistance) > 0 && populationArea[currentX - viewDistance][currentY]['speedDeleyA'] > currentPlaceQuality){
+					if((currentX - viewDistance) > 0 && populationArea[currentX - viewDistance][currentY].speedDeleyA > currentPlaceQuality){
 						newPosition['x'] = currentX - viewDistance;
 						}else{
 							newPosition['x'] = currentX--;
@@ -38,7 +38,7 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 					
 					}
 					else{
-						if((currentX - viewDistance) < (populationArea.length -2) && populationArea[currentX + viewDistance][currentY]['speedDeleyA'] > currentPlaceQuality){
+						if((currentX - viewDistance) < (populationArea.length -2) && populationArea[currentX + viewDistance][currentY].speedDeleyA > currentPlaceQuality){
 						newPosition[0] = currentX + viewDistance;
 						}else{
 							newPosition['x']++;
@@ -50,7 +50,7 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 				if(currentX==0){
 					}
 					else{
-						if((currentX - viewDistance) > 0 && populationArea[currentX - viewDistance][currentY]['speedDeleyA'] > currentPlaceQuality){
+						if((currentX - viewDistance) > 0 && populationArea[currentX - viewDistance][currentY].speedDeleyA > currentPlaceQuality){
 						newPosition['x'] = currentX - viewDistance;
 						}else{
 							newPosition['x'] = currentX--;
@@ -60,14 +60,14 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 				case 3: //Направо
 				
 				if(currentY > super.populationArea[0].length-2){
-					if((currentY - viewDistance) > 0 && populationArea[currentX][currentY - viewDistance]['speedDeleyA'] > currentPlaceQuality){
+					if((currentY - viewDistance) > 0 && populationArea[currentX][currentY - viewDistance].speedDeleyA > currentPlaceQuality){
 						newPosition['y'] = currentY - viewDistance;
 						}else{
 							newPosition['y']--;
 							}
 					}
 					else{
-						if((currentY + viewDistance)< (populationArea[0].length - 2) && populationArea[currentX][currentY + viewDistance]['speedDeleyA'] > currentPlaceQuality){
+						if((currentY + viewDistance)< (populationArea[0].length - 2) && populationArea[currentX][currentY + viewDistance].speedDeleyA > currentPlaceQuality){
 						newPosition['y'] = currentY + viewDistance;
 						}else{
 							newPosition['y']++;;
@@ -79,7 +79,7 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 				if (currentY == 0){
 					}
 					else{
-						if((currentY - viewDistance) > 0 && populationArea[currentX][currentY - viewDistance]['speedDeleyA'] > currentPlaceQuality){
+						if((currentY - viewDistance) > 0 && populationArea[currentX][currentY - viewDistance].speedDeleyA > currentPlaceQuality){
 						newPosition['y'] = currentY - viewDistance;
 						}else{
 							newPosition['y']--;

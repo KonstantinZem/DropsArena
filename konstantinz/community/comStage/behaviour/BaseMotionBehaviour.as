@@ -35,7 +35,7 @@ package konstantinz.community.comStage.behaviour{
 			} 
 		
 		public function getPlaceQuality(currentX:int, currentY:int):int{
-			currentPlaceQuality = populationArea[currentX][currentY]['speedDeleyA'];
+			currentPlaceQuality = populationArea[currentX][currentY].speedDeleyA;
 			return currentPlaceQuality;
 			}
 	

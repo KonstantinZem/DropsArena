@@ -46,7 +46,6 @@ package konstantinz.community.comStage{
 				sqrQantH = stgHeight/squSize;//Количество квадратов по высоте
 				sqrQantW = stgWidth/squSize;//Количество квадратов по ширине
 				lifeQuant = int(extOptions.getOption('main.lifeQuant'));
-				buildStage();
 				buildNet();
 					
 				msgString = 'The stage ' + chessDesk.length + 'X' + chessDesk[0].length + ' has bulded succesfully';
@@ -57,47 +56,35 @@ package konstantinz.community.comStage{
 				messenger.message(msgString, 0);
 				}
 				}
-		   private function buildStage():void{
-				
-				chessDesk = new Array(sqrQantH);
-				
-				for(var i:int = 0; i<sqrQantH; i++){
-					chessDesk[i] = new Array(sqrQantW);
-					for(var j:int = 0; j< sqrQantW; j++){
-						chessDesk[i][j] = new Array
-						chessDesk[i][j]['picture'] = new Object();
-						//chessDesk[i][j]['envParams'] = new Object();//Параметры окружающей среды
-						chessDesk[i][j]['sqrX'] = new Object(); 
-						chessDesk[i][j]['sqrY'] = new Object();
-						chessDesk[i][j]['speedDeleyA'] = new Object();//Задержка между тиками таймера для взрослых
-						chessDesk[i][j]['speedDeleyY'] = new Object();//Задержка между тиками таймера для молодых
-						chessDesk[i][j]['lifeQuant'] = new Object();//Убыль жизни
-						chessDesk[i][j]['numberOfIndividuals'] = new Object();//Количество особей в данном квадрате
-						
-						}
-				}
-				}
 			
 			private function buildNet():void{
 				//Разлинеивает игровое поле в квадратики
 				var xpos:int = 0; //Позиция квадрата на поле
 				var ypos:int = 0;
+				var counterI:int;
+				var counterJ:int;
+				
+				chessDesk = new Array(sqrQantH);
+				
+				counterI = chessDesk.length;
 
-				for(var i:int = 0; i<chessDesk.length; i++){
-					
-					for(var j:int = 0; j<chessDesk[i].length; j++){
-						chessDesk[i][j]['picture'] = new Sprite();
-						chessDesk[i][j]['picture'].graphics.lineStyle(1,BORDERCOLOR);
-						chessDesk[i][j]['picture'].graphics.beginFill(RECTCOLOR);
-						chessDesk[i][j]['picture'].graphics.drawRect(xpos,ypos,squSize,squSize);
-						chessDesk[i][j]['sqrX'] = xpos; //Чтобы не лазить за координатами квадрата в картинку, разместим их внутри самого массива
-						chessDesk[i][j]['sqrY'] = ypos;
-						chessDesk[i][j]['speedDeleyA'] = 1;//по умолчанию двигаемся без задержки 
-						chessDesk[i][j]['speedDeleyY'] = 1;
-						chessDesk[i][j]['lifeQuant'] = lifeQuant;
-						chessDesk[i][j]['numberOfIndividuals'] = '';//Изначально в квадрате нет ни одной особи
+				for(var i:int = 0; i< counterI; i++){
+					chessDesk[i] = new Vector.<ChessCell>(sqrQantW);
+					counterJ = chessDesk[i].length;
+					for(var j:int = 0; j< counterJ; j++){
+						chessDesk[i][j] = new ChessCell();
+						chessDesk[i][j].picture = new Sprite();
+						chessDesk[i][j].picture.graphics.lineStyle(1,BORDERCOLOR);
+						chessDesk[i][j].picture.graphics.beginFill(RECTCOLOR);
+						chessDesk[i][j].picture.graphics.drawRect(xpos,ypos,squSize,squSize);
+						chessDesk[i][j].sqrX = xpos; //Чтобы не лазить за координатами квадрата в картинку, разместим их внутри самого массива
+						chessDesk[i][j].sqrY = ypos;
+						chessDesk[i][j].speedDeleyA = 1;//по умолчанию двигаемся без задержки 
+						chessDesk[i][j].speedDeleyY = 1;
+						chessDesk[i][j].lifeQuant = lifeQuant;
+						chessDesk[i][j].numberOfIndividuals = '';//Изначально в квадрате нет ни одной особи
 						
-						addChild(chessDesk[i][j]['picture']);
+						addChild(chessDesk[i][j].picture);
 						xpos = xpos + squSize;
 						}
 					   ypos = ypos + squSize;

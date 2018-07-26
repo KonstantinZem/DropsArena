@@ -147,26 +147,26 @@ package konstantinz.community.comStage{
 			var ASIGN:String = 'A';//Adult
 			
 			if(adultAge<0){
-				chessDesk[currentChessDeskI][currentChessDeskJ]['numberOfIndividuals']+=ASIGN;//Делаем в квадрате отметку своего присутсвия
+				chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals +=ASIGN;//Делаем в квадрате отметку своего присутсвия
 				indStatus = ASIGN;
 			}
 			else{
-				chessDesk[currentChessDeskI][currentChessDeskJ]['numberOfIndividuals']+=YSIGN;//В квадрате побывала молодая особь
+				chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals +=YSIGN;//В квадрате побывала молодая особь
 				indStatus =YSIGN;
 				}
 			
-			if(chessDesk[currentChessDeskI][currentChessDeskJ]['numberOfIndividuals'].length == 2){//Если встретились две особи
+			if(chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals.length == 2){//Если встретились две особи
 				
 				if(deleySteps>2){//если перемещение происходит слишком быстро, не переключаем цвета
 					
 					markIndividual('collision');//Визуально отмечаем факт встречи особей
 				}
-				setTimeout(clearCell, 2);
+				setTimeout(clearCell, 1);
 				return false;
 				}
 				else{
 					 markIndividual('nothing'); //Визуально показываем, что ничего не произошло
-					 setTimeout(clearCell, 2)//Без временной задержки особи затирают о себе информацию быстрее чем другие смогут ее прочитать
+					 setTimeout(clearCell, 1)//Без временной задержки особи затирают о себе информацию быстрее чем другие смогут ее прочитать
 					
 					 return true;
 					 }
@@ -202,7 +202,7 @@ package konstantinz.community.comStage{
 
 		private function clearCell():void{
 			//функция полностью платформонезависимая
-			chessDesk[currentChessDeskI][currentChessDeskJ]['numberOfIndividuals'] = '';
+			chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals = '';
 			}
 		
 		private function maturing():void{
@@ -243,17 +243,17 @@ package konstantinz.community.comStage{
 			
 			if(amIAdult){
 				if(!amIAlong){
-					if(chessDesk[currentChessDeskI][currentChessDeskJ]['numberOfIndividuals']=='AA'){//Если встретились две взрослые
+					if(chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals =='AA'){//Если встретились две взрослые
 					maturing();
 					}
 				}
 			}
 			
-			currentChessDeskI = myBehaviour.getNewPosition(currentChessDeskI,currentChessDeskJ)['x'];
-			currentChessDeskJ = myBehaviour.getNewPosition(currentChessDeskI,currentChessDeskJ)['y'];
+			currentChessDeskI = myBehaviour.getNewPosition(currentChessDeskI,currentChessDeskJ).x;
+			currentChessDeskJ = myBehaviour.getNewPosition(currentChessDeskI,currentChessDeskJ).y;
 			
-			individual.x = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrX'];
-			individual.y = chessDesk[currentChessDeskI][currentChessDeskJ]['sqrY'];
+			individual.x = chessDesk[currentChessDeskI][currentChessDeskJ].sqrX;
+			individual.y = chessDesk[currentChessDeskI][currentChessDeskJ].sqrY;
 				
 			  }
 				
@@ -334,7 +334,7 @@ package konstantinz.community.comStage{
 		}
 		
 		public function markPresenceInPlot():void{
-			chessDesk[currentChessDeskI][currentChessDeskJ]['numberOfIndividuals'] += indStatus;
+			chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals += indStatus;
 			}
 	
 			

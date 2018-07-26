@@ -180,19 +180,23 @@ public class Accumulator{
 			var trow:String;//Строки таблицы
 			var spacer:String;//Строка пробелов выравнивающая ширину столбца с заголовком столбца
 			var numberSign:String;
+			var counter:int;
 			
 			spacer = emptySpace(statTable[0][0], statTable[statTable.length - 1][0])//Находим разницу в динне между символом номера и последней цифрой счетчика в таблици
 			numberSign = statTable[0][0] + spacer + '|';
 			
 			statTable[0][0] = statTable[0][0] + spacer;
 			
-			for(var i:int = 1; i<statTable[0].length; i++){
+			counter = statTable[0].length;
+			
+			for(var i:int = 1; i< counter; i++){
 				thead = thead + statTable[0][i] + '|';
 				}
 				tbody = '\n|'+ numberSign + thead + '|\n';
 			
-			for(i = 1; i<statTable.length; i++){
+			for(i = 1; i< statTable.length; i++){
 				trow = '|';
+				
 				for(var j:int = 0; j<statTable[i].length; j++){
 					spacer = emptySpace(statTable[i][j], statTable[0][j]);
 					trow = trow + statTable[i][j] + spacer;
@@ -215,8 +219,10 @@ public class Accumulator{
 			}
 			
 	private function setStatusText():void{
+		var counter:int;
+		counter = statTable[0].length;
          statusBarText = '';
-         for(var i:int = 1; i<statTable[0].length; i++){
+         for(var i:int = 1; i< counter; i++){
             statusBarText = statusBarText + (statTable[0][i] + ': ' + statTable[statTable.length - 1][i] + '    ');
 			}
       }

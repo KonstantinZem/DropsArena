@@ -1,4 +1,4 @@
-![Drops arena banner](http://konstantinz.byethost32.com/drops_arena_logo.png)
+![Drops arena banner](https://raw.githubusercontent.com/KonstantinZem/DropsArena/variable_behaviour/pictures/drops_arena_logo.png)
 
 # Drops' Arena population model
 
@@ -15,11 +15,11 @@ The compiled in swf files version of model yoy can foun [here](http://konstantin
 
 The main model screen
 
-![Model screenshot 1](http://konstantinz.byethost32.com/pictures/fotos/screenshot1.png)
+![Model screenshot 1](https://raw.githubusercontent.com/KonstantinZem/DropsArena/variable_behaviour/pictures/screenshot1.png)
 
 Results screen
 
-![Model screenshot 1](http://konstantinz.byethost32.com/pictures/fotos/screenshot2.png)
+![Model screenshot 1](https://raw.githubusercontent.com/KonstantinZem/DropsArena/variable_behaviour/pictures/screenshot2.png)
 
 ### The plug-ins
 
@@ -31,7 +31,7 @@ At the moment, the following types of plug-ins are developed for this model:
 
 Example of picture loading by cover plug-in
 
-![Cover plug-in picture](http://konstantinz.byethost32.com/pictures/park/aegopodium.png)
+![Cover plug-in picture](https://raw.githubusercontent.com/KonstantinZem/DropsArena/variable_behaviour/pictures/park/aegopodium.png)
 
 ## Russian
 

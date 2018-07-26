@@ -10,7 +10,7 @@
 		private const INTERRUPT_MARK:int = 0;//Если подать функции stopIndividual это число, функция остановит всех особей не запуская таймер паузы
 		private const ERROR_MARK:int = 0;//Сообщение об ошибке помечаются в messanger помечаеся цифрой 0
 		
-		private static var tickInterval:int = 20;//Интервал между тиками таймера
+		private static var tickInterval:int = 10;//Интервал между тиками таймера
 		
 		private var individual:Individual;
 		private var suspendTime:Timer;

@@ -109,6 +109,8 @@ public class cover extends Sprite{
 		var controllX:int;
 		var controllY:int;
 		var bmd:BitmapData = image.bitmapData;
+		var counterI:int;
+		var counterJ:int;
 	
 		image.x = root.commStage.x;
 		image.y = root.commStage.y;
@@ -116,28 +118,33 @@ public class cover extends Sprite{
 		image.width = root.commStage.width;
 				
 		var tableRoot:Array = root.commStage.chessDesk;
+		counterI = tableRoot.length;
 			
-		for(var i:int = 0; i<tableRoot.length; i++){
+		for(var i:int = 0; i< counterI; i++){
 				
-				for(var j:int = 0; j<tableRoot[i].length; j++){
+				counterJ = tableRoot[i].length;
+				
+				for(var j:int = 0; j<counterJ; j++){
 					var pixelValue:String = bmd.getPixel(tableRoot[i][j]['sqrX']/2,tableRoot[i][j]['sqrY']/2).toString(16);
 		
 					if(pixelValue!='ffffff'){//Если участок картинки не белый
 						root.commStage.chessDesk[i][j].picture.transform.colorTransform = ct;
-						root.commStage.chessDesk[i][j]['speedDeleyA'] += aDeley//Переопределяем скорость взрослых
-						root.commStage.chessDesk[i][j]['speedDeleyY'] += yDeley//И молодых особей
-						root.commStage.chessDesk[i][j]['lifeQuant'] += lifequant;//Переопределяем время жизни особи за ход
+						root.commStage.chessDesk[i][j].speedDeleyA += aDeley//Переопределяем скорость взрослых
+						root.commStage.chessDesk[i][j].speedDeleyY += yDeley//И молодых особей
+						root.commStage.chessDesk[i][j].lifeQuant += lifequant;//Переопределяем время жизни особи за ход
 						controllX = i;
 						controllY =j;
 					}
 				}	
 		}
 		
+		bmd.dispose(); //Небольшая оптимизация, чтобы уменьшить занимаемую память
+		bmd = null;
 	    //По окончанию работы плагина
 		//Выводим результат работы
-		msgString = 'Individuals speed now is ' + root.commStage.chessDesk[controllX][controllY]['speedDeleyA'];
+		msgString = 'Individuals speed now is ' + root.commStage.chessDesk[controllX][controllY].speedDeleyA;
 		messenger.message(msgString, 2);
-	    msgString = 'Individuals life decriasing now is ' + root.commStage.chessDesk[controllX][controllY]['lifeQuant'] + ' points after step';
+	    msgString = 'Individuals life decriasing now is ' + root.commStage.chessDesk[controllX][controllY].lifeQuant + ' points after step';
 	    messenger.message(msgString, 2);
 		removeChild(image);//Удаляем вспомогательную картинку с рисунком напочвенного покрова
 		pluginEvent.ready();//Сообщаем о том, что все уже сделано,

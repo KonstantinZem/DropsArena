@@ -5,6 +5,7 @@ package konstantinz.plugins{
 	import flash.events.TimerEvent; 
 	import flash.utils.*;
 	import konstantinz.community.auxilarity.*;
+	import konstantinz.community.comStage.*;
 	import konstantinz.plugins.*;
 	
 	public class morisita extends Sprite{
@@ -20,8 +21,8 @@ package konstantinz.plugins{
 		private var cellSize:int;
 		private var config:Object;
 		private var communityStage:Object;
-		private var indDrivers:Array;
-		private var individuals:Array;
+		private var indDrivers:Vector.<Suspender>;
+		private var individuals:Vector.<Individual>;
 		private var initTimer:Timer;
 		private var refreshTimer:Timer;
 		
@@ -117,18 +118,22 @@ package konstantinz.plugins{
 			msgString = 'Counting Morisita index';
 			messenger.message(msgString, 3);
 			var morisita:Number;
+			var drvCounter:int;
+			var indCounter:int
 		
 			if(plotsPosition.length == 0){//Если пречень координат  квадратов еще не составлялся
 				getPlotPosition();//Составляем его чтобы в дальнейшем не расчитывать позиции которые уже не изменятся а просто брать уже готовые координаты
 				}
 		
-			for(var i:int = 0; i<indDrivers.length;i++){//Перед тем как расчитать индекс приостанавливаем особей на некоторое время
+			drvCounter = indDrivers.length;
+			for(var i:int = 0; i< drvCounter;i++){//Перед тем как расчитать индекс приостанавливаем особей на некоторое время
 				indDrivers[i].stopIndividual(500);
 				}
 				
 				clearStage();//Очищаем массив сцены от информации о прибывании там особе, так как отметка от пристутсвия особи часто остается в уже пустой ячейки
 				
-			for(var j:int = 0; j<individuals.length;j++){
+			indCounter = individuals.length;
+			for(var j:int = 0; j< indCounter;j++){
 				individuals[j].markPresenceInPlot();//Даем особям команду обозначить те квадраты в которых они уже находятся
 				}
 				
@@ -167,9 +172,14 @@ package konstantinz.plugins{
 		}
 		
 		private function clearStage():void{
-			for(var i:int = 0; i<communityStage.chessDesk.length;i++){
+			var counterI:int;
+			var counterJ:int;
+			
+			counterI = communityStage.chessDesk.length;
+			for(var i:int = 0; i< counterI;i++){
 				
-				for(var j:int = 0;j<communityStage.chessDesk[i].length;j++){
+				counterJ = communityStage.chessDesk[i].length;
+				for(var j:int = 0;j< counterJ; j++){
 					communityStage.chessDesk[i][j]['numberOfIndividuals'] = '';
 					}
 				}
@@ -185,21 +195,24 @@ package konstantinz.plugins{
 			var niSumm:int = 0;
 			var newX:int = 0;
 			var newY:int = 0;
+			var counter:int;
+			
+			counter = plotsPosition.length;
 	
-			for (var i:int = 0; i<plotsPosition.length; i++){
+			for (var i:int = 0; i< counter; i++){
 				newX = plotsPosition[i][0];
 				newY = plotsPosition[i][1];
 				ind = countIndividuals(newX,newY,plotSize);
 				individualsInplot.push(ind);
 				}
+			
+			allPlotsNumber = individualsInplot.length;
 				
-			for(i = 0; i<individualsInplot.length; i++){//Подсчитываем общее количество особей в квадратах
+			for(i = 0; i< allPlotsNumber; i++){//Подсчитываем общее количество особей в квадратах
 				allIndividuals += individualsInplot[i];
 				}
 			
-			allPlotsNumber = individualsInplot.length;
-			
-			for(i = 0; i<individualsInplot.length; i++){
+			for(i = 0; i< allPlotsNumber; i++){
 				niSumm += individualsInplot[i]*(individualsInplot[i]-1);
 				}
 			

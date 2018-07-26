@@ -7,6 +7,7 @@ import flash.events.Event
 	import flash.events.TimerEvent; 
 	import flash.utils.*;
 	import konstantinz.community.auxilarity.*;
+	import konstantinz.community.comStage.*;
 	import konstantinz.plugins.*;
     
 public class activitySwitcher extends Sprite{
@@ -15,7 +16,7 @@ public class activitySwitcher extends Sprite{
 	private const STATISTIC_MARK:int = 10;//Сообщение статистического характера помечаются в messanger помечаеся цифрой 10
 	private const MAX_OPTIONS_LIST_SIZE:int = 1000;//Чтобы небыло бесконечных поисковых циклов, их надо ограничить
 	
-	private var dispatchedObjects:Array//Ссылка на массив с управляемыми объектами
+	private var dispatchedObjects:Vector.<Suspender>//Ссылка на массив с управляемыми объектами
 	private var stopedObjects:Array;//Список остановленных в данный момент особей
 	private var suspendTime:int;//Время на которое нужно остановить особь
 	private var numberOfData:int;
@@ -208,8 +209,9 @@ public class activitySwitcher extends Sprite{
 				
 				currentActivitIndNumber++;
 			}
+			  
 				stopOnly(currentActivity, 'percents');
-			
+				
 				msgString = 'Current stoped individuals part is ' +  currentActivitIndNumber + ':'+ currentActivity;
 				messenger.message(msgString, 3);
 				
@@ -226,6 +228,7 @@ public class activitySwitcher extends Sprite{
 				
 			}catch(e:Error){
 				messenger.message(e.message, ERROR_MARK);
+				
 				}
 		}
 			
@@ -233,12 +236,14 @@ public class activitySwitcher extends Sprite{
 	//Передаются два параметра - число особей, которое надо остановить и единицы измерения - проценты или штуки
 		var itemsNumber:int;
 		stopedObjects = new Array;
+		
+		try{
 	
 		switch(unit_type){
 		case 'percents':
 
 			itemsNumber = 0;
-			itemsNumber = Math.round((objNumber/100)*dispatchedObjects.length)//Высчитываем количество из процентов
+			itemsNumber = Math.round((objNumber/100)* (dispatchedObjects.length - 1))//Высчитываем количество из процентов
 			for(var i:int = 0; i< itemsNumber; i++){
 			
 			stopedObjects[i] = setObjRange();
@@ -248,7 +253,7 @@ public class activitySwitcher extends Sprite{
 
 		case 'items':
 			itemsNumber = 0;
-			itemsNumber = objNumber;
+			itemsNumber = objNumber - 1;
 			for(i = 0; i< itemsNumber; i++){
 				stopedObjects[i] = setObjRange();
 			}
@@ -260,12 +265,15 @@ public class activitySwitcher extends Sprite{
 			itemsNumber = 0
 			messenger.message('Wrong unit type', ERROR_MARK);
 		}
+	}catch(e:Error){
+		messenger.message(e.message, ERROR_MARK);
+		}
 	}
 	
 	private function setObjRange():int{//поиск случайной особи
 		var stopedObjPosition:int = 0;
 		
-			stopedObjPosition = Math.round(Math.random()*dispatchedObjects.length);
+			stopedObjPosition = Math.round(Math.random()* (dispatchedObjects.length - 1));
 			
 			if(dispatchedObjects[stopedObjPosition]==null){//Если особь существует и движеться
 				stopedObjPosition = setObjRange();
@@ -275,12 +283,15 @@ public class activitySwitcher extends Sprite{
 	}
 
 	private function sendStop():void{
+		var counter:int;
 		try{
-			if(dispatchedObjects.length < CRITIAL_IND_NUMBER){
+			if((dispatchedObjects.length - 1) < CRITIAL_IND_NUMBER){
 				throw new IllegalOperationError('Number of individals less then critical');
 				}
 			
-			for(var i:int = 0; i<stopedObjects.length; i++){
+			counter = stopedObjects.length - 1;
+			
+			for(var i:int = 0; i< counter; i++){
 				
 				if(dispatchedObjects[stopedObjects[i]] != null){
 					switch(signalType){
@@ -292,14 +303,19 @@ public class activitySwitcher extends Sprite{
 								throw new ReferenceError('Can not find function stopIndividual. It seems, that individual now not exist');
 								}
 						break;
+						
 						case 'kill':
+							
 							if(dispatchedObjects[stopedObjects[i]].hasOwnProperty('killIndividual')){
+								
 								if(killStoped =='true'){//Если можно, убиваем всех особей из выборки
 									dispatchedObjects[stopedObjects[i]].killIndividual();
+									
 									}else{
 										if(dispatchedObjects[stopedObjects[i]].indState()=='moved'){
 											dispatchedObjects[stopedObjects[i]].killIndividual();//А иначе убиваем только тех, кто движеться
 										}
+									
 									}
 								}
 								else{
@@ -313,6 +329,7 @@ public class activitySwitcher extends Sprite{
 				}
 				
 			}
+			
 		}
 		catch(e:IllegalOperationError){
 			messenger.message(e.message, ERROR_MARK);
