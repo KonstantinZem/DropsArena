@@ -180,7 +180,7 @@ package konstantinz.plugins{
 				
 				counterJ = communityStage.chessDesk[i].length;
 				for(var j:int = 0;j< counterJ; j++){
-					communityStage.chessDesk[i][j]['numberOfIndividuals'] = '';
+					communityStage.chessDesk[i][j].numberOfIndividuals = '';
 					}
 				}
 			}
@@ -228,7 +228,7 @@ package konstantinz.plugins{
 			for(var i:int = 0; i<plSize; i++){
 		
 				for(var j:int = 0; j<plSize; j++){
-					individualsNumber += communityStage.chessDesk[xcrd+i][ycrd+j]['numberOfIndividuals'].length;
+					individualsNumber += communityStage.chessDesk[xcrd+i][ycrd+j].numberOfIndividuals.length;
 					}
 				}
 			return individualsNumber;

@@ -27,6 +27,7 @@ package{
 		
 		private var stgHeight:int;
 		private var stgWidth:int;
+		private var indNumber:int;
 		private var debugLevel:String;
 		private var msgString:String;
 		private var statRefreshTime:String;//Время обновления статистической информации
@@ -38,8 +39,8 @@ package{
 		private var eventsForPlugins:Object;
 		private var eventsForPluginsList:Array;
 		
-		public var indSuspender:Array//Структура, через которую особей можно на нужное время останавливать
-		public var individuals:Array;
+		public var indSuspender:Vector.<Suspender>//Структура, через которую особей можно на нужное время останавливать
+		public var individuals:Vector.<Individual>;
 		public var model:Sprite;
 		public var plugins:PluginLoader;
 		public var configuration:ConfigurationContainer;
@@ -63,6 +64,7 @@ package{
 			    }
         
         private function removeAllObjects():void{//Очищает все объекты программы перед ее перезапуском
+			var counter:int;
 			Accumulator.instance.clear();
 			
 			startStopButtonEvent.removeEventListener(ModelEvent.FIRST_CLICK, onStartClick);
@@ -71,8 +73,9 @@ package{
 			
 			messenger.removeEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);
 			messenger = null;
-				
-			for(var i:int = 0;i<individuals.length;i++){//Полностью останавливаем особей и убираем их со сцены
+			
+			counter = individuals.length;
+			for(var i:int = 0;i< counter;i++){//Полностью останавливаем особей и убираем их со сцены
 				indSuspender[i].stopIndividual(0);
 				commStage.removeChild(individuals[i]);
 			}
@@ -118,7 +121,7 @@ package{
 			messenger.setMessageMark('Main');
 			messenger.addEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);
 						
-			versionText = new myVersion('0.6.2',debugLevel);
+			versionText = new myVersion('0.6.4',debugLevel);
 			
 			if(configuration.getOption('main.behaviourSwitching.enable') == 'true'){
 			
@@ -138,8 +141,11 @@ package{
 			commStage.y = 20;
 			commStage.scaleX = 0.9;
 			commStage.scaleY = 0.9;
-			individuals = new Array;
-			indSuspender = new Array;
+			
+			indNumber = int(configuration.getOption('main.indQuntaty'));
+			
+			individuals = new Vector.<Individual>(indNumber);
+			indSuspender = new Vector.<Suspender>(indNumber);
 			
 			statRefreshTime = configuration.getOption('main.statRefreshTime');
 			Accumulator.instance.setDebugLevel(debugLevel);
@@ -264,7 +270,7 @@ package{
 		
 		private function addInitIndividuals(indX:int, indY:int):void{//Добавляем первых особей
 			
-			for (var i:int = 0; i< int(configuration.getOption('main.indQuntaty')); i++){
+			for (var i:int = 0; i< indNumber; i++){
 				individuals[i] = new Individual(this,commStage.chessDesk,configuration,i,indX,indY);
 				indSuspender[i] = new Suspender(individuals[i],commStage.chessDesk,configuration)
 				
@@ -287,7 +293,7 @@ package{
 			var chessDeskLengthX:int = commStage.chessDesk.length - 1;
 			var chessDeskLengthY:int = commStage.chessDesk[1].length - 1;
 			
-			for (var i:int = 0; i< int(configuration.getOption('main.indQuntaty')); i++){
+			for (var i:int = 0; i< indNumber; i++){
 				indXRnd = Math.round(Math.random() * chessDeskLengthX);
 				indYRnd = Math.round(Math.random() * chessDeskLengthY);
 				
@@ -324,6 +330,8 @@ package{
 		
 		private function removeIndividuals(e:Event):void{
 			var individual:int = e.target.individual;//Получаем номер особи, которую надо удалить
+			var counter:int;
+			try{
 			
 			individuals[individual].IndividualEvent.removeEventListener(ModelEvent.DEATH, removeIndividuals);
 			individuals[individual] = null;//Убираем из массива особей
@@ -332,7 +340,8 @@ package{
 			indSuspender.splice(individual,1);//Ужимаем массивы
 			individuals.splice(individual,1);
 			
-			for(var i:int = 0; i<individuals.length; i++){
+			counter = individuals.length;
+			for(var i:int = 0; i< counter; i++){
 				individuals[i].setName(i);//После ужимания массива делаем так, чтобы имя особи совпадало с ее позицией
 				}
 			
@@ -346,6 +355,12 @@ package{
 				Accumulator.instance.stopRefresh();//И выключаем таймер
 				showMessageWindow();
 				}
+			}catch(e:Error){
+				messenger.message(e.message, ERROR_MARK);
+				}
+				catch(e:RangeError){
+					messenger.message(e.message, ERROR_MARK);
+					}
 			}
 		private function onPluginsLoading(e:ModelEvent):void{
 			if(plugins.loaderEvent.pluginName=='last'){
@@ -356,13 +371,15 @@ package{
 		}
 			
 		private function onStartClick(e:ModelEvent):void{//Действия по нажатию на кнопку старт
+			var counter:int;
 			
 			if(msgWindow){//Если окно статистики уже было открыто
 				removeChild(msgWindow);//Закрываем его
 				msgWindow = null;
 				}
 			
-			for(var i:int = 0; i<individuals.length; i++){
+			counter = individuals.length;
+			for(var i:int = 0; i< counter; i++){
 				indSuspender[i].stopIndividual(1);
 				}
 			msgString = 'Individuals begin to move';
@@ -371,8 +388,10 @@ package{
 			}
 		
 		private function onStopClick(e:ModelEvent):void{//Действия по нажатию на кнопку стоп
+			var counter:int;
 			
-			for(var i:int = 0; i<individuals.length; i++){
+			counter = individuals.length;
+			for(var i:int = 0; i< counter; i++){
 				indSuspender[i].stopIndividual(0);
 				}
 			msgString = 'Individuals has stoped';
@@ -383,13 +402,17 @@ package{
 			}
 		
 		private function onReloadClick(e:ModelEvent):void{//При нажатии на кнопку перезагрузки модели
+			
 			removeAllObjects();//Очищаем все объекты модели
 			initConfig();//Запускаем программу с самого начала
 			}
 			
 		private function onConditionsChange(e:Event):void{
 			var condition:String = e.target.behaviourName;
-			for(var i :int = 0; i<individuals.length; i++){
+			var counter:int;
+			
+			counter = individuals.length;
+			for(var i :int = 0; i< counter; i++){
 				individuals[i].motionBehaviour.switchBehaviour(condition)
 				}
 			}
