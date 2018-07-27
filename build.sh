@@ -1,7 +1,9 @@
 #!/bin/bash
-cd /home/konstantin/Documents/Rabochie/swf/swf_comunity/src
+
+srcPath='/Documents/Rabochie/swf/swf_comunity/src'
+cd $HOME$srcPath
 # путь до каталога с Flex SDK
-sdk='/home/konstantin/.programs/flex_sdk_4.6/'
+sdk=$HOME'/.programs/flex_sdk_4.6/'
 # путь до компилятора mxmlc
 mxmlc=$sdk'bin/mxmlc'
  

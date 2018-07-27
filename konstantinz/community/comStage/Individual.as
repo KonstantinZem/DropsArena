@@ -46,6 +46,8 @@ package konstantinz.community.comStage{
 		private var offspringsQuant:int;
 		private var currentChessDeskI:int;//Номер строки текущего квадрата
 		private var currentChessDeskJ:int;//Номер столбца текущего квадрата
+		private var previosChessDeskI:int;
+		private var previosChessDeskJ:int
 		private var indDirection:int;//Текущие направление
 		private var deleySteps:int;//количество ходов, которые надо пропустить для замедления движения
 		private var chessDesk:Array; //Ссылка на внешний массив с координатами и условиями среды
@@ -71,6 +73,10 @@ package konstantinz.community.comStage{
 				messanger = new Messenger(debugLevel);
 				messanger.setMessageMark('Individual');
 				indNumber = args[0];
+				
+				previosChessDeskI = 0;
+				previosChessDeskJ = 0;
+				
 			
 			if(args[0]==undefined){
 				indNumber = Math.round(Math.random()*1000);;
@@ -161,13 +167,12 @@ package konstantinz.community.comStage{
 					
 					markIndividual('collision');//Визуально отмечаем факт встречи особей
 				}
-				setTimeout(clearCell, 1);
+				
 				return false;
 				}
 				else{
-					 markIndividual('nothing'); //Визуально показываем, что ничего не произошло
-					 setTimeout(clearCell, 1)//Без временной задержки особи затирают о себе информацию быстрее чем другие смогут ее прочитать
-					
+					 markIndividual('nothing'); //Визуально показываем, что ничего не произошло					
+					 
 					 return true;
 					 }
 			}
@@ -202,7 +207,9 @@ package konstantinz.community.comStage{
 
 		private function clearCell():void{
 			//функция полностью платформонезависимая
-			chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals = '';
+			chessDesk[previosChessDeskI][previosChessDeskJ].numberOfIndividuals = '';
+			previosChessDeskI = currentChessDeskI;
+			previosChessDeskJ = currentChessDeskJ;
 			}
 		
 		private function maturing():void{
@@ -254,8 +261,11 @@ package konstantinz.community.comStage{
 			
 			individual.x = chessDesk[currentChessDeskI][currentChessDeskJ].sqrX;
 			individual.y = chessDesk[currentChessDeskI][currentChessDeskJ].sqrY;
+			
+			clearCell()
 				
 			  }
+			  
 				
 			}
 			
