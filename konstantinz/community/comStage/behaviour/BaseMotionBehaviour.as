@@ -7,10 +7,14 @@ package konstantinz.community.comStage.behaviour{
 		private const ERROR_MARK:int = 0;//Сообщение об ошибке помечаются в messanger помечаеся цифрой 0
 		
 		private var debugeLevel:String;
+		private var previosChessDeskI:int
+		private var previosChessDeskJ:int
 		
 		protected var currentPlaceQuality:int;
 		protected var populationArea:Array;
 		protected var msgString:String;
+		private var newPosition:Array = new Array();
+		private var individualName:int;
 		
 		public var messenger:Messenger;
 		
@@ -19,13 +23,15 @@ package konstantinz.community.comStage.behaviour{
 			messenger = new Messenger();
 			messenger.setDebugLevel (debugeLevel);
 			messenger.setMessageMark('Behaviour');
+			previosChessDeskI = 0;
+			previosChessDeskJ = 0;
 			
 			}
 		public function setPopulationArea(area:Array):void{//передает классу ссылку на массив координат внутри класса CommunityStage А еще лучше передавать это через конструктор
 			try{
 			
-			if(area.length == 0){
-				throw new Error('Population area array is empty');
+				if(area.length == 0){
+					throw new Error('Population area array is empty');
 				}
 				populationArea = area;
 			}catch(err:Error){
@@ -41,9 +47,10 @@ package konstantinz.community.comStage.behaviour{
 	
 		public function getNewPosition(currentX:int, currentY:int):Array{//Класс на основе выбранного алгоритма поведения определяет новую позицию особи
 			
-			var newPosition:Array = new Array();
-			newPosition['x'] = currentX;
-			newPosition['y'] = currentY;
+			clearCell();
+			
+			newPosition.x = currentX;
+			newPosition.y = currentY;
 			
 			var indDirection:int = 0;
 			
@@ -54,15 +61,14 @@ package konstantinz.community.comStage.behaviour{
 			switch(indDirection){
 				case 0: //Стоим наместе
 				
-				
 				break;
 				case 1://Идем вниз
 				
 				if(currentX > populationArea.length-2){
-					newPosition['x'] = currentX--;
+					newPosition.x = currentX--;
 					}
 					else{
-						newPosition['x']++;
+						newPosition.x++;
 						}
 				break;
 				case 2://Идем вверх
@@ -70,16 +76,16 @@ package konstantinz.community.comStage.behaviour{
 				if(currentX==0){
 					}
 					else{
-						newPosition['x']--;
+						newPosition.x--;
 					}
 				break;
 				case 3: //Направо
 				
 				if(currentY > populationArea[0].length-2){
-					newPosition['y']--;
+					newPosition.y--;
 					}
 					else{
-						newPosition['y']++;
+						newPosition.y++;
 						}
 				break;
 				case 4://Идем налево
@@ -87,7 +93,7 @@ package konstantinz.community.comStage.behaviour{
 				if (currentY == 0){
 					}
 					else{
-						newPosition['y']--;
+						newPosition.y--;
 						}
 				break;
 				default://Стоим на месте
@@ -104,6 +110,7 @@ package konstantinz.community.comStage.behaviour{
 
 		public function getNewState():String{//На основе выбранного алгоритма поведения определяется новое состояние особи
 			var newState:String = 'nothing'
+			
 			try{
 				
 				}catch(err:Error){
@@ -111,6 +118,19 @@ package konstantinz.community.comStage.behaviour{
 					messenger.message(msgString, ERROR_MARK);
 					}
 				return newState;
+			}
+		
+		public function setIndividualNumber(newNumber:int):void{
+			individualName = newNumber;
+			}
+			
+			public function clearCell():void{
+			//функция полностью платформонезависимая
+			previosChessDeskI = newPosition.x;
+			previosChessDeskJ = newPosition.y;
+			populationArea[previosChessDeskI][previosChessDeskJ].numberOfIndividuals = '';
+			populationArea[previosChessDeskI][previosChessDeskJ].individualName = 0;
+			
 			}
 	
 	}

@@ -77,7 +77,7 @@ package{
 			counter = individuals.length;
 			for(var i:int = 0;i< counter;i++){//Полностью останавливаем особей и убираем их со сцены
 				indSuspender[i].stopIndividual(0);
-				commStage.removeChild(individuals[i]);
+				commStage.removeChild(individuals[i].individualPicture.individualBody);
 			}
 			indSuspender.length = 0;
 
@@ -121,7 +121,7 @@ package{
 			messenger.setMessageMark('Main');
 			messenger.addEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);
 						
-			versionText = new myVersion('0.6.4',debugLevel);
+			versionText = new myVersion('0.6.6',debugLevel);
 			
 			if(configuration.getOption('main.behaviourSwitching.enable') == 'true'){
 			
@@ -271,10 +271,10 @@ package{
 		private function addInitIndividuals(indX:int, indY:int):void{//Добавляем первых особей
 			
 			for (var i:int = 0; i< indNumber; i++){
-				individuals[i] = new Individual(this,commStage.chessDesk,configuration,i,indX,indY);
+				individuals[i] = new Individual(commStage.chessDesk,configuration,i,indX,indY);
 				indSuspender[i] = new Suspender(individuals[i],commStage.chessDesk,configuration)
 				
-				commStage.addChild(individuals[i]);
+				commStage.addChild(individuals[i].individualPicture.individualBody);
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
 				
@@ -297,9 +297,9 @@ package{
 				indXRnd = Math.round(Math.random() * chessDeskLengthX);
 				indYRnd = Math.round(Math.random() * chessDeskLengthY);
 				
-				individuals[i] = new Individual(this,commStage.chessDesk,configuration,i,indXRnd,indYRnd);
+				individuals[i] = new Individual(commStage.chessDesk,configuration,i,indXRnd,indYRnd);
 				indSuspender[i] = new Suspender(individuals[i],commStage.chessDesk,configuration);
-				commStage.addChild(individuals[i]);
+				commStage.addChild(individuals[i].individualPicture.individualBody);
 				
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
@@ -316,10 +316,10 @@ package{
 				for(var i:int = startPos;i<stopPos;i++){
 					var newX:int = e.target.currentChessDeskI;
 					var newY:int = e.target.currentChessDeskJ;
-					individuals[i] = new Individual(this,commStage.chessDesk, configuration, i,newX,newY);
+					individuals[i] = new Individual(commStage.chessDesk, configuration, i,newX,newY);
 					indSuspender[i] = new Suspender(individuals[i],commStage.chessDesk,configuration);
 					
-					commStage.addChild(individuals[i]);
+					commStage.addChild(individuals[i].individualPicture.individualBody);
 					
 					individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
 					individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
@@ -333,27 +333,28 @@ package{
 			var counter:int;
 			try{
 			
-			individuals[individual].IndividualEvent.removeEventListener(ModelEvent.DEATH, removeIndividuals);
-			individuals[individual] = null;//Убираем из массива особей
-			indSuspender[individual] = null;//И связанные с ними драйверы
+				individuals[individual].IndividualEvent.removeEventListener(ModelEvent.DEATH, removeIndividuals);
+				commStage.removeChild(individuals[individual].individualPicture.individualBody);
+				individuals[individual] = null;//Убираем из массива особей
+				indSuspender[individual] = null;//И связанные с ними драйверы
 			
-			indSuspender.splice(individual,1);//Ужимаем массивы
-			individuals.splice(individual,1);
+				indSuspender.splice(individual,1);//Ужимаем массивы
+				individuals.splice(individual,1);
 			
-			counter = individuals.length;
-			for(var i:int = 0; i< counter; i++){
-				individuals[i].setName(i);//После ужимания массива делаем так, чтобы имя особи совпадало с ее позицией
+				counter = individuals.length;
+				for(var i:int = 0; i< counter; i++){
+					individuals[i].setName(i);//После ужимания массива делаем так, чтобы имя особи совпадало с ее позицией
 				}
 			
-			msgString = 'Now number of individuals is ' + individuals.length;
-			messenger.message(msgString, 2);
-			msgString = IND_NUMB + individuals.length;
-			messenger.message(msgString, STAT_MSG_MARK);//Сохраняем количество особей для статистики
+				msgString = 'Now number of individuals is ' + individuals.length;
+				messenger.message(msgString, 2);
+				msgString = IND_NUMB + individuals.length;
+				messenger.message(msgString, STAT_MSG_MARK);//Сохраняем количество особей для статистики
 			
-			if(individuals.length < CRITIAL_IND_NUMBER){//Если особей слишком мало
-				messenger.removeEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);//Перестаем за ними следить
-				Accumulator.instance.stopRefresh();//И выключаем таймер
-				showMessageWindow();
+				if(individuals.length < CRITIAL_IND_NUMBER){//Если особей слишком мало
+					messenger.removeEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);//Перестаем за ними следить
+					Accumulator.instance.stopRefresh();//И выключаем таймер
+					showMessageWindow();
 				}
 			}catch(e:Error){
 				messenger.message(e.message, ERROR_MARK);
@@ -362,6 +363,7 @@ package{
 					messenger.message(e.message, ERROR_MARK);
 					}
 			}
+		
 		private function onPluginsLoading(e:ModelEvent):void{
 			if(plugins.loaderEvent.pluginName=='last'){
 				addChild(startStopButton);//Когда плагины загрузились, показываем кнопку старта. Иначе могут случатся ошибки, когда плагин еще не загрузился а юзер уже пытается его остановить кнопкой

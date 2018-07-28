@@ -11,6 +11,7 @@ public class ChessCell{
 	public var speedDeleyY:int;
 	public var lifeQuant:int;
 	public var numberOfIndividuals:String;
+	public var individualName:int;
 	
 	public function ChessCell(){
 	
