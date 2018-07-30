@@ -10,6 +10,8 @@ package konstantinz.plugins{
 	
 	public class morisita extends Sprite{
 		private const BORDERCOLOR:Number = 0x000000;
+		private const STATISTIC_MARK:int = 10;//Сообщение статистического характера помечаются в messanger помечаеся цифрой 10
+		
 		private var debugeLevel:String;
 		private var msgString:String;
 		private var refreshTime:int;//Время обновления
@@ -29,7 +31,7 @@ package konstantinz.plugins{
 		public var messenger:Messenger;
 		public var activeOnLoad:String
 		public var pluginName:String; //Должна быть включена в интерфейс этого типа плагинов
-		public var pluginEvent:Object; //Дает возможность плагину общатся с главной программой с помощью отсылки сообщений
+		public var pluginEvent:DispatchEvent; //Дает возможность плагину общатся с главной программой с помощью отсылки сообщений
 	
 		public function morisita (){
 			
@@ -148,7 +150,7 @@ package konstantinz.plugins{
 					msgString = 'morisita_index:' + morisita;//Посылаем результат для дальнейшей обработки сторонними компонентами
 					}
 			
-			messenger.message(msgString,10);
+			messenger.message(msgString, STATISTIC_MARK);
 		}
 		
 		private function getPlotPosition():int{

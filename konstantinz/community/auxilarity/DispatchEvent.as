@@ -12,6 +12,8 @@
 		public var scrollerPosition:Number;
 		public var scrollingDirection:String;
 		public var clickMessag:String;
+		public var message:String;
+		public var target:String;//Имя отправителя сообщения
 		
 		public function DispatchEvent(){
 		}		
@@ -23,6 +25,10 @@
 		
 		public function death():void{
 			dispatchEvent(new ModelEvent(ModelEvent.DEATH));	
+		}
+		
+		public function newStatistic():void{
+			dispatchEvent(new ModelEvent(ModelEvent.NEW_STATISTIC));	
 		}
 		
 		public function ready():void{

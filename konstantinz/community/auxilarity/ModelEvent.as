@@ -11,7 +11,8 @@
 		 public static const CLICKING:String = 'clicking';
 		 public static const FIRST_CLICK:String = 'firstClick';
 		 public static const SECOND_CLICK:String = 'secondClick';
-		 
+		 public static const NEW_STATISTIC:String = 'new_statistic';
+		
 		 public function ModelEvent(type:String) {
              super(type);
         }

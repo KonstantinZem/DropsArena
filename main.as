@@ -49,6 +49,7 @@ package{
 		public var reloadButtonEvent:DispatchEvent;
 		public var startStopButton:KzSimpleButton;
 		public var reloadButton:KzSimpleButton;
+		public var stageEvent:DispatchEvent;
 
 		public function main(){
 			
@@ -61,6 +62,10 @@ package{
 				Accumulator.instance.pushToBuffer(e.target.msg);//Передаем ее в копонент, формирующий таблицу
 				statusBar.setTexSource(Accumulator.instance.statusBarText);//А затем выводим текущую статистическую информацию в статусную строку
 				behaviourChoicer.getConditionsMeaning(e.target.msg);
+				stageEvent.message = e.target.msg
+				stageEvent.target = e.target.messageMark;
+				stageEvent.newStatistic();
+				
 			    }
         
         private function removeAllObjects():void{//Очищает все объекты программы перед ее перезапуском
@@ -151,6 +156,8 @@ package{
 			Accumulator.instance.setDebugLevel(debugLevel);
 			Accumulator.instance.setRefreshTime(int(statRefreshTime));//Устанавливаем время обновления статистики
 			
+			stageEvent = new DispatchEvent();
+			
 			initGUIElements();
 						
 			switch(initPosition){//Помещаем первых особей по разным схемам, согласно конфигу
@@ -213,7 +220,12 @@ package{
 						sendFromRootObject:'startStopButtonEvent',
 						sendToPluginObject:'startPlugin',
 						rootEventHandler:ModelEvent.FIRST_CLICK
-						}];
+						},
+						{
+						sendFromRootObject:'stageEvent',
+						sendToPluginObject:'onNewStatistic',
+						rootEventHandler:ModelEvent.NEW_STATISTIC
+							}];
 				
 					plugins = new PluginLoader(configuration);//Загружаем плагины
 					plugins.setPluginsEventsList(eventsForPluginsList);

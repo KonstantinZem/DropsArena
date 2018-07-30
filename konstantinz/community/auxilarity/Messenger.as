@@ -9,7 +9,8 @@ package konstantinz.community.auxilarity{
 		
 		private const EXT_DATA_MARK:int = 10;//Значение messageLevel при котором поступившую информацию нужно посылать сообщением
 		private var debugeLevel:String;
-		private var messageMark:String;
+		
+		public var messageMark:String;
 		
 		public static const HAVE_EXT_DATA:String = 'have_ext_data';
 		public var msg:String;
