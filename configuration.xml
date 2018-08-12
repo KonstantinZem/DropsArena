@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
-    <!--устойчиво-->
+ 
 <main>
 	<debugLevel>1</debugLevel>
 	<pluginEnable>true</pluginEnable>
-	<!-- indQuntaty -- how many individuals must to be created at the start -->
-	<indQuntaty>100</indQuntaty>
+	<!-- indQuntaty how many individuals must to be created at the start -->
+	<indQuntaty>200</indQuntaty>
 	<lifeTime>7000</lifeTime>
 	<lifeQuant>1</lifeQuant>
 	<adultAge>1500</adultAge>
@@ -72,7 +72,9 @@
 	<activity>
 		<signal>stop</signal>
 		<steps>6500</steps>
-		<debugLevel>2</debugLevel>
+		<debugLevel>1</debugLevel>
+		<selectionType>percents</selectionType>
+		<!--switching_event define the event making plugin work. Can be timer or calendar_data-->
 		<switching_event>timer</switching_event>
 		<data>
 			<observation>
@@ -1200,16 +1202,17 @@
 				<day>02.08.12</day>
 			</observation>
 	</data>
-</activity>
+	</activity>
   <death>
+	<debugLevel>1</debugLevel>
 	<signal>kill</signal>
 	<!-- individuals will have been killed une time per this number of steps -->
      <steps>6500</steps>
-     <debugLevel>1</debugLevel>
-     <!-- killStoped: are unactive individuals will be killed to -->
+     <!-- killStoped will unactive individuals hawe to be killed -->
      <killStoped>true</killStoped>
      <switching_event>calendar_data</switching_event>
-	<data>
+     <selectionType>percents</selectionType>
+		<data>
 			<observation>
 				<part>20</part>
 				<day>18.08.11</day>
@@ -1219,15 +1222,15 @@
 				<day>17.04.12</day>
 			</observation>
 			<observation>
-				<part>40</part>
+				<part>20</part>
 				<day>01.08.12</day>
 			</observation>
-    </data>
+		</data>
     </death>
-<morisitaCounter>
-	<debugLevel>1</debugLevel>
-	<refreshTime>20</refreshTime>
-	<plotSize>8</plotSize>
-</morisitaCounter>
+	<morisitaCounter>
+		<debugLevel>1</debugLevel>
+		<refreshTime>20</refreshTime>
+		<plotSize>8</plotSize>
+	</morisitaCounter>
 </plugins>
 </configuration>

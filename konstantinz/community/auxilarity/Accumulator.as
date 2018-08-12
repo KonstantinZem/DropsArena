@@ -8,8 +8,6 @@ import konstantinz.community.auxilarity.*;
 
 public class Accumulator{
 	
-	private const ERROR_MARK:int = 0;//Сообщение об ошибке помечаются в messanger помечаеся цифрой 0
-	
 	private var debugLevel:String;
 	private var msgString:String;
 	private var paramNamebuffer:Array//Здесь хранится информация для формирования таблицы статистики
@@ -19,6 +17,7 @@ public class Accumulator{
 	private var refreshTime:int;
 	private var refreshTimer:Timer;
 	private var messenger:Messenger;
+	private var modelEvent:ModelEvent;
 	
 	public var statTable:Array;//Здесь будет хранится собираемая статистика
 	public var statusBarText:String;
@@ -32,13 +31,15 @@ public class Accumulator{
 		if ((!_okToCreate)){//Singleton realisation
              throw new Error("Class is singleton. Use method instance() to get it");
 		}else{
-		
+			
+			modelEvent = new ModelEvent();//Будем брать основные константы от сюда
+			
 			debugLevel = '3';
 			messenger = new Messenger(debugLevel);
 			counter = 0;
 			messenger.setMessageMark('Accumulator');
 			msgString = "Acumulator loaded";
-			messenger.message(msgString, 1);
+			messenger.message(msgString, modelEvent.INIT_MSG_MARK);
 			refreshTime = 0;
 			paramNamebuffer = new Array;
 			paramNamebuffer[0] = '№';
@@ -87,7 +88,7 @@ public class Accumulator{
 			//refreshTimer.start();
 		}catch(err:Error){
 			msgString = err.message;
-			messenger.message(msgString, ERROR_MARK);
+			messenger.message(msgString, modelEvent.ERROR_MARK);
 			refreshTime = 0;
 			}
 
@@ -95,13 +96,13 @@ public class Accumulator{
 	public function stopRefresh():void{
 		refreshTimer.stop();
 		msgString = 'Accumulator has stoping refreshing statistical data';
-		messenger.message(msgString, 2);
+		messenger.message(msgString, modelEvent.INFO_MARK);
 		}
 		
 	public function startRefresh():void{
 		refreshTimer.start();
 		msgString = 'Accumulator has starting refreshing statistical data';
-		messenger.message(msgString, 2);
+		messenger.message(msgString, modelEvent.INFO_MARK);
 		}
 	
 	public function pushToBuffer(message:String):void{
@@ -131,14 +132,14 @@ public class Accumulator{
 					
 			}catch(err:ReferenceError){
 				msgString = err.message;
-				messenger.message(msgString, ERROR_MARK);
+				messenger.message(msgString, modelEvent.ERROR_MARK);
 				paramNamebuffer = new Array();//ИНициируем массивы и ничего дальше не делаем, все равно на следующем выхове все сработает правильно
 				valueBuffer = new Array();
 				}
 			catch(err:ArgumentError){
 				
-				msgString = err.message;
-				messenger.message(msgString, ERROR_MARK);
+				msgString = err.message + ':' + parsedMessage;
+				messenger.message(msgString, modelEvent.ERROR_MARK);
 				
 			}
 				paramPosition = 0;
@@ -170,7 +171,7 @@ public class Accumulator{
 				
 				valueBuffer[0]=counter;
 				msgString = tableToString();
-				messenger.message(msgString, 1);
+				messenger.message(msgString, modelEvent.INIT_MSG_MARK);
 				setStatusText();//Сохраняем статистическую информацию для показа в строке состояния
 				
 		}

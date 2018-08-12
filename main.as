@@ -22,8 +22,6 @@ package{
 		
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
 		private const CRITIAL_IND_NUMBER:int = 5;//Минимально подходящие для отслеживания статистики количество особей
-		private const STAT_MSG_MARK:int = 10;
-		private const ERROR_MARK:int = 0;//Сообщение об ошибке помечаются в messanger помечаеся цифрой 0
 		
 		private var stgHeight:int;
 		private var stgWidth:int;
@@ -38,6 +36,7 @@ package{
 		private var behaviourChoicer:BehaviourChoicer;
 		private var eventsForPlugins:Object;
 		private var eventsForPluginsList:Array;
+		private var modelEvent:ModelEvent;
 		
 		public var indSuspender:Vector.<Suspender>//Структура, через которую особей можно на нужное время останавливать
 		public var individuals:Vector.<Individual>;
@@ -101,6 +100,7 @@ package{
 			commStage = null;
 			reloadButton = null;
 			startStopButton = null;
+			//plugins = null;
 			}
         
         private function initConfig():void{
@@ -126,7 +126,8 @@ package{
 			messenger.setMessageMark('Main');
 			messenger.addEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);
 						
-			versionText = new myVersion('0.6.6',debugLevel);
+			versionText = new myVersion('0.7',debugLevel);
+			modelEvent = new ModelEvent();//Будем брать основные константы от сюда
 			
 			if(configuration.getOption('main.behaviourSwitching.enable') == 'true'){
 			
@@ -228,13 +229,14 @@ package{
 							}];
 				
 					plugins = new PluginLoader(configuration);//Загружаем плагины
+					model.addChild(plugins);
 					plugins.setPluginsEventsList(eventsForPluginsList);
 					plugins.loaderEvent.addEventListener(ModelEvent.PLUGIN_LOADED, onPluginsLoading);//После загрузки плагинов даем команду на загрузку элементов интерфейса
-					model.addChild(plugins);
+					
 					msgString = 'Plugins are enabled';
 				}catch(e:ArgumentError){
 					msgString = e.message;
-					messenger.message(msgString, ERROR_MARK);
+					messenger.message(msgString, modelEvent.ERROR_MARK);
 					addChild(startStopButton);//Просто добавляем кнопку пуск
 					addChild(reloadButton);
 					}
@@ -245,7 +247,7 @@ package{
 				addChild(reloadButton);
 				}
 					
-			messenger.message(msgString, 2);
+			messenger.message(msgString, modelEvent.INFO_MARK);
 				
 			}
 			
@@ -293,7 +295,7 @@ package{
 				indSuspender[i].stopIndividual(0);//Останавливаем особей. Потом они запустятся кнопкой Старт
 			}
 			msgString = IND_NUMB + individuals.length;
-			messenger.message(msgString, STAT_MSG_MARK);//Сохраняем количество особей для статистики
+			messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
 			
 			}
 			
@@ -317,7 +319,7 @@ package{
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
 			}
 			msgString = IND_NUMB + individuals.length;
-			messenger.message(msgString, STAT_MSG_MARK);//Сохраняем количество особей для статистики
+			messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
 			}
 		
 		private function addNewIndividuals(e:Event):void {
@@ -337,14 +339,18 @@ package{
 					individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
 				}
 				msgString = IND_NUMB + individuals.length;
-			    messenger.message(msgString, STAT_MSG_MARK);//Сохраняем количество особей для статистики
+			    messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
 		}
 		
 		private function removeIndividuals(e:Event):void{
 			var individual:int = e.target.individual;//Получаем номер особи, которую надо удалить
 			var counter:int;
-			try{
 			
+			try{
+				
+				if(individual > individuals.length){
+					individual = individuals.length;
+					}
 				individuals[individual].IndividualEvent.removeEventListener(ModelEvent.DEATH, removeIndividuals);
 				commStage.removeChild(individuals[individual].individualPicture.individualBody);
 				individuals[individual] = null;//Убираем из массива особей
@@ -359,9 +365,9 @@ package{
 				}
 			
 				msgString = 'Now number of individuals is ' + individuals.length;
-				messenger.message(msgString, 2);
+				messenger.message(msgString, modelEvent.INFO_MARK);
 				msgString = IND_NUMB + individuals.length;
-				messenger.message(msgString, STAT_MSG_MARK);//Сохраняем количество особей для статистики
+				messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
 			
 				if(individuals.length < CRITIAL_IND_NUMBER){//Если особей слишком мало
 					messenger.removeEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);//Перестаем за ними следить
@@ -369,10 +375,10 @@ package{
 					showMessageWindow();
 				}
 			}catch(e:Error){
-				messenger.message(e.message, ERROR_MARK);
+				messenger.message(e.message, modelEvent.ERROR_MARK);
 				}
 				catch(e:RangeError){
-					messenger.message(e.message, ERROR_MARK);
+					messenger.message(e.message, modelEvent.ERROR_MARK);
 					}
 			}
 		
@@ -397,7 +403,7 @@ package{
 				indSuspender[i].stopIndividual(1);
 				}
 			msgString = 'Individuals begin to move';
-			messenger.message(msgString, 2);
+			messenger.message(msgString, modelEvent.INFO_MARK);
 			Accumulator.instance.startRefresh();
 			}
 		
@@ -409,7 +415,7 @@ package{
 				indSuspender[i].stopIndividual(0);
 				}
 			msgString = 'Individuals has stoped';
-			messenger.message(msgString, 2);
+			messenger.message(msgString, modelEvent.INFO_MARK);
 			
 			showMessageWindow();//Показываем статистику в окне
 			Accumulator.instance.stopRefresh();//Останавливаем сбор статистики

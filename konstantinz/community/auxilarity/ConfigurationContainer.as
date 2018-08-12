@@ -8,7 +8,6 @@
 	public class ConfigurationContainer extends EventDispatcher{
 		
 		private const 	DEFAULT_FILE_NAME:String = 'configuration.xml';
-		private const ERROR_MARK:int = 0;//Сообщение об ошибке помечаются в messanger помечаеся цифрой 0
 		
 		public static var LOADED:String = 'loaded';//Так мы говорим, что загрузка файла окнчена и программа может к нему обращаться
 		public static var LOADING_ERROR:String = 'loading_error';//Так говорим, что произошла какая то ошибка
@@ -21,6 +20,7 @@
 		private var msgStreeng:String;
 		private var currentStatus:String;
 		private var messenger:Messenger;
+		private var modelEvent:ModelEvent
 		
 		private static var _instance:ConfigurationContainer;
 		private static var _okToCreate:Boolean = false;//Переменная сигнализирует существует ли уже экземпляр данного класса
@@ -32,6 +32,7 @@
 			}else{
 				debugLevel = '3';//По умолчанию показываем все сообщения, кроме тей что посылаются из цикла
 				currentStatus = 'ready';
+				modelEvent = new ModelEvent();//Будем брать основные константы от сюда
 			}	
 			}
 			
@@ -83,7 +84,7 @@
 				}
 			}catch(e:Error){
 				msgStreeng = e.message;
-				messenger.message(msgStreeng, ERROR_MARK);
+				messenger.message(msgStreeng, modelEvent.ERROR_MARK);
 				}
 			currentStatus = 'ready';//Помечаем: контейнер готов к обработки нового запроса
 			return optionValue;
@@ -179,11 +180,11 @@
 				}
 			}catch(e:ArgumentError){
 				msgStreeng = e.message;
-				messenger.message(msgStreeng, ERROR_MARK);
+				messenger.message(msgStreeng, modelEvent.ERROR_MARK);
 				}
 			catch(e:Error){
 				msgStreeng = e.message;
-				messenger.message(msgStreeng, ERROR_MARK);
+				messenger.message(msgStreeng, modelEvent.ERROR_MARK);
 				}
 			return resultValue;
 		}

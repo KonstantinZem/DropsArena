@@ -14,86 +14,70 @@ package konstantinz.plugins{
 	import flash.events.Event
 	import flash.errors.IOError;
 	import flash.events.IOErrorEvent;
-	import flash.net.URLRequest
-	import flash.display.Sprite
+	import flash.net.URLRequest;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.geom.ColorTransform;
 	import flash.display.Loader;
 	import flash.events.TimerEvent; 
-	import flash.utils.*;
 	import konstantinz.community.auxilarity.*;
 	import konstantinz.plugins.*;
 	
-public class cover extends Sprite{
+public class cover extends Plugin{
 	
 	private var aDeley:int = 1//Задержка при движении взрослых особей. Должна быть включена в интерфейс этого типа плагинов
 	private var yDeley:int = 3//Задержка при движении молодых особей. Должна быть включена в интерфейс этого типа плагинов
 	private var lifequant:int = 1; //Убыль жизни за ход. Должна быть включена в интерфейс этого типа плагинов
 	private var color:Number = 0x000000; //Должна быть включена в интерфейс этого типа плагинов. Определяет цвет участка с данными характеристиками
 	private var ct:ColorTransform;
-	private var debugeLevel:String;
-	private var msgString:String;
 	private var imageName:String;
 	private var image:Object; //Должна быть включена в интерфейс этого типа плагинов
 	private var loader:Loader;
-	private var errors:ModelErrors;
-	private var timer:Timer;
-	private var configuration:ConfigurationContainer; //В эту переменную будет загружатся класс, содержащий настройки
-	
-	public var pluginName:String; //В эту переменную загрузчик плагина передает его имя
-	public var pluginEvent:Object;
-	public var messenger:Messenger;
 	
 	function cover(){
-		
-		messenger = new Messenger(debugeLevel);
-		
 		ct = new ColorTransform();
 		loader = new Loader();
-		errors = new ModelErrors();
-		pluginEvent = new DispatchEvent();
-		pluginName = '';
-
-		timer = new Timer(1000, 1);//Ждем некоторое время, пока в главная программа не передаст нужные плагину параметры
-		timer.addEventListener(TimerEvent.TIMER, initPlugin);// потом запускаем программу
-		timer.start();
 		}
 	
-	private function initPlugin(e:TimerEvent):void{
+	override public function initPlugin(e:TimerEvent):void{
 		timer.stop();
 		timer.removeEventListener(TimerEvent.TIMER, initPlugin);
 	
 		if(root != null && pluginName !=''){//Если клип запущен из главной программы и плагин знает свое имя
 		
-			var optionPath:String = 'plugins.'+ pluginName + '.';
+			optionPath = 'plugins.'+ pluginName + '.';
 			configuration = root.configuration;
  
-			imageName = configuration.getOption(optionPath + 'picture');
-			color = configuration.getOption(optionPath + 'color');
-			ct.color = this.color;
-			adeley = configuration.getOption(optionPath + 'stepDeley');
-			
 			debugeLevel = configuration.getOption(optionPath + 'debugLevel');
 			messenger.setDebugLevel(debugeLevel);
 			messenger.setMessageMark(pluginName);
  
 			msgString = 'Wating for start...';
-			messenger.message(msgString, 3);
+			messenger.message(msgString, modelEvent.DEBUG_MARK);
 	
-			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
-			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
-   			loader.load(new URLRequest(imageName));
+			initSpecial();
    				
 		}else{//Иначе просто выводим предупреждение о неправильном запуске
-			msgString = errors.pluginStartAlong;
-			messenger.message(msgString, 0);
+			msgString = errorType.pluginStartAlong;
+			messenger.message(msgString, modelEvent.ERROR_MARK);
 		}	
 	}
+	
+	override public function initSpecial():void{
+		
+		imageName = configuration.getOption(optionPath + 'picture');
+		color = configuration.getOption(optionPath + 'color');
+		ct.color = this.color;
+		adeley = configuration.getOption(optionPath + 'stepDeley');
+			
+		loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
+		loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
+   		loader.load(new URLRequest(imageName));
+		}
 
 	private function onIOError(error:IOErrorEvent):void{
 		msgString = "Unable to load picture: " + error.text; 
-		messenger.message(msgString, 0);
+		messenger.message(msgString, modelEvent.ERROR_MARK);
 		loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onIOError);
 		pluginEvent.ready();//Сообщаем о том, что все уже сделано, ведь другие плагины тоже хотят загрузится
 	}

@@ -8,12 +8,9 @@ package konstantinz.plugins{
 	import konstantinz.community.comStage.*;
 	import konstantinz.plugins.*;
 	
-	public class morisita extends Sprite{
+	public class morisita extends Plugin{
 		private const BORDERCOLOR:Number = 0x000000;
-		private const STATISTIC_MARK:int = 10;//Сообщение статистического характера помечаются в messanger помечаеся цифрой 10
 		
-		private var debugeLevel:String;
-		private var msgString:String;
 		private var refreshTime:int;//Время обновления
 		private var plotSize:int;//Количество пробных площадок
 		private var plotsXQuantaty:int//Колиство квадратов в ряду
@@ -21,78 +18,51 @@ package konstantinz.plugins{
 		private var plotsPosition:Array;//Координаты площадок (чтобы не высчитывать их каждый раз заново)
 		private var plotsCells:Array;
 		private var cellSize:int;
-		private var config:Object;
-		private var communityStage:Object;
 		private var indDrivers:Vector.<Suspender>;
 		private var individuals:Vector.<Individual>;
-		private var initTimer:Timer;
 		private var refreshTimer:Timer;
 		
-		public var messenger:Messenger;
-		public var activeOnLoad:String
-		public var pluginName:String; //Должна быть включена в интерфейс этого типа плагинов
-		public var pluginEvent:DispatchEvent; //Дает возможность плагину общатся с главной программой с помощью отсылки сообщений
-	
 		public function morisita (){
-			
-			debugeLevel = '3';
 			activeOnLoad = 'true';
-			pluginEvent = new DispatchEvent();
-			messenger = new Messenger(debugeLevel);
 			messenger.setMessageMark('Morisita counter');
-			initTimer = new Timer(1000, 1);//Ждем некоторое время, пока в главная программа не передаст нужные плагину параметры
-			initTimer.addEventListener(TimerEvent.TIMER, initPlugin);// потом запускаем программу
-			initTimer.start();
-			
 			}
 			
-		public function suspendPlugin(e:ModelEvent):void{
+		override public function suspendPlugin(e:ModelEvent):void{
 			refreshTimer.stop();
 			}
 	
-		public function startPlugin(e:ModelEvent):void{
+		override public function startPlugin(e:ModelEvent):void{
 			refreshTimer.start();
 			}
 	
-		private function initPlugin(e:TimerEvent):void{
-		
-			if(root != null){//Если плагин загрузился внутри модели
-				var time:int;
-				config = root.configuration;
-				communityStage = root.commStage;
-				indDrivers = root.indSuspender;
-				individuals = root.individuals;
+		public override function initSpecial():void{
+			indDrivers = root.indSuspender;
+			individuals = root.individuals;
 				
-				debugeLevel = config.getOption('plugins.morisitaCounter.debugLevel');
-				plotSize = int(config.getOption('plugins.morisitaCounter.plotSize'));
-				refreshTime = (int(config.getOption('plugins.morisitaCounter.refreshTime')))*1000;//Берем время обновления из конфига и переводим его в миллисекунды
+			debugeLevel = configuration.getOption('plugins.morisitaCounter.debugLevel');
+			plotSize = int(configuration.getOption('plugins.morisitaCounter.plotSize'));
+			refreshTime = (int(configuration.getOption('plugins.morisitaCounter.refreshTime')))*1000;//Берем время обновления из конфига и переводим его в миллисекунды
 				
-				cellSize = int(config.getOption('main.dropSize'));
-				plotsCells = new Array;
-				plotsPosition = new Array;
-				messenger.setDebugLevel (debugeLevel);
+			cellSize = int(configuration.getOption('main.dropSize'));
+			plotsCells = new Array;
+			plotsPosition = new Array;
+			messenger.setDebugLevel (debugeLevel);
 				
-				plotsXQuantaty = communityStage.chessDesk[0].length/plotSize;
-				plotsYQuantaty = communityStage.chessDesk.length/plotSize;
-				drawMorisitaPlot();
+			plotsXQuantaty = communityStage.chessDesk[0].length/plotSize;
+			plotsYQuantaty = communityStage.chessDesk.length/plotSize;
+			drawMorisitaPlot();
 				
-				msgString = 'Morisita counter plugin';
-				messenger.message(msgString, 1);
-				
-				if(refreshTime>0){
-					refreshTimer = new Timer(refreshTime);
-					refreshTimer.addEventListener(TimerEvent.TIMER, countMorisita);
-					if(activeOnLoad=='true'){
-						refreshTimer.start();
+			if(refreshTime>0){
+				refreshTimer = new Timer(refreshTime);
+				refreshTimer.addEventListener(TimerEvent.TIMER, countMorisita);
+				if(activeOnLoad=='true'){
+					refreshTimer.start();
 					}
-				}else{
-					msgString = 'Refresh time not set';
-					messenger.message(msgString, 0);
-					}
-
+			}else{
+				msgString = 'Refresh time not set';
+				messenger.message(msgString, modelEvent.ERROR_MARK);
+				}
 			}
-		pluginEvent.ready();//Сообщаем загружающей плагин программе о том что плагин загружен и готов к работе
-		}
 		
 		private function drawMorisitaPlot():void{	//Разлинеивает игровое поле в квадратики для большей наглядности
 			var xpos:int = 0; //Позиция квадрата на поле
@@ -118,7 +88,7 @@ package konstantinz.plugins{
 		
 		private function countMorisita(e:TimerEvent):void{
 			msgString = 'Counting Morisita index';
-			messenger.message(msgString, 3);
+			messenger.message(msgString, modelEvent.DEBUG_MARK);
 			var morisita:Number;
 			var drvCounter:int;
 			var indCounter:int
@@ -144,13 +114,13 @@ package konstantinz.plugins{
 			if(isNaN(morisita)){//Проверяем, можем ли мы расчитать индекс
 				msgString = 'morisita_index:-';//И если индекс уже не может быть расчитан (особей слишком мало)
 				refreshTimer.stop();//Перестаем расчитывать индекс
-				messenger.message('Stoping to count Morisita index',2);
+				messenger.message('Stoping to count Morisita index', modelEvent.INFO_MARK);
 				}
 				else{//Если индекс расчитан
 					msgString = 'morisita_index:' + morisita;//Посылаем результат для дальнейшей обработки сторонними компонентами
 					}
 			
-			messenger.message(msgString, STATISTIC_MARK);
+			messenger.message(msgString, modelEvent.STATISTIC_MARK);
 		}
 		
 		private function getPlotPosition():int{

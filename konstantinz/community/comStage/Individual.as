@@ -20,8 +20,6 @@ package konstantinz.community.comStage{
 	public class Individual{
 		//Класс, описывающий поведение отдельного организма в сообществе
 		
-		private const ERROR_MARK:int = 0;//Сообщение об ошибке помечаются в messanger помечаеся цифрой 0
-		
 		private var tickInterval:int = 20;//Интервал между тиками таймера
 		private var indNumber:int;
 		private var indConfiguration:ConfigurationContainer;
@@ -46,6 +44,7 @@ package konstantinz.community.comStage{
 		private var debugLevel:String;
 		private var currentBehaviourName:String;//Переключаться поведение будет только если название поведения из пришедшего сообщения будет отличаться от записанного сюда
 		private var myBehaviour:BaseMotionBehaviour;
+		private var modelEvent:ModelEvent;
 				
 		public var IndividualEvent:DispatchEvent;
 		public var motionBehaviour:MotionBehaviourSwitcher;
@@ -62,6 +61,7 @@ package konstantinz.community.comStage{
 				debugLevel = indConfiguration.getOption('main.debugLevel');
 				messanger = new Messenger(debugLevel);
 				messanger.setMessageMark('Individual');
+				modelEvent = new ModelEvent();//Будем брать основные константы от сюда
 				indNumber = args[0];
 				
 				previosChessDeskI = 0;
@@ -71,7 +71,7 @@ package konstantinz.community.comStage{
 				if(args[0]==undefined){
 					indNumber = Math.round(Math.random()*1000);;
 					msgString = 'Individual ' + errorType.idUndefined + ' There were set random name ' + indNumber;
-					messanger.message(msgString, 2);
+					messanger.message(msgString, modelEvent.INFO_MARK);
 					}
 				
 				adultAge = int(indConfiguration.getOption('main.adultAge'))
@@ -106,11 +106,11 @@ package konstantinz.community.comStage{
 				lifeStart = new Date();
 				
 				msgString = 'Individual ' + indNumber + ' has created. \n It current position is '+ currentChessDeskI+ ':' + currentChessDeskJ;
-				messanger.message(msgString, 1);
+				messanger.message(msgString, modelEvent.INIT_MSG_MARK);
 			
 			}catch(error:ArgumentError){
 				msgString = error.message;
-				messanger.message(msgString, ERROR_MARK);
+				messanger.message(msgString, modelEvent.ERROR_MARK);
 				}
 			}
 /////////////////////////Private//////////////////////////////////////////////////////////////////////
@@ -128,7 +128,7 @@ package konstantinz.community.comStage{
 					if(adultAge==0){//После этого adultAge станет меньше нуля и сообщение появлятся не должно
 						adultAge--;
 						msgString= 'Individual ' + indNumber + ' now adult';
-						messanger.message(msgString, 2);
+						messanger.message(msgString, modelEvent.INFO_MARK);
 					}
 					return true;
 				}
@@ -171,7 +171,7 @@ package konstantinz.community.comStage{
 				IndividualEvent.maturing();
 				
 				msgString = 'Maturing in '+ currentChessDeskI+ ':'+ currentChessDeskJ;
-				messanger.message(msgString, 3);
+				messanger.message(msgString, modelEvent.DEBUG_MARK);
 				maturingDeley = int(indConfiguration.getOption('main.maturingDeley'));
 			
 			}
@@ -226,13 +226,12 @@ package konstantinz.community.comStage{
 				
 			deltaTime = lifeEnd.getTime()-lifeStart.getTime();
 			msgString = 'Individual ' + indNumber + ' is dead. R.I.P. \n' + 'It lived ' + Math.round((deltaTime)*0.00006) + ' min';
-			messanger.message(msgString, 2);
+			messanger.message(msgString, modelEvent.INFO_MARK);
 			messanger = null;
 			motionBehaviour = null;
 			indConfiguration = null;
 			lifeEnd = null;
 			lifeStart = null;
-
 			IndividualEvent.individual = indNumber;//Посылаем сообщение о том что особь с этим номером
 			IndividualEvent.death();//Умерла
 				
@@ -244,7 +243,7 @@ package konstantinz.community.comStage{
 		public function externalTimer():void{
 			timerForIndividuals.stop()
 			msgString = 'Individual number '+ indNumber + ': ' + 'Internal timer has stoped';
-			messanger.message(msgString, 3);
+			messanger.message(msgString, modelEvent.DEBUG_MARK);
 			}
 			
 		public function doStep():void{//Заставляем особь двигаться по внешнему таймеру
@@ -253,13 +252,13 @@ package konstantinz.community.comStage{
 		
 		public function stop():void{//Так особь можно заставить остановится
 			msgString = 'Individual number '+ indNumber + ' has been stoped'
-			messanger.message(msgString, 3);
+			messanger.message(msgString, modelEvent.DEBUG_MARK);
 			individualPicture.markIndividual('stoped');
 			}
 		
 		public function start():void{//Так особь можно заставить двигаться снова
 			msgString = 'Individual number '+ indNumber + ' has been started';
-			messanger.message(msgString, 3);
+			messanger.message(msgString, modelEvent.DEBUG_MARK);
 			individualPicture.markIndividual('nothing');
 			}
 		
@@ -277,12 +276,12 @@ package konstantinz.community.comStage{
 			indNumber = newNumber;
 			myBehaviour.setIndividualNumber(newNumber);
 			msgString = 'Individual has change it number from ' + oldNumber + ' to ' + newNumber;
-			messanger.message(msgString, 3);
+			messanger.message(msgString, modelEvent.DEBUG_MARK);
 		}
 	
 		public function kill():void{
 			msgString = 'Individual ' + indNumber + 'has killed';
-			messanger.message(msgString, 2);
+			messanger.message(msgString, modelEvent.INFO_MARK);
 			killIndividual();
 		}
 		

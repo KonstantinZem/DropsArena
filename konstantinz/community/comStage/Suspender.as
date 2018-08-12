@@ -8,7 +8,6 @@
 	public class Suspender{
 		
 		private const INTERRUPT_MARK:int = 0;//Если подать функции stopIndividual это число, функция остановит всех особей не запуская таймер паузы
-		private const ERROR_MARK:int = 0;//Сообщение об ошибке помечаются в messanger помечаеся цифрой 0
 		
 		private static var tickInterval:int = 10;//Интервал между тиками таймера
 		
@@ -23,6 +22,7 @@
 		private var debugLevel:String;
 		private var errorType:ModelErrors;
 		private var msgString:String;
+		private var modelEvent:ModelEvent;
 		
 		private var individualState:String;//Помечаем состояние особи, чтобы не посылать стоп-команды если особь уже остановлена
 		public var SuspenderEvent:DispatchEvent;//О результатах работы будем сообщать другим компонентам посредством сообщений
@@ -39,6 +39,7 @@
 			indStepPulsor.addEventListener(TimerEvent.TIMER, step);//На каждый импульс этого таймера особь будет делать шаг
 			debugLevel = config.getOption('main.debugLevel');
 			messanger = new Messenger(debugLevel);
+			modelEvent = new ModelEvent();//Будем брать основные константы от сюда
 			messanger.setMessageMark('Suspender');
 			immortal = false;//По умолчанию время жизни особи конечно
 			
@@ -47,17 +48,17 @@
 			if(lifeTime==0){//Если так, то особь становится бессмертной
 				immortal=true;
 				msgString = 'Individual ' + individual.getName() + ' will be immortal';
-				messanger.message(msgString, 2);
+				messanger.message(msgString, modelEvent.INFO_MARK);
 				}
 			
 			msgString = 'Individual life time is ' + lifeTime;
-			messanger.message(msgString, 2);
+			messanger.message(msgString, modelEvent.INFO_MARK);
 			
 			indStepPulsor.start();
 			individual.externalTimer();
 			msgString = 'Suspender begin to serch individual ' + individual.getName();
 			
-			messanger.message(msgString, 1);
+			messanger.message(msgString, modelEvent.INIT_MSG_MARK);
 			}
 		
 		public function stopIndividual(time:int):void{
@@ -65,7 +66,7 @@
 			try{
 				if(time>INTERRUPT_MARK){//Если нам просто нужно сделать паузу на время
 					if(individualState !='paused'){//Если особь снялась с паузы
-						suspendTime = new Timer(time, 1);
+						suspendTime = new Timer(time, modelEvent.INIT_MSG_MARK);
 						suspendTime.addEventListener(TimerEvent.TIMER, startIndividual);
 						indStepPulsor.stop();
 						individual.stop();
@@ -80,11 +81,12 @@
 				
 			}catch(e:Error){//Если что то пошло не так
 				msgString = 'Can not stop individual ' + individual.getName() + ': ' + errorType.indExemplarNotExist;
-				messanger.message(msgString, ERROR_MARK);
+				messanger.message(msgString, modelEvent.ERROR_MARK);
 				suspendTime.stop();//Сбрасываем паузу
 				indStepPulsor.stop();//И вообще отключаем подачу сигналов к этой особи
 				}
 			}
+		
 		public function killIndividual():void{
 			if(individualState=='moved'){
 				individualState = 'stoped';
@@ -99,7 +101,7 @@
 		
 		public function indState():String{
 				return individualState;
-			}
+				}
 		
 		/////////////////////////////////////////////Private//////////////////////////////////////////////////////////////////
 		private function startIndividual(event:TimerEvent):void{
@@ -107,13 +109,13 @@
 				if(individualState == 'paused'){   
 				individualState = 'moved';
 				msgString = 'Try to start individual ' + individual.getName();
-				messanger.message(msgString, 3);
+				messanger.message(msgString, modelEvent.DEBUG_MARK);
 					
 				indStepPulsor.start();
 				SuspenderEvent.done();//Говорим о том что особи вновь запущены тому компоненту, который просил приостановить особей
 				}
 			}catch(e:Error){
-				messanger.message(e.message, ERROR_MARK);
+				messanger.message(e.message, modelEvent.ERROR_MARK);
 				indStepPulsor.stop();
 				}
 			}
@@ -134,7 +136,7 @@
 			}catch(e:Error){
 				indStepPulsor.stop();
 				msgString = 'Can not drive individual ' + individual.getName() + ': ' + errorType.indExemplarNotExist;
-				messanger.message(msgString, ERROR_MARK);
+				messanger.message(msgString, modelEvent.ERROR_MARK);
 				}
 			
 			

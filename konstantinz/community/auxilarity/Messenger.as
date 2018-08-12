@@ -4,20 +4,23 @@ package konstantinz.community.auxilarity{
    import flash.events.Event; 
    import flash.events.EventDispatcher;
    import flash.events.IOErrorEvent;
+   import konstantinz.community.auxilarity.*;
    
 	public class Messenger extends EventDispatcher{
 		
-		private const EXT_DATA_MARK:int = 10;//Значение messageLevel при котором поступившую информацию нужно посылать сообщением
 		private var debugeLevel:String;
 		
 		public var messageMark:String;
+		private var modelEvent:ModelEvent;
 		
 		public static const HAVE_EXT_DATA:String = 'have_ext_data';
 		public var msg:String;
 		
+		
 		public function Messenger(dbgLevel:String = '3'):void{
 			debugeLevel = dbgLevel;
 			messageMark = '';
+			modelEvent = new ModelEvent();//Будем брать основные константы от сюда
 			}
 		
 		public function message(messageString:String, messageLevel:int = 3):void{
@@ -29,7 +32,7 @@ package konstantinz.community.auxilarity{
 				trace('[' + messageMark + ']: ' + messageString + ';' + '\n');
 			}
 			}
-			if(messageLevel == EXT_DATA_MARK){
+			if(messageLevel == modelEvent.STATISTIC_MARK){
 			
 				dispatchEvent(new Event(Messenger.HAVE_EXT_DATA));//Посылаем статистику в виде сообщения, ведь неизвестно, какой компонент и как ее будет обрабатывать
 			}

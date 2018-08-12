@@ -10,10 +10,8 @@ import flash.events.Event
 	import konstantinz.community.comStage.*;
 	import konstantinz.plugins.*;
     
-public class activitySwitcher extends Sprite{
+public class activitySwitcher extends Plugin{
 	private const CRITIAL_IND_NUMBER:int = 3;//До какого количество особей плагин будет работать
-	private const ERROR_MARK:int = 0;//Сообщение об ошибке помечаются в messanger помечаеся цифрой 0
-	private const STATISTIC_MARK:int = 10;//Сообщение статистического характера помечаются в messanger помечаеся цифрой 10
 	private const MAX_OPTIONS_LIST_SIZE:int = 1000;//Чтобы небыло бесконечных поисковых циклов, их надо ограничить
 	
 	private var dispatchedObjects:Vector.<Suspender>//Ссылка на массив с управляемыми объектами
@@ -23,110 +21,74 @@ public class activitySwitcher extends Sprite{
 	private var cycleCounter:int;
 	private var activeIndividualsNumber:String;
 	private var currentActivitIndNumber:int = 1;//Позиция в таблице активности где надо искать текущее число особей, которых необходимо остановить
-	private var debugeLevel:String;
 	private var timerStatement:String;
-	private var msgString:String;
 	private var signalType:String;
-	private var optionPath:String;//Указывает на место хранения количества активных особей в конфиге
-	private var statMessageHead:String;
+	private var selectionType:String;//percents or items
 	private var killStoped:String;//Будудт ли подвержены случайной смерти неактивные особи
 	private var dataPath:String;
-	private var switchingType:String;
-	private var errorType:ModelErrors;
-	private var configuration:ConfigurationContainer;
-	private var timer:Timer;
 	private var stopingTimer:Timer;//Этот таймер включается сразу после запуска плагина и заставляет особей останавливаться через заданный промежуток времени
-	private var statisticFromRoot:Array;
 	private var optionPosition:Array;
-	private var currentDay:String;
 	private var calendarData:String
 	
-	public var messenger:Messenger;
-	public var pluginName:String; //В эту переменную загрузчик плагина передает его имя
-	public var pluginEvent:DispatchEvent;
-	public var activeOnLoad:String;
-	
 	public function activitySwitcher(){
-		debugeLevel = '3';
-		pluginName = '';
+
 		killStoped = 'false';
 		activeOnLoad = 'true';
 		pluginEvent = new DispatchEvent();
-		timer = new Timer(1000, 1);//Ждем некоторое время, пока в главная программа не передаст нужные плагину параметры
-		timer.addEventListener(TimerEvent.TIMER, initPlugin);// потом запускаем программу
-		timer.start();
 		suspendTime = 5000;
 		numberOfData = 0;
-		messenger = new Messenger(debugeLevel);
-		statisticFromRoot = new Array('','');
 		}
 		
-	public function suspendPlugin(e:ModelEvent):void{
+	override public function suspendPlugin(e:ModelEvent):void{
 		msgString = 'Suspend plugin';
 		messenger.message(msgString, 2);
 		stopingTimer.stop();
 		}
 	
-	public function startPlugin(e:ModelEvent):void{
-		msgString = 'Restart plugin';
-		messenger.message(msgString, 2);
+	override public function startPlugin(e:ModelEvent):void{
+		msgString = 'Restart plugin ';
+		messenger.message(msgString, modelEvent.INFO_MARK);
 		
 		if(switchingType == 'timer'){
 			stopingTimer.start();
 			}
 		}
 		
-	public function onNewStatistic(e:ModelEvent):void{
-		if(switchingType == 'calendar_data' && e.target != pluginName){//Если к нам не пришло наше собственное сообщение
-			statisticFromRoot = e.target.message.split(':');
-			
-			if(currentDay == statisticFromRoot[1]){
-				stopInd();
-				}
-			}
-		
+	override public function startPluginJobe():void{
+		stopInd();
 		}
 	
-	private function initPlugin(e:TimerEvent):void{
-			
-			if(root != null && pluginName !=''){
-				errorType = new ModelErrors();
-				dispatchedObjects = root.indSuspender;//Чтобы дальше root не встречался в тексте
-				configuration = root.configuration;
-				optionPath = 'plugins.'+ pluginName + '.';//Формируем путь к настройкам в XML файле на основе имя файла плагина
-				
-				dataPath = 'plugins.' + pluginName + '.data.observation';
-				calendarData = dataPath + '.day';
+	 override public function initSpecial():void{
+		 
+		 dispatchedObjects = root.indSuspender;//Чтобы дальше root не встречался в тексте
+		
+		 dataPath = 'plugins.' + pluginName + '.data.observation';
+		 calendarData = dataPath + '.day';
 				
 				optionPosition = new Array(0,0,0,0,0);
+				
 				currentDay = configuration.getOption(calendarData, optionPosition);//Берем из аттрибутов дату наблюдения
 				
-				var rawData:String = configuration.getOption(optionPath + 'data');
 				var time:int;
-	
-				debugeLevel = configuration.getOption(optionPath + 'debugLevel');
-				
-				messenger.setDebugLevel (debugeLevel);
-				messenger.setMessageMark(pluginName);
-				
-				switchingType = configuration.getOption(optionPath + 'switching_event');
-				
-				if(switchingType != 'timer' && switchingType != 'calendar_data'){//Если в конфиге тип переключения не указан или указан неправильно
-					switchingType = 'timer';//даем переменной значение по умолчанию timer
-					msgString = errorType.varIsIncorrect + '. ' + errorType.defaultValue + ': timer';
-					messenger.message(msgString, ERROR_MARK);
-					}
 				
 				signalType = configuration.getOption(optionPath + 'signal');
-				
+								
 				if(signalType=='kill'){//Если плагин настроен чтобы убивать особей
 					killStoped = configuration.getOption(optionPath + 'killStoped');//Узнаем, должны ли мы убивать всех подряд или только активных осоей
 				
-					if(killStoped !='true'&& killStoped !='false'){//Если опция killStoped напсиана неправильно
-						messenger.message('killStoped: ' + killStoped + '. ' + errorType.varIsIncorrect, 0);//
-						killStoped = 'false';
+					if(killStoped !='true' && killStoped !='false'){//Если опция killStoped напсиана неправильно
+						messenger.message('killStoped: ' + killStoped + '. ' + errorType.varIsIncorrect, 0);
+						killStoped = 'false';//Заменяем неправильное значение на значение по умолчанию 
+						}
 					}
-				}
+				
+				selectionType = configuration.getOption(optionPath + 'selectionType');
+				
+				if(selectionType != 'percents' && selectionType != 'items'){
+					selectionType = 'percents';
+					msgString = errorType.varIsIncorrect + '. ' + errorType.defaultValue + ': percents';
+					messenger.message(msgString, modelEvent.ERROR_MARK);
+					}
 				
 				switch(signalType){
 						case 'stop':		
@@ -139,31 +101,25 @@ public class activitySwitcher extends Sprite{
 							signalType = 'stop';
 							statMessageHead = 'inactive_ind_numb';
 						default:
-							messenger.message('wrong type of signal', ERROR_MARK);
+							messenger.message('wrong type of signal', modelEvent.ERROR_MARK);
 							signalType = 'stop';
 							statMessageHead = 'inactive_ind_numb';
 				}
 				
 				time = setTimingQant();
+				
 				stopingTimer = new Timer(time);
-				
-				
 				
 				if(switchingType == 'timer'){
 					stopingTimer.addEventListener(TimerEvent.TIMER, stopIndByTimer);
-				}
+					}
 				
 				if(activeOnLoad=='true' && switchingType == 'timer'){
 					stopingTimer.start();
-				}
-			}
-		pluginEvent.ready();
-		cycleCounter = 1;
-		msgString = 'cycle: ' + cycleCounter;
-		
-		if(switchingType == 'timer'){
-			messenger.message(msgString, STATISTIC_MARK);
-			}
+					}
+					
+				cycleCounter = 1;
+				msgString = 'cycle: ' + cycleCounter;
 		}
 	
 	private function setTimingQant():int{//Расчитываем время между переключениями
@@ -189,13 +145,13 @@ public class activitySwitcher extends Sprite{
 					}
 		
 			}catch(e:ArgumentError){
-				messenger.message(e, ERROR_MARK);
+				messenger.message(e.message, modelEvent.ERROR_MARK);
 				numberOfSteps = int(configuration.getOption('main.lifeTime'));//Если для особии количество шагов не заданно, принимаем его как время жизн
 				}
 			
 			catch(e:ReferenceError){
 				msgString = e.message;
-				messenger.message(msgString, ERROR_MARK);
+				messenger.message(msgString, modelEvent.ERROR_MARK);
 				timeQant = 20;//Если не удалось получить информацию о частоте срабатывания таймера от драйвера особи, задаем таймер сами
 				}
 			
@@ -225,15 +181,15 @@ public class activitySwitcher extends Sprite{
 			
 		}catch(e:Error){
 			msgString = e.message;
-			messenger.message(msgString, 0);
+			messenger.message(msgString, modelEvent.ERROR_MARK);
 			}
 		return numberOfData;
 		}
 	
 	private function stopIndByTimer(e:TimerEvent):void{
 		if(switchingType == 'timer'){
-		stopInd();
-	}
+			stopInd();
+			}
 		}
 			
 	private function stopInd():void{
@@ -249,7 +205,7 @@ public class activitySwitcher extends Sprite{
 				
 					if(switchingType == 'timer'){
 						msgString = 'cycle: ' + cycleCounter;
-						messenger.message(msgString, STATISTIC_MARK);	
+						messenger.message(msgString, modelEvent.STATISTIC_MARK);	
 						}
 				}else{
 					currentActivitIndNumber++;
@@ -257,7 +213,7 @@ public class activitySwitcher extends Sprite{
 					currentDay = configuration.getOption(calendarData, optionPosition);//Берем из конфига следующую дату
 					}
 							
-				stopOnly(currentActivity, 'percents');
+				stopOnly(currentActivity, selectionType);
 				
 
 				msgString = 'Current stoped individuals part is ' +  currentActivitIndNumber + ':'+ currentActivity;
@@ -266,16 +222,16 @@ public class activitySwitcher extends Sprite{
 				
 				if(currentActivity != 'Error'){
 					msgString = statMessageHead + ':' + currentActivity;
-					messenger.message(msgString, STATISTIC_MARK);//Посылаем данные о количестве неактивных особей как статистику
+					messenger.message(msgString, modelEvent.STATISTIC_MARK);//Посылаем данные о количестве неактивных особей как статистику
 					}
 					
 				if(switchingType == 'timer' && currentDay != 'Error'){
 					msgString = 'calendar_data' + ':' + currentDay;//Передаем в статистику дату наблюдения
-					messenger.message(msgString, STATISTIC_MARK);
+					messenger.message(msgString, modelEvent.STATISTIC_MARK);
 					}
 				
 				}catch(e:Error){
-					messenger.message(e.message, ERROR_MARK);
+					messenger.message(e.message, modelEvent.ERROR_MARK);
 					}
 		}
 	
@@ -290,44 +246,63 @@ public class activitySwitcher extends Sprite{
 		case 'percents':
 
 			itemsNumber = 0;
-			itemsNumber = Math.round((objNumber/100)* (dispatchedObjects.length - 1))//Высчитываем количество из процентов
-			for(var i:int = 0; i< itemsNumber; i++){
+			itemsNumber = Math.round((objNumber/100)*(dispatchedObjects.length))//Высчитываем количество из процентов
 			
-			stopedObjects[i] = setObjRange();
-			}
+			for(var i:int = 0; i< itemsNumber; i++){//Определяем количество особей, которых надо остановить
+				stopedObjects[i] = setObjRange();
+				}
+			stopedObjects.sort(Array.DESCENDING);//Это нужно, чтобы элементы удалялись один за одним начиная с самого последнего иначе есть риск обратится к уже несуществующему элементу
+			
+			for(i = 1; i< stopedObjects.length; i++){//По возможности убираем повторяющиеся элементы сдвигая их на шаг вперед. Понятно что снижает скорость, зато увеличивает точность
+				if(stopedObjects[i]==stopedObjects[i-1]){
+					stopedObjects[i]++;
+					}
+				}
+			
 			sendStop();
+			
 		break;
 
 		case 'items':
 			itemsNumber = 0;
 			itemsNumber = objNumber - 1;
+			
 			for(i = 0; i< itemsNumber; i++){
 				stopedObjects[i] = setObjRange();
-			}
+				}
+			
+			stopedObjects.sort(Array.DESCENDING);//Это нужно, чтобы элементы удалялись один за одним начиная с самого последнего иначе есть риск обратится к уже несуществующему элементу
+			
+			for(i = 1; i< stopedObjects.length; i++){//По возможности убираем повторяющиеся элементы сдвигая их на шаг вперед. Понятно что снижает скорость, зато увеличивает точность
+				if(stopedObjects[i]==stopedObjects[i-1]){
+					stopedObjects[i]++;
+					}
+				}
 			
 			sendStop();
+			
 		break;
 		
 		default:
 			itemsNumber = 0
-			messenger.message('Wrong unit type', ERROR_MARK);
+			messenger.message('Wrong unit type', modelEvent.ERROR_MARK);
 		}
 	}catch(e:Error){
-		messenger.message(e.message, ERROR_MARK);
+		messenger.message(e.message, modelEvent.ERROR_MARK);
 		}
 	}
 	
 	private function setObjRange():int{//поиск случайной особи
 		var stopedObjPosition:int = 0;
 		
-			stopedObjPosition = Math.round(Math.random()* (dispatchedObjects.length - 1));
+			stopedObjPosition = Math.round(Math.random()* (dispatchedObjects.length - 2));
 			
 			if(dispatchedObjects[stopedObjPosition]==null){//Если особь существует и движеться
 				stopedObjPosition = setObjRange();
 				}
 				
 		return stopedObjPosition;
-	}
+		}
 
 	private function sendStop():void{
 		var counter:int;
@@ -336,13 +311,16 @@ public class activitySwitcher extends Sprite{
 				throw new IllegalOperationError(errorType.tooSmall + '. Number of individals less then critical');
 				}
 			
-			counter = stopedObjects.length - 1;
+			counter = stopedObjects.length;
 			
-			for(var i:int = 0; i< counter; i++){
+			
+			for(var i:int = 0; i< counter; i++){//Пробигаемся по списку особей, которых надо остановить
 				
 				if(dispatchedObjects[stopedObjects[i]] != null){
+				
 					switch(signalType){
 						case 'stop':	
+						
 							if(dispatchedObjects[stopedObjects[i]].hasOwnProperty('stopIndividual')){
 								dispatchedObjects[stopedObjects[i]].stopIndividual(suspendTime);//Останавливаем особь на нужное время
 							}
@@ -361,16 +339,17 @@ public class activitySwitcher extends Sprite{
 									}else{
 										if(dispatchedObjects[stopedObjects[i]].indState()=='moved'){
 											dispatchedObjects[stopedObjects[i]].killIndividual();//А иначе убиваем только тех, кто движеться
-										}
+											}
 									
+										}
 									}
-								}
-								else{
-									throw new ReferenceError('Can not find function killIndividual. It seems, that individual now not exist');
-								}
+									else{
+										throw new ReferenceError('Can not find function killIndividual. It seems, that individual now not exist');
+										}
 						break;
 						default:
-							messenger.message('Wrong type of signal', ERROR_MARK);
+
+							messenger.message('Wrong type of signal', modelEvent.ERROR_MARK);
 					}
 				
 				}
@@ -379,15 +358,15 @@ public class activitySwitcher extends Sprite{
 			
 		}
 		catch(e:IllegalOperationError){
-			messenger.message(e.message, ERROR_MARK);
+			messenger.message(e.message, modelEvent.ERROR_MARK);
 			stopingTimer.stop();//Прекращаем работу плагина
 			messenger.message('Activity switcher plugin has finished working', 2);
 		}
 		catch(e:ReferenceError){
-			messenger.message(e.message, ERROR_MARK);
+			messenger.message(e.message, modelEvent.ERROR_MARK);
 			}
 		catch(e:Error){
-			messenger.message(e.message, ERROR_MARK);
+			messenger.message(e.message, modelEvent.ERROR_MARK);
 			}
 	}
 }

@@ -18,6 +18,7 @@ package konstantinz.community.comStage{
 		private var debugLevel:String;
 		private var msgString:String
 		private var messenger:Messenger;
+		private var modelEvent:ModelEvent;
 		
 		public var chessDesk:Array;
 		
@@ -29,6 +30,7 @@ package konstantinz.community.comStage{
 				debugLevel = extOptions.getOption('main.debugLevel');
 				messenger = new Messenger(debugLevel);
 				messenger.setMessageMark('Community stage');
+				modelEvent = new ModelEvent();//Будем брать основные константы от сюда
 				
 				for(var i:int = 0; i<arguments.length; i++){
 					if(arguments[i] ==0){ //Если аргументу передали некорректные аргументы, генерируем ошибку
@@ -49,11 +51,11 @@ package konstantinz.community.comStage{
 				buildNet();
 					
 				msgString = 'The stage ' + chessDesk.length + 'X' + chessDesk[0].length + ' has bulded succesfully';
-				messenger.message(msgString, 1);
+				messenger.message(msgString, modelEvent.INIT_MSG_MARK);
 				}
 			catch(error:ArgumentError){
 				msgString = "<Error> " +  error.message;
-				messenger.message(msgString, 0);
+				messenger.message(msgString, modelEvent.ERROR_MARK);
 				}
 				}
 			
