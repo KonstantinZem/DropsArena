@@ -20,6 +20,7 @@ package konstantinz.plugins{
 	import flash.geom.ColorTransform;
 	import flash.display.Loader;
 	import flash.events.TimerEvent; 
+	import konstantinz.community.comStage.*;
 	import konstantinz.community.auxilarity.*;
 	import konstantinz.plugins.*;
 	
@@ -33,42 +34,34 @@ public class cover extends Plugin{
 	private var imageName:String;
 	private var image:Object; //Должна быть включена в интерфейс этого типа плагинов
 	private var loader:Loader;
+	private var optionPosition:Array;
+	private var behaviourModelName:String;
 	
 	function cover(){
 		ct = new ColorTransform();
 		loader = new Loader();
+		messenger.setMessageMark('Ground cover plugin');
 		}
 	
-	override public function initPlugin(e:TimerEvent):void{
-		timer.stop();
-		timer.removeEventListener(TimerEvent.TIMER, initPlugin);
-	
-		if(root != null && pluginName !=''){//Если клип запущен из главной программы и плагин знает свое имя
-		
-			optionPath = 'plugins.'+ pluginName + '.';
-			configuration = root.configuration;
- 
-			debugeLevel = configuration.getOption(optionPath + 'debugLevel');
-			messenger.setDebugLevel(debugeLevel);
-			messenger.setMessageMark(pluginName);
- 
-			msgString = 'Wating for start...';
-			messenger.message(msgString, modelEvent.DEBUG_MARK);
-	
-			initSpecial();
-   				
-		}else{//Иначе просто выводим предупреждение о неправильном запуске
-			msgString = errorType.pluginStartAlong;
-			messenger.message(msgString, modelEvent.ERROR_MARK);
-		}	
-	}
-	
 	override public function initSpecial():void{
+		optionPosition = new Array(0,0,0,0,0);
+		dataPath = 'plugins.' + pluginName + '.data.observation';
+		calendarData = dataPath + '.day';
 		
 		imageName = configuration.getOption(optionPath + 'picture');
 		color = configuration.getOption(optionPath + 'color');
-		ct.color = this.color;
+		ct.color = color;
 		adeley = configuration.getOption(optionPath + 'stepDeley');
+		behaviourModelName = configuration.getOption(optionPath + 'behaviour_model');//Какое поведение должна прявлять особь на закрашенных плагином участках
+		if(behaviourModelName == 'Error'){//Если в конфиге не указано название модели поведения
+			behaviourModelName = '';//Оставляем название пустым
+			}
+		
+		if(lifequant == 0){
+			lifequant = 1;
+			}
+		
+		currentDay = configuration.getOption(calendarData, optionPosition);//Берем из аттрибутов дату наблюдения
 			
 		loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
 		loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
@@ -96,43 +89,55 @@ public class cover extends Plugin{
 		var counterI:int;
 		var counterJ:int;
 	
-		image.x = root.commStage.x;
-		image.y = root.commStage.y;
-		image.height = root.commStage.height;
-		image.width = root.commStage.width;
+		image.x = communityStage.x;
+		image.y = communityStage.y;
+		image.height = communityStage.height;
+		image.width = communityStage.width;
 				
-		var tableRoot:Array = root.commStage.chessDesk;
+		var tableRoot:Array = communityStage.chessDesk;
 		counterI = tableRoot.length;
 			
 		for(var i:int = 0; i< counterI; i++){
-				
+				var pixelValue:String;
 				counterJ = tableRoot[i].length;
 				
 				for(var j:int = 0; j<counterJ; j++){
-					var pixelValue:String = bmd.getPixel(tableRoot[i][j]['sqrX']/2,tableRoot[i][j]['sqrY']/2).toString(16);
+					
+					pixelValue = bmd.getPixel(tableRoot[i][j].sqrX /2,tableRoot[i][j].sqrY /2).toString(16);
 		
-					if(pixelValue!='ffffff'){//Если участок картинки не белый
-						root.commStage.chessDesk[i][j].picture.transform.colorTransform = ct;
-						root.commStage.chessDesk[i][j].speedDeleyA += aDeley//Переопределяем скорость взрослых
-						root.commStage.chessDesk[i][j].speedDeleyY += yDeley//И молодых особей
-						root.commStage.chessDesk[i][j].lifeQuant += lifequant;//Переопределяем время жизни особи за ход
+					if(pixelValue != 'ffffff'){//Если участок картинки не белый
+						communityStage.chessDesk[i][j].picture.transform.colorTransform = ct;
+						communityStage.chessDesk[i][j].speedDeleyA += aDeley//Переопределяем скорость взрослых
+						communityStage.chessDesk[i][j].speedDeleyY += yDeley//И молодых особей
+						communityStage.chessDesk[i][j].lifeQuant += lifequant;//Переопределяем время жизни особи за ход
+						communityStage.chessDesk[i][j].behaviourModel = behaviourModelName;//Передаем название поведения, которое должно прявлять особь на этом квадрате
 						controllX = i;
 						controllY =j;
 					}
 				}	
 		}
-		
-		bmd.dispose(); //Небольшая оптимизация, чтобы уменьшить занимаемую память
-		bmd = null;
 	    //По окончанию работы плагина
 		//Выводим результат работы
-		msgString = 'Individuals speed now is ' + root.commStage.chessDesk[controllX][controllY].speedDeleyA;
-		messenger.message(msgString, 2);
-	    msgString = 'Individuals life decriasing now is ' + root.commStage.chessDesk[controllX][controllY].lifeQuant + ' points after step';
-	    messenger.message(msgString, 2);
+		msgString = 'Individuals speed now is ' + communityStage.chessDesk[controllX][controllY].speedDeleyA;
+		messenger.message(msgString, modelEvent.INFO_MARK);
+	    msgString = 'Individuals life decriasing now is ' + communityStage.chessDesk[controllX][controllY].lifeQuant + ' points after step';
+	    messenger.message(msgString, modelEvent.INFO_MARK);
 		removeChild(image);//Удаляем вспомогательную картинку с рисунком напочвенного покрова
+		refreshIndividualsSetting();
 		pluginEvent.ready();//Сообщаем о том, что все уже сделано,
 	}
+	
+	private function refreshIndividualsSetting():void{
+		var counter:int = root.indSuspender.length - 2;
+		
+		for(var i:int = 0; i < counter; i++){
+			root.indSuspender[i].doOnlyOneStep();
+			}
+		}
+	
+	override public function startPluginJobe():void{
+		initSpecial();
+		}
 	
 }
 }

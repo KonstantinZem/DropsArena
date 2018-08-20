@@ -15,7 +15,7 @@
 	<!-- initPosition of individual can be left-top, left-bottom,  right-top, right-bottom, center and random -->
 	<initPosition>left-top</initPosition>
 	<statRefreshTime>10</statRefreshTime>
-	<pluginsList>plugins/ground.swf;plugins/grass.swf;plugins/grass2.swf;plugins/grass3.swf;plugins/grass4.swf;plugins/activity.swf;plugins/death.swf;plugins/morisitaCounter.swf</pluginsList>
+	<pluginsList>plugins/mowing.swf;plugins/ground.swf;plugins/grass.swf;plugins/grass2.swf;plugins/grass3.swf;plugins/grass4.swf;plugins/activity.swf;plugins/death.swf;plugins/morisitaCounter.swf</pluginsList>
 	<arePluginsActiveOnLoading>false</arePluginsActiveOnLoading>
 	<behaviourSwitching>
 		<enable>true</enable>
@@ -44,30 +44,79 @@
 		<stepDeley>6</stepDeley>
 		<debugLevel>1</debugLevel>
 		<color>0x007100</color>
+		<switching_event>calendar_data</switching_event>
+		<data>
+			<observation>
+				<part>20</part>
+				<day>29.09.11</day>
+			</observation>
+		</data>
 	</grass>
+	<mowing>
+		<picture>pictures/park/pocos.png</picture>
+		<stepDeley>1</stepDeley>
+		<debugLevel>1</debugLevel>
+		<color>0xf4e17f</color>
+		<behaviour_model>MomentalDeath</behaviour_model>
+		<switching_event>calendar_data</switching_event>
+		<data>
+			<observation>
+				<part>20</part>
+				<day>18.08.11</day>
+			</observation>
+		</data>
+	</mowing>
 	<ground>
 		<picture>pictures/park/ground.png</picture>
 		<stepDeley>0</stepDeley>
 		<debugLevel>1</debugLevel>
-		<color>0xf4e17f</color>
+		<color>0x333333</color>
+		<switching_event>calendar_data</switching_event>
+		<data>
+			<observation>
+				<part>20</part>
+				<day>26.09.11</day>
+			</observation>
+		</data>
 	</ground>
 	<grass2>
 		<picture>pictures/park/lamium.png</picture>
 		<stepDeley>2</stepDeley>
 		<debugLevel>1</debugLevel>
 		<color>0x27bd71</color>
+		<switching_event>calendar_data</switching_event>
+		<data>
+			<observation>
+				<part>20</part>
+				<day>28.09.11</day>
+			</observation>
+		</data>
 	</grass2>
 	<grass3>
 		<picture>pictures/park/glehoma.png</picture>
 		<stepDeley>2</stepDeley>
 		<debugLevel>1</debugLevel>
 		<color>0x2b6334</color>
+		<switching_event>calendar_data</switching_event>
+		<data>
+			<observation>
+				<part>20</part>
+				<day>29.09.11</day>
+			</observation>
+		</data>
 	</grass3>
 	<grass4>
 		<picture>pictures/park/poa.png</picture>
 		<stepDeley>1</stepDeley>
 		<debugLevel>1</debugLevel>
 		<color>0xb4e53c</color>
+		<switching_event>calendar_data</switching_event>
+		<data>
+			<observation>
+				<part>20</part>
+				<day>29.09.11</day>
+			</observation>
+		</data>
 	</grass4>
 	<activity>
 		<signal>stop</signal>

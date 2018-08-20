@@ -1,7 +1,6 @@
 package konstantinz.plugins{
 	
 	import flash.display.Sprite;
-	import flash.events.TimerEvent; 
 	import flash.utils.*;
 	import konstantinz.community.auxilarity.*;
 	import konstantinz.community.comStage.*;
@@ -17,12 +16,12 @@ public class Plugin extends Sprite{
 	protected var msgString:String;
 	protected var statisticFromRoot:Array;
 	protected var currentDay:String;
+	protected var alreadyInited:String;
 	
 	protected var errorType:ModelErrors;
 	protected var modelEvent:ModelEvent
 	protected var configuration:ConfigurationContainer;
 	protected var communityStage:CommunityStage;
-	protected var timer:Timer;
 	
 	public var messenger:Messenger;
 	public var pluginName:String; //В эту переменную загрузчик плагина передает его имя
@@ -32,7 +31,8 @@ public class Plugin extends Sprite{
 	public function Plugin(){
 		
 		debugeLevel = '3';
-		pluginName = '';
+		pluginName = 'noname';
+		alreadyInited = 'fals';
 		
 		modelEvent = new ModelEvent();//Будем брать основные константы от сюда
 		errorType = new ModelErrors();
@@ -41,17 +41,11 @@ public class Plugin extends Sprite{
 		statisticFromRoot = new Array('','');
 		errorType = new ModelErrors();
 		
-		timer = new Timer(500, 1);//Ждем некоторое время, пока в главная программа не передаст нужные плагину параметры
-		timer.addEventListener(TimerEvent.TIMER, initPlugin);// потом запускаем программу
-		timer.start();
 	}
 	
-	public function initPlugin(e:TimerEvent):void{
-		timer.stop();//Мы выждали нужное количество веремени. Плагин загрузился в памят 
-		timer.removeEventListener(TimerEvent.TIMER, initPlugin);//Поэтому перестаем ждать загрузки
-		
-		if(root != null && pluginName !=''){
+	public function initPlugin(e:ModelEvent):void{//Функция запускается сообщением PLUGIN_LOADED из pluginLoader
 			
+		if(alreadyInited != 'true'){//Чтобы не инициироваться по сто раз после прихода сообшщения от других плагинов
 			dispatchedObjects = root.indSuspender;//Чтобы дальше root не встречался в тексте
 			configuration = root.configuration;
 			optionPath = 'plugins.'+ pluginName + '.';//Формируем путь к настройкам в XML файле на основе имя файла плагина
@@ -70,20 +64,13 @@ public class Plugin extends Sprite{
 				if(switchingType != 'timer' && switchingType != 'calendar_data'){//Если в конфиге тип переключения не указан или указан неправильно
 					switchingType = 'timer';//даем переменной значение по умолчанию timer
 					msgString = errorType.varIsIncorrect + '. ' + errorType.defaultValue + '- timer';
-					messenger.message(msgString, modelEvent.ERROR_MARK);
+					messenger.message(msgString, modelEvent.INFO_MARK);
 					}
-				
+			
+			alreadyInited = 'true';//Помечаем что мы уже инициированы
 			initSpecial();
-				
-				if(switchingType == 'timer'){
-					messenger.message(msgString, modelEvent.STATISTIC_MARK);
-					}
-					
-				pluginEvent.ready();//В конце посылаем сообщение что можно загружать остальные плагины
-			}else{//Иначе просто выводим предупреждение о неправильном запуске
-				msgString = errorType.pluginStartAlong;
-				messenger.message(msgString, modelEvent.ERROR_MARK);
-				}
+			
+			}
 		
 		}
 		
@@ -92,7 +79,7 @@ public class Plugin extends Sprite{
 		}
 		
 	public function startPluginJobe():void{
-	
+		
 		}
 	
 	public function startPlugin(e:ModelEvent):void{

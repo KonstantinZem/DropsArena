@@ -12,6 +12,7 @@ public class ChessCell{
 	public var lifeQuant:int;
 	public var numberOfIndividuals:String;
 	public var individualName:int;
+	public var behaviourModel:String;
 	
 	public function ChessCell(){
 	

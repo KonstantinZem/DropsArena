@@ -29,14 +29,16 @@ public class activitySwitcher extends Plugin{
 	private var stopingTimer:Timer;//Этот таймер включается сразу после запуска плагина и заставляет особей останавливаться через заданный промежуток времени
 	private var optionPosition:Array;
 	private var calendarData:String
+	private var firstInit:String
 	
 	public function activitySwitcher(){
-
+		firstInit = 'true';
 		killStoped = 'false';
 		activeOnLoad = 'true';
 		pluginEvent = new DispatchEvent();
 		suspendTime = 5000;
 		numberOfData = 0;
+		messenger.setMessageMark('Activity switcher plugin');
 		}
 		
 	override public function suspendPlugin(e:ModelEvent):void{
@@ -46,12 +48,14 @@ public class activitySwitcher extends Plugin{
 		}
 	
 	override public function startPlugin(e:ModelEvent):void{
+		
 		msgString = 'Restart plugin ';
 		messenger.message(msgString, modelEvent.INFO_MARK);
 		
 		if(switchingType == 'timer'){
 			stopingTimer.start();
 			}
+			
 		}
 		
 	override public function startPluginJobe():void{
@@ -120,6 +124,8 @@ public class activitySwitcher extends Plugin{
 					
 				cycleCounter = 1;
 				msgString = 'cycle: ' + cycleCounter;
+				
+				setTimeout(pluginEvent.ready, 500);//Сообщение о том что плагин полностью готов к работе принимается функцией onPluginsJobeFinish в pluginLoader
 		}
 	
 	private function setTimingQant():int{//Расчитываем время между переключениями
@@ -187,12 +193,14 @@ public class activitySwitcher extends Plugin{
 		}
 	
 	private function stopIndByTimer(e:TimerEvent):void{
+	
 		if(switchingType == 'timer'){
 			stopInd();
 			}
 		}
 			
 	private function stopInd():void{
+		
 		optionPosition[3] = currentActivitIndNumber;
 		//Узнать размер таймера у особи, посмотреть число ходов в конфиге, запускать паузы по таймеру и не ждать ответа от драйверов особей
 		try{

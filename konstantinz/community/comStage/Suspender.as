@@ -88,6 +88,7 @@
 			}
 		
 		public function killIndividual():void{
+			
 			if(individualState=='moved'){
 				individualState = 'stoped';
 				}
@@ -102,6 +103,10 @@
 		public function indState():String{
 				return individualState;
 				}
+		
+		public function doOnlyOneStep():void{//Нужна для того чтобы особи двигаясь смогли прочитать настройки с CommunityStage
+			individual.doStep();
+			}
 		
 		/////////////////////////////////////////////Private//////////////////////////////////////////////////////////////////
 		private function startIndividual(event:TimerEvent):void{

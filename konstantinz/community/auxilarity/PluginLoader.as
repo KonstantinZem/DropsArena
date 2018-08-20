@@ -8,7 +8,7 @@
 	
 	public class PluginLoader extends Sprite{
 		//Класс предназначен для загрузки в главную программу дополнительных модулей и предоставления информации об этих модулях
-		private var currentPlNumber:int;
+		private var currentPlNumber:int;//Номер текущего плагина в списке переданном из конфига
 		private var pluginsList:Array;//Ссылка на список плагинов в списки передаваемых ролику опций
 		private var pluginsEventsList:Array
 		private var plugins:Array;
@@ -16,13 +16,13 @@
 		private var debugLevel:String;
 		private var msgString:String;
 		private var arePluginsActiveOnLoading:String;//Будут ли плагины активироваться сразу после загрузки
+		private var currentPlugName:String;//Загруженный плагин не знает своего имени. Передать его должен загрузчик
 		private var options:ConfigurationContainer;
 		private var messenger:Messenger;
 		private var errorType:ModelErrors;
 		private var modelEvent:ModelEvent;
 		
-		public var loaderEvent:Object;
-		public var currentPlugName:String;
+		public var loaderEvent:DispatchEvent;
 		
 		function PluginLoader(opt:ConfigurationContainer){
 			var pluginString:String;
@@ -42,38 +42,50 @@
 				
 				currentPlNumber = 0;
 				pluginString = options.getOption('main.pluginsList');
+				
 				if(pluginString=='Error'){
 					throw new ArgumentError('Plugins list not set');
 					}else{
-					pluginsList = pluginString.split(';')//Отделяем пути к плагинам друг от друга
-					content = new Array();
-				}
-			
-			for(var i:int = 0; i<pluginsList.length;i++){
-				plugins[i] = new Loader();//Создаем на каждый плагин по загрузчику
-				}
-			 
-			 loadPlugins(currentPlNumber);
-		
+						pluginsList = pluginString.split(';')//Отделяем пути к плагинам друг от друга
+						content = new Array();
+						}
+
 			}catch(error:ArgumentError){
 				loaderEvent.pluginName = 'last';//Если в списке плагинов есть ошибки, посылаем сообщение что мы уже ничего не загружаем
 				loaderEvent.pluginLoaded();
 				messenger.message(error.message, modelEvent.ERROR_MARK);
 				}
 			}
-		
+		public function startLoading():void{
+			try{
+				if(root==null){
+					throw new Error('Plugin loader not mounted in main program yet');
+					}
+				var counter:int = pluginsList.length
+				
+				for(var i:int = 0; i< counter;i++){
+					plugins[i] = new Loader();//Создаем на каждый плагин по загрузчику
+				}
+			 
+			 loadPlugins(currentPlNumber);
+				}catch(error:Error){
+					loaderEvent.pluginName = 'last';//Если в списке плагинов есть ошибки, посылаем сообщение что мы уже ничего не загружаем
+					loaderEvent.pluginLoaded();
+					messenger.message(error.message, modelEvent.ERROR_MARK);
+					}
+			}
 		private function loadPlugins(pluginNumber:int):void{//Начинаем загрузку файлов плагинов в корневой ролик
 			
-			if(pluginNumber>pluginsList.length-1){//Когда список плагинов закончился, прерываемся
-				loaderEvent.pluginName = 'last';
+			if(pluginNumber > pluginsList.length -1){//Когда список плагинов закончился, прерываемся
+				loaderEvent.pluginName = 'last';//Это сообщение принимается в main
 				loaderEvent.pluginLoaded();
 				msgString = 'All plugins has loaded';
-				messenger.message(msgString, 1);
+				messenger.message(msgString, modelEvent.INIT_MSG_MARK);
 				}
            else{
-				plugins[pluginNumber].contentLoaderInfo.addEventListener(Event.COMPLETE, onPluginFileDownloading);//Это событие должно придти щт URLRequest ко
+				plugins[pluginNumber].contentLoaderInfo.addEventListener(Event.COMPLETE, onPluginFileDownloading);//Это событие должно придти от URLRequest 
 				plugins[pluginNumber].load(new URLRequest(pluginsList[pluginNumber]));
-				currentPlugName = pluginsList[pluginNumber];
+				currentPlugName = pluginsList[pluginNumber];//Берем полное имя плагина из списка плагинов, заданного в конфигурационном файле
 				msgString = 'Load plugin ' + pluginNumber + ' '+ currentPlugName;
 				messenger.message(msgString, modelEvent.DEBUG_MARK);
 				}
@@ -81,6 +93,78 @@
 			
 		public function setPluginsEventsList(eventsList:Array):void{
 			pluginsEventsList = eventsList;
+			}
+		
+		private function onPluginFileDownloading(e:Event):void{//Срабатывает от события Event.COMPLETE при загрузке предыдущего плагина
+			try{
+				//После того, как файл плагина загрузится в основной ролик
+				//Отделяем имя плагина из названия файла и его пути
+				
+				if(plugins[currentPlNumber].content.plEntry != null && root['model'] != null){
+					
+					root['model'].addChild(plugins[currentPlNumber].content.plEntry);
+					
+				}else{
+					throw new Error('plEntry is null');
+					}
+				
+				var plugDir:Array = currentPlugName.split("/"); 
+				var plugFile:Array = plugDir[1].split(".");
+				var className:String = plugFile[0];	
+				currentPlugName = className;// Заносим в переменную с именем плагина, уже обработанное имя, очищенное от пути и расширения
+							
+				if(plugins[currentPlNumber].content.plEntry.hasOwnProperty('activeOnLoad')){
+
+				switch(arePluginsActiveOnLoading){
+					case 'true':
+						plugins[currentPlNumber].content.plEntry.activeOnLoad = 'true';
+					break
+					case 'false':
+						plugins[currentPlNumber].content.plEntry.activeOnLoad = 'false';
+					break
+					default:
+						msgString='Wrong option item';
+						messenger.message(msgString, modelEvent.ERROR_MARK);
+					break
+					}
+				}
+				
+				if(plugins[currentPlNumber].content.plEntry.hasOwnProperty('pluginName')){
+					plugins[currentPlNumber].content.plEntry.pluginName = currentPlugName;//Загруженный плагин не знает своего имени. Передать его должен загрузчик
+					}
+					else{
+						msgString = 'Plugin ' + currentPlugName + ' has no property pluginName';
+						messenger.message(msgString, modelEvent.ERROR_MARK);
+						}
+				
+				
+				if(plugins[currentPlNumber].content.plEntry.hasOwnProperty('pluginEvent')){//Проверяем, есть ли вообще в загружаемом плагине pluginEvent
+					plugins[currentPlNumber].content.plEntry.pluginEvent.addEventListener(ModelEvent.FINISH, onPluginsJobeFinish);//Если это так, то ждем от плагина сообщения что он отработал, чтобы загрузить следующий только потом
+					}
+					else{//Если плагин не содержит такого события, то просто загружаем следующий не дожидаясь окончания работы предыдущего
+						loadPlugins(currentPlNumber);
+						msgString = 'Plugin ' + currentPlugName + ' has no property pluginEvent';
+						messenger.message(msgString, modelEvent.ERROR_MARK);
+						}
+				loaderEvent.addEventListener(ModelEvent.PLUGIN_LOADED, plugins[currentPlNumber].content.plEntry['initPlugin']);	
+				linkRootAndPlugisByEvents(currentPlNumber);
+				
+				loaderEvent.pluginLoaded();//Сообщаем плагину о том, что он загружен
+				
+				msgString = 'Plugin '+ currentPlNumber +': ' + className + ' has loaded';
+				messenger.message(msgString, modelEvent.INIT_MSG_MARK);
+				
+				plugins[currentPlNumber].removeEventListener(Event.COMPLETE, onPluginFileDownloading);
+					
+				currentPlNumber++;
+				
+			}catch(e:Error){
+				loaderEvent.pluginName = 'last';//Если в списке плагинов есть ошибки, посылаем сообщение что мы уже ничего не загружаем
+				loaderEvent.pluginLoaded();
+				msgString = e.message;
+				messenger.message(msgString, modelEvent.ERROR_MARK);
+				}
+				
 			}
 			
 		private function linkRootAndPlugisByEvents(pluginNumber:int):void{
@@ -111,87 +195,23 @@
 					}
 				}
 			
-		private function onPluginFileDownloading(e:Event):void{
-			try{
-				//После того, как файл плагина загрузится в основной ролик
-				//Отделяем имя плагина из названия файла и его пути
-				
-				if(plugins[currentPlNumber].content.plEntry != null && root['model'] != null){
-					
-					root['model'].addChild(plugins[currentPlNumber].content.plEntry);
-					
-				}else{
-					throw new Error('plEntry is null');
-					}
-				
-				var plugDir:Array = currentPlugName.split("/"); 
-				var plugFile:Array = plugDir[1].split(".");
-				var className:String = plugFile[0];	
-				currentPlugName = className;// Заносим в переменную с именем плагина, уже обработанное имя, очищенное от пути и расширения
-				
-				if(loaderEvent.pluginName != null){
-					loaderEvent.pluginName = currentPlugName;//Когда плагин загрузился, передаем ему через событие его имя
-				}
-				
-				if(plugins[currentPlNumber].content.plEntry.hasOwnProperty('activeOnLoad')){
-
-				switch(arePluginsActiveOnLoading){
-					case 'true':
-							plugins[currentPlNumber].content.plEntry.activeOnLoad = 'true'
-					break
-					case 'false':
-						plugins[currentPlNumber].content.plEntry.activeOnLoad = 'false'
-					break
-					default:
-						msgString='Wrong option item';
-						messenger.message(msgString, modelEvent.ERROR_MARK);
-					break
-					}
-				}
-				
-				if(plugins[currentPlNumber].content.plEntry.hasOwnProperty('pluginName')){
-					plugins[currentPlNumber].content.plEntry.pluginName = currentPlugName;
-					}
-					else{
-						msgString = 'Plugin ' + currentPlugName + ' has no property pluginName';
-						messenger.message(msgString, modelEvent.INIT_MSG_MARK);
-						}
-				
-				
-				if(plugins[currentPlNumber].content.plEntry.hasOwnProperty('pluginEvent')){//Проверяем, есть ли вообще в загружаемом плагине pluginEvent
-					plugins[currentPlNumber].content.plEntry.pluginEvent.addEventListener(ModelEvent.FINISH, onPluginsJobeFinish);//Если это так, то ждем от плагина сообщения что он отработал и загружаем следующий только потом
-					}
-					else{//Если плагин не содержит такого события, то просто загружаем следующий не дожидаясь окончания работы предыдущего
-						loadPlugins(currentPlNumber);
-						msgString = 'Plugin ' + currentPlugName + ' has no property pluginEvent';
-						messenger.message(msgString, modelEvent.INIT_MSG_MARK);
-						}
-					
-				linkRootAndPlugisByEvents(currentPlNumber);
-				
-				loaderEvent.pluginLoaded();//Сообщаем плагину о том, что он загружен
-				
-				plugins[currentPlNumber].removeEventListener(Event.COMPLETE, onPluginFileDownloading);
-				
-				msgString = 'Plugin '+ currentPlNumber +': ' + className + ' has loaded';
-				messenger.message(msgString, modelEvent.INIT_MSG_MARK);
-				
-				currentPlNumber++;
-			}catch(e:Error){
-				msgString = e.message;
-				messenger.message(msgString, modelEvent.ERROR_MARK);
-				}
-				
-				}
-			
 			private function onError(e:ModelEvent):void{
 				msgString = 'Plugin has not loaded. ' + errorType.fileNotFound;
 				messenger.message(msgString, modelEvent.ERROR_MARK);
 				}
 			
-			private function onPluginsJobeFinish(e:ModelEvent):void{
-				
-				loadPlugins(currentPlNumber);//После загрузки очередного плагина загружаем следующий
+			private function onPluginsJobeFinish(e:ModelEvent):void{//Функция вызывается когда загруженный плагин посылает сообщение ready()
+				try{
+					if(root==null){
+						throw new Error('Plugin loader not mounted in main program yet');
+					}
+					if(currentPlNumber <= pluginsList.length-1){//Если мы не достигли конца списка плагинов
+						loadPlugins(currentPlNumber);//После загрузки очередного плагина загружаем следующий
+						}
+				}catch(e:Error){
+					msgString = e.message;
+					messenger.message(msgString, modelEvent.ERROR_MARK);
+					}
 				
 				}
 		}

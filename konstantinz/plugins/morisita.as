@@ -62,13 +62,15 @@ package konstantinz.plugins{
 				msgString = 'Refresh time not set';
 				messenger.message(msgString, modelEvent.ERROR_MARK);
 				}
+			
+				pluginEvent.ready();//Сообщение о том что плагин полностью готов к работе принимается функцией onPluginsJobeFinish в pluginLoader
 			}
 		
 		private function drawMorisitaPlot():void{	//Разлинеивает игровое поле в квадратики для большей наглядности
 			var xpos:int = 0; //Позиция квадрата на поле
 			var ypos:int = 0;
 
-			var morisitaPlotSize:int = communityStage.width/plotsXQuantaty
+			var morisitaPlotSize:int = communityStage.width/plotsXQuantaty;
 
 				for(var i:int = 0; i<plotsXQuantaty;i++){
 					plotsCells[i]  = new Array;

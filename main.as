@@ -58,7 +58,7 @@ package{
 			}
         
         public function getNewStatistics(e:Event):void{//При получении информации, которую нужно сохранить для дальнейшего анализа
-				Accumulator.instance.pushToBuffer(e.target.msg);//Передаем ее в копонент, формирующий таблицу
+				Accumulator.instance.pushToBuffer(e.target.msg);//Передаем ее в компонент, формирующий таблицу
 				statusBar.setTexSource(Accumulator.instance.statusBarText);//А затем выводим текущую статистическую информацию в статусную строку
 				behaviourChoicer.getConditionsMeaning(e.target.msg);
 				stageEvent.message = e.target.msg
@@ -100,7 +100,7 @@ package{
 			commStage = null;
 			reloadButton = null;
 			startStopButton = null;
-			//plugins = null;
+			plugins = null;
 			}
         
         private function initConfig():void{
@@ -232,6 +232,7 @@ package{
 					model.addChild(plugins);
 					plugins.setPluginsEventsList(eventsForPluginsList);
 					plugins.loaderEvent.addEventListener(ModelEvent.PLUGIN_LOADED, onPluginsLoading);//После загрузки плагинов даем команду на загрузку элементов интерфейса
+					plugins.startLoading();//Начинаем загружать плагины, только когда загрузчик плагинов полностью инициирован
 					
 					msgString = 'Plugins are enabled';
 				}catch(e:ArgumentError){
@@ -291,6 +292,7 @@ package{
 				commStage.addChild(individuals[i].individualPicture.individualBody);
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
+				individuals[i].motionBehaviour.setSuspender(indSuspender[i]);
 				
 				indSuspender[i].stopIndividual(0);//Останавливаем особей. Потом они запустятся кнопкой Старт
 			}
@@ -317,6 +319,7 @@ package{
 				
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
+				individuals[i].motionBehaviour.setSuspender(indSuspender[i]);
 			}
 			msgString = IND_NUMB + individuals.length;
 			messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
@@ -337,6 +340,7 @@ package{
 					
 					individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
 					individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
+					individuals[i].motionBehaviour.setSuspender(indSuspender[i]);
 				}
 				msgString = IND_NUMB + individuals.length;
 			    messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики

@@ -21,13 +21,11 @@ package konstantinz.community.comStage{
 		//Класс, описывающий поведение отдельного организма в сообществе
 		
 		private var tickInterval:int = 20;//Интервал между тиками таймера
-		private var indNumber:int;
-		private var indConfiguration:ConfigurationContainer;
-		private var maturingDeley:int;//Промежуток между размножениями
-		private var messanger:Messenger;
 		private var lifeStart:Date
 		private var lifeEnd:Date;
 		private var date:Date;
+		private var indNumber:int;
+		private var maturingDeley:int;//Промежуток между размножениями
 		private var adultAge:int;//Время взросления. Передается из настроек
 		private var offspringsQuant:int;
 		private var currentChessDeskI:int;//Номер строки текущего квадрата
@@ -37,14 +35,16 @@ package konstantinz.community.comStage{
 		private var indDirection:int;//Текущие направление
 		private var deleySteps:int;//количество ходов, которые надо пропустить для замедления движения
 		private var chessDesk:Array; //Ссылка на внешний массив с координатами и условиями среды
-		private var errorType:ModelErrors;//Контейнер для ошибок;
-		private var timerForIndividuals:Timer; //Не самое удачное решение, снабдить каждую особь своим таймером, но сделать один из главного класса у меня не получается
 		private var msgString:String;
 		private var indStatus:String;
 		private var debugLevel:String;
 		private var currentBehaviourName:String;//Переключаться поведение будет только если название поведения из пришедшего сообщения будет отличаться от записанного сюда
 		private var myBehaviour:BaseMotionBehaviour;
 		private var modelEvent:ModelEvent;
+		private var indConfiguration:ConfigurationContainer;
+		private var messanger:Messenger;
+		private var errorType:ModelErrors;//Контейнер для ошибок;
+		private var timerForIndividuals:Timer; //Не самое удачное решение, снабдить каждую особь своим таймером, но сделать один из главного класса у меня не получается
 				
 		public var IndividualEvent:DispatchEvent;
 		public var motionBehaviour:MotionBehaviourSwitcher;
@@ -214,6 +214,10 @@ package konstantinz.community.comStage{
 				individualPicture.individualBody.y = chessDesk[currentChessDeskI][currentChessDeskJ].sqrY;
 				
 			  }
+			  
+			  if(chessDesk[currentChessDeskI][currentChessDeskJ].behaviourModel != ''){//Если в новом квадарте указанно поведение, которое особь должна начать проявлять
+				motionBehaviour.switchBehaviour(chessDesk[currentChessDeskI][currentChessDeskJ].behaviourModel);//Включаем этот тип
+					}
 		}
 			
 		private function killIndividual():void{//Убирает особь со сцены

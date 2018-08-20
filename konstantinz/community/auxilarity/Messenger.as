@@ -14,6 +14,7 @@ package konstantinz.community.auxilarity{
 		private var modelEvent:ModelEvent;
 		
 		public static const HAVE_EXT_DATA:String = 'have_ext_data';
+		
 		public var msg:String;
 		
 		
@@ -23,18 +24,19 @@ package konstantinz.community.auxilarity{
 			modelEvent = new ModelEvent();//Будем брать основные константы от сюда
 			}
 		
-		public function message(messageString:String, messageLevel:int = 3):void{
+		public function message(messageString:String, messageLevel:int = modelEvent.DEBUG_MARK):void{
 			msg = messageString;
-			if(messageLevel <= int(debugeLevel)){
-				if(messageLevel ==0){//Если пришло сообщение об ошибке
-					trace('[' + messageMark + ' Error!]: ' + messageString + ';' + '\n');
-					}else{
-				trace('[' + messageMark + ']: ' + messageString + ';' + '\n');
-			}
-			}
 			if(messageLevel == modelEvent.STATISTIC_MARK){
 			
 				dispatchEvent(new Event(Messenger.HAVE_EXT_DATA));//Посылаем статистику в виде сообщения, ведь неизвестно, какой компонент и как ее будет обрабатывать
+			}
+			if(messageLevel <= int(debugeLevel)){
+				if(messageLevel == modelEvent.ERROR_MARK){//Если пришло сообщение об ошибке
+					trace('[' + messageMark + ' Error!]: ' + messageString + ';' + '\n');
+					msg = '';
+					}else{
+				trace('[' + messageMark + ']: ' + messageString + ';' + '\n');
+			}
 			}
 			}
 		

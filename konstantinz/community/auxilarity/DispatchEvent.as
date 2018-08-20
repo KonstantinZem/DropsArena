@@ -5,6 +5,12 @@
 	
 	//Класс предназначен для рассылки событий из тех компонентов, которые не могут рассылать их сами
 	public class DispatchEvent extends EventDispatcher {
+		
+		private var messanger:Messenger;
+		private var msgString:String;
+		private var modelEvent:ModelEvent;
+		private var debugLevel:String;
+		
 		public var currentChessDeskI:int;//Посылаем вместе с событием координаты объекта вызвавшего его
 		public var currentChessDeskJ:int;
 		public var pluginName:String;//Передаем плагину его имя так как сам он его не узнает. А это надо для загрузки, например, конфига
@@ -16,6 +22,13 @@
 		public var target:String;//Имя отправителя сообщения
 		
 		public function DispatchEvent(){
+			debugLevel = '1';
+			messanger = new Messenger(debugLevel);
+			modelEvent = new ModelEvent();//Будем брать основные константы от сюда
+			messanger.setMessageMark('DispatchEvent');
+			pluginName = 'noneme';
+			msgString = 'DispatchEvent has loaded';
+			messanger.message(msgString, modelEvent.INFO_MARK);
 		}		
 		public function maturing():void{
 			dispatchEvent(new ModelEvent(ModelEvent.MATURING));
@@ -56,7 +69,8 @@
 					dispatchEvent(new ModelEvent(ModelEvent.CLICKING));
 				break;
 				default:
-					trace('Wrong signal');
+					msgString = 'Wrong signal: ' + clickNumber;
+					messanger.message(msgString, modelEvent.ERROR_MARK);
 				}
 			
 			}
