@@ -4,29 +4,32 @@ package konstantinz.community.comStage.behaviour{
 
 	public class BaseMotionBehaviour implements MotionBehaviour{
 		
-		private const ERROR_MARK:int = 0;//Сообщение об ошибке помечаются в messanger помечаеся цифрой 0
-		
 		private var debugeLevel:String;
 		private var previosChessDeskI:int
 		private var previosChessDeskJ:int
 		
 		protected var currentPlaceQuality:int;
+		protected var stepLength:int;
 		protected var populationArea:Array;
 		protected var msgString:String;
+		protected var modelEvent:ModelEvent;
+		
 		private var newPosition:Array = new Array();
-		private var individualName:int;
+		protected var individualName:int;
 		
 		public var messenger:Messenger;
 		
 		function BaseMotionBehaviour(dbgLevel:String='3'){
 			debugeLevel = dbgLevel;
 			messenger = new Messenger();
+			modelEvent = new ModelEvent();
 			messenger.setDebugLevel (debugeLevel);
 			messenger.setMessageMark('Behaviour');
 			previosChessDeskI = 0;
 			previosChessDeskJ = 0;
-			
+			stepLength = 1;
 			}
+		
 		public function setPopulationArea(area:Array):void{//передает классу ссылку на массив координат внутри класса CommunityStage А еще лучше передавать это через конструктор
 			try{
 			
@@ -36,7 +39,7 @@ package konstantinz.community.comStage.behaviour{
 				populationArea = area;
 			}catch(err:Error){
 				msgString = err.message;
-				messenger.message(msgString, ERROR_MARK);
+				messenger.message(msgString, modelEvent.ERROR_MARK);
 				}
 			} 
 		
@@ -65,10 +68,10 @@ package konstantinz.community.comStage.behaviour{
 				case 1://Идем вниз
 				
 				if(currentX > populationArea.length-2){
-					newPosition.x = currentX--;
+					newPosition.x = currentX - stepLength;
 					}
 					else{
-						newPosition.x++;
+						newPosition.x = newPosition.x + stepLength;
 						}
 				break;
 				case 2://Идем вверх
@@ -76,16 +79,16 @@ package konstantinz.community.comStage.behaviour{
 				if(currentX==0){
 					}
 					else{
-						newPosition.x--;
+						newPosition.x = newPosition.x - stepLength;
 					}
 				break;
 				case 3: //Направо
 				
 				if(currentY > populationArea[0].length-2){
-					newPosition.y--;
+					newPosition.y = newPosition.y - stepLength;
 					}
 					else{
-						newPosition.y++;
+						newPosition.y = newPosition.y + stepLength;
 						}
 				break;
 				case 4://Идем налево
@@ -93,7 +96,7 @@ package konstantinz.community.comStage.behaviour{
 				if (currentY == 0){
 					}
 					else{
-						newPosition.y--;
+						newPosition.y = newPosition.y - stepLength;
 						}
 				break;
 				default://Стоим на месте
@@ -102,7 +105,7 @@ package konstantinz.community.comStage.behaviour{
 			
 			}catch(err:Error){
 				msgString = err.message;
-				messenger.message(msgString, ERROR_MARK);
+				messenger.message(msgString, modelEvent.ERROR_MARK);
 				}	
 			return newPosition;
 			}
@@ -115,7 +118,7 @@ package konstantinz.community.comStage.behaviour{
 				
 				}catch(err:Error){
 					msgString = err.message;
-					messenger.message(msgString, ERROR_MARK);
+					messenger.message(msgString, modelEvent.ERROR_MARK);
 					}
 				return newState;
 			}
@@ -124,13 +127,16 @@ package konstantinz.community.comStage.behaviour{
 			individualName = newNumber;
 			}
 			
-			public function clearCell():void{
+		public function clearCell():void{
 			//функция полностью платформонезависимая
 			previosChessDeskI = newPosition.x;
 			previosChessDeskJ = newPosition.y;
 			populationArea[previosChessDeskI][previosChessDeskJ].numberOfIndividuals = '';
 			populationArea[previosChessDeskI][previosChessDeskJ].individualName = 0;
 			
+			}
+		public function setStepLength(stLength:int = 1):void{
+			stepLength = stLength;
 			}
 	
 	}

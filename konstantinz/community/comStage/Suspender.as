@@ -89,13 +89,14 @@
 		
 		public function killIndividual():void{
 			
-			if(individualState=='moved'){
+			if(individual != null || individualState !='stoped'){
 				individualState = 'stoped';
 				}
 				indStepPulsor.stop();//Останавливаем отсылку команд на совершение новых ходов
 				suspendTime.stop();//Останавливаем ожидание команды на запуск тем особям которые в данный момент приостановлены
 				individual.kill();
-			}
+				}
+		
 		public function getTimeQuant():int{
 			return tickInterval;
 			}
@@ -112,13 +113,13 @@
 		private function startIndividual(event:TimerEvent):void{
 			try{
 				if(individualState == 'paused'){   
-				individualState = 'moved';
-				msgString = 'Try to start individual ' + individual.getName();
-				messanger.message(msgString, modelEvent.DEBUG_MARK);
+					individualState = 'moved';
+					msgString = 'Try to start individual ' + individual.getName();
+					messanger.message(msgString, modelEvent.DEBUG_MARK);
 					
-				indStepPulsor.start();
-				SuspenderEvent.done();//Говорим о том что особи вновь запущены тому компоненту, который просил приостановить особей
-				}
+					indStepPulsor.start();
+					SuspenderEvent.done();//Говорим о том что особи вновь запущены тому компоненту, который просил приостановить особей
+					}
 			}catch(e:Error){
 				messanger.message(e.message, modelEvent.ERROR_MARK);
 				indStepPulsor.stop();
@@ -128,7 +129,7 @@
 		private function step(event:TimerEvent):void{
 			try{
 				if(!immortal){//Если особь не бессмертна, следим за временем жизни
-					lifeTime = lifeTime - chessDesk[10][10]['lifeQuant'];
+					lifeTime = lifeTime - chessDesk[10][10].lifeQuant;
 					if(lifeTime==0){//Если время жизни вышло
 						indStepPulsor.stop();
 						individual.kill();//Даем особи команду убиться

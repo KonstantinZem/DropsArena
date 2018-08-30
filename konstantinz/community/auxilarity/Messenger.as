@@ -24,7 +24,7 @@ package konstantinz.community.auxilarity{
 			modelEvent = new ModelEvent();//Будем брать основные константы от сюда
 			}
 		
-		public function message(messageString:String, messageLevel:int = modelEvent.DEBUG_MARK):void{
+		public function message(messageString:String, messageLevel:int = 3):void{
 			msg = messageString;
 			if(messageLevel == modelEvent.STATISTIC_MARK){
 			

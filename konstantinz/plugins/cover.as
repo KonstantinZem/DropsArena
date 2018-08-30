@@ -29,30 +29,51 @@ public class cover extends Plugin{
 	private var aDeley:int = 1//Задержка при движении взрослых особей. Должна быть включена в интерфейс этого типа плагинов
 	private var yDeley:int = 3//Задержка при движении молодых особей. Должна быть включена в интерфейс этого типа плагинов
 	private var lifequant:int = 1; //Убыль жизни за ход. Должна быть включена в интерфейс этого типа плагинов
-	private var color:Number = 0x000000; //Должна быть включена в интерфейс этого типа плагинов. Определяет цвет участка с данными характеристиками
+	private var behaviourFrequency:int;
+	private var color:Number = 0x000000; //Определяет цвет участка с данными характеристиками
 	private var ct:ColorTransform;
 	private var imageName:String;
+	private var behaviourModelName:String;
 	private var image:Object; //Должна быть включена в интерфейс этого типа плагинов
 	private var loader:Loader;
 	private var optionPosition:Array;
-	private var behaviourModelName:String;
+	private var coverShema:Array;//Схема напочвенного покрова может загружаться в процессе работы программы несколько раз. Чтобы не загружать битмап каждый раз, надо заранее создать схему
+	private var modelError:ModelErrors;
 	
 	function cover(){
 		ct = new ColorTransform();
 		loader = new Loader();
 		messenger.setMessageMark('Ground cover plugin');
+		coverShema = new Array;
+		modelError = new ModelErrors();
 		}
 	
 	override public function initSpecial():void{
 		optionPosition = new Array(0,0,0,0,0);
+		
 		dataPath = 'plugins.' + pluginName + '.data.observation';
 		calendarData = dataPath + '.day';
+		
+		behaviourFrequency = int(configuration.getOption(optionPath + 'behaviour_frequency'));
+		
+		if(behaviourFrequency == 0 || behaviourFrequency < 0){
+			behaviourFrequency = 100;
+			msgString = 'Behaviour frequency: ' + modelError.varIsIncorrect;
+			messenger.message(msgString, modelEvent.ERROR_MARK);
+			}
+		
+		if(behaviourFrequency > 100){
+			behaviourFrequency = 100;
+			msgString = 'Behaviour frequency: ' + modelError.varIsIncorrect + ' It can not be greater then 100';
+			messenger.message(msgString, modelEvent.ERROR_MARK);
+			}
 		
 		imageName = configuration.getOption(optionPath + 'picture');
 		color = configuration.getOption(optionPath + 'color');
 		ct.color = color;
 		adeley = configuration.getOption(optionPath + 'stepDeley');
 		behaviourModelName = configuration.getOption(optionPath + 'behaviour_model');//Какое поведение должна прявлять особь на закрашенных плагином участках
+		
 		if(behaviourModelName == 'Error'){//Если в конфиге не указано название модели поведения
 			behaviourModelName = '';//Оставляем название пустым
 			}
@@ -65,7 +86,7 @@ public class cover extends Plugin{
 			
 		loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
 		loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
-   		loader.load(new URLRequest(imageName));
+		loader.load(new URLRequest(imageName));
 		}
 
 	private function onIOError(error:IOErrorEvent):void{
@@ -83,6 +104,32 @@ public class cover extends Plugin{
 	}
 
 	private function modifyTable():void{
+		var xPos:int = 0;
+		var yPos:int = 0;
+		var counterI:int = 0;
+		if(coverShema.length == 0){//Если плагин запустился в первый раз, 
+			initCoverShema ();//то сначала создаем схему напочвенного покрова, чтобы при его последующих запусках уменьшить объем обрабатываемой информации
+			if(behaviourFrequency > 0){
+				initBehaviourShema();
+				}
+			}else{
+				counterI = coverShema.length;
+				for(var i:int = 0; i< counterI; i++){
+					for(var j:int = 0; j< coverShema[i].length; j++){
+						xPos = coverShema[i][j]['controllX'];
+						yPos = coverShema[i][j]['controllY'];
+						communityStage.chessDesk[xPos][yPos].picture.transform.colorTransform = ct;
+						communityStage.chessDesk[xPos][yPos]['behaviourModel'] = coverShema[i][j]['behaviourModel'];
+						}
+					
+					}
+				}
+		
+		refreshIndividualsSetting();
+		pluginEvent.ready();//Сообщаем о том, что все уже сделано,
+	}
+	
+	private function initCoverShema():void{
 		var controllX:int;
 		var controllY:int;
 		var bmd:BitmapData = image.bitmapData;
@@ -100,9 +147,10 @@ public class cover extends Plugin{
 		for(var i:int = 0; i< counterI; i++){
 				var pixelValue:String;
 				counterJ = tableRoot[i].length;
+				coverShema[i] = new Array();
 				
 				for(var j:int = 0; j<counterJ; j++){
-					
+					var aux:Object = new Object();
 					pixelValue = bmd.getPixel(tableRoot[i][j].sqrX /2,tableRoot[i][j].sqrY /2).toString(16);
 		
 					if(pixelValue != 'ffffff'){//Если участок картинки не белый
@@ -110,33 +158,68 @@ public class cover extends Plugin{
 						communityStage.chessDesk[i][j].speedDeleyA += aDeley//Переопределяем скорость взрослых
 						communityStage.chessDesk[i][j].speedDeleyY += yDeley//И молодых особей
 						communityStage.chessDesk[i][j].lifeQuant += lifequant;//Переопределяем время жизни особи за ход
-						communityStage.chessDesk[i][j].behaviourModel = behaviourModelName;//Передаем название поведения, которое должно прявлять особь на этом квадрате
 						controllX = i;
 						controllY =j;
+						aux['controllX'] = controllX;
+						aux['controllY'] = controllY;
+						aux['behaviourModel'] = '';
+						coverShema[i].push(aux);
+						
 					}
 				}	
 		}
-	    //По окончанию работы плагина
-		//Выводим результат работы
+		bmd.dispose(); //Небольшая оптимизация, чтобы уменьшить занимаемую память
+		bmd = null;
+		removeChild(image);//Удаляем вспомогательную картинку с рисунком напочвенного покрова
 		msgString = 'Individuals speed now is ' + communityStage.chessDesk[controllX][controllY].speedDeleyA;
 		messenger.message(msgString, modelEvent.INFO_MARK);
 	    msgString = 'Individuals life decriasing now is ' + communityStage.chessDesk[controllX][controllY].lifeQuant + ' points after step';
 	    messenger.message(msgString, modelEvent.INFO_MARK);
-		removeChild(image);//Удаляем вспомогательную картинку с рисунком напочвенного покрова
-		refreshIndividualsSetting();
-		pluginEvent.ready();//Сообщаем о том, что все уже сделано,
-	}
+		}
+		
+	private function initBehaviourShema():void{
+		var aux:Array = new Array(0,1,2,3,4,5,6,7,8,9);//Этот массив нужен для присвоения модели поведения случайным клеткам из десяти
+		var counterI:int = coverShema.length;
+		var counterD:int = 0;
+		var initedCellsNumber:int = behaviourFrequency/10;
+		var cellNumber:int;
+		
+		for(var i:int = 0; i < counterI; i++){
+			
+			for(var j:int = 0; j< coverShema[i].length; j = j + 10){
+				counterD = j + initedCellsNumber;
+				
+				for(var d:int = j; d < counterD; d++){
+					cellNumber = Math.round(Math.random() * (aux.length));//Выбираем случайную ячейку вспомогатеьного массива
+					
+					if(coverShema[i][aux[cellNumber] + j] != undefined){
+						coverShema[i][aux[cellNumber] + j]['behaviourModel'] = behaviourModelName;
+						}
+					aux.splice(cellNumber,1);
+					
+					}
+					aux = new Array(0,1,2,3,4,5,6,7,8,9);
+				}
+			}
+		}
 	
 	private function refreshIndividualsSetting():void{
-		var counter:int = root.indSuspender.length - 2;
 		
-		for(var i:int = 0; i < counter; i++){
-			root.indSuspender[i].doOnlyOneStep();
+		for(var i:int = 1; i < root.indSuspender.length; i++){//Если не вычислять длинну массива с indSuspender каждый раз, может вылитеть ошибка: особи могут и умирать по комманде перейдя в квадрат и дляинна массива будет меняться
+			if(root.indSuspender[i] && root.indSuspender[i].indState() != 'stoped'){
+				root.indSuspender[i].doOnlyOneStep();
+				}
 			}
 		}
 	
 	override public function startPluginJobe():void{
-		initSpecial();
+		modifyTable();
+		optionPosition[3]++;
+		currentDay = configuration.getOption(calendarData, optionPosition);
+		if(currentDay == 'Error'){//Если мы выскочили за последнюю запись в данной секции кофига
+			optionPosition[3] = 0;
+			currentDay = configuration.getOption(calendarData, optionPosition);//Переходим к первое его записи
+			}
 		}
 	
 }

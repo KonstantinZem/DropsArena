@@ -15,6 +15,7 @@
 	<!-- initPosition of individual can be left-top, left-bottom,  right-top, right-bottom, center and random -->
 	<initPosition>left-top</initPosition>
 	<statRefreshTime>10</statRefreshTime>
+	<stepLength>2</stepLength>
 	<pluginsList>plugins/mowing.swf;plugins/ground.swf;plugins/grass.swf;plugins/grass2.swf;plugins/grass3.swf;plugins/grass4.swf;plugins/activity.swf;plugins/death.swf;plugins/morisitaCounter.swf</pluginsList>
 	<arePluginsActiveOnLoading>false</arePluginsActiveOnLoading>
 	<behaviourSwitching>
@@ -40,6 +41,8 @@
 </main>
 <plugins>
 	<grass>
+		<description>Aegopodium podagraria grass cover</description>
+		<icon></icon>
 		<picture>pictures/park/aegopodium.png</picture>
 		<stepDeley>6</stepDeley>
 		<debugLevel>1</debugLevel>
@@ -47,26 +50,46 @@
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>
-				<part>20</part>
+				<day>20.10.10</day>
+			</observation>
+			<observation>
+				<day>16.06.11</day>
+			</observation>
+			<observation>
 				<day>29.09.11</day>
+			</observation>
+			<observation>
+				<day>20.10.11</day>
 			</observation>
 		</data>
 	</grass>
 	<mowing>
+		<description>Zone of decading mowing</description>
 		<picture>pictures/park/pocos.png</picture>
 		<stepDeley>1</stepDeley>
 		<debugLevel>1</debugLevel>
 		<color>0xf4e17f</color>
 		<behaviour_model>MomentalDeath</behaviour_model>
+		<!--behaviour_frequency individual will change it's behaviour in each second cell-->
+		<behaviour_frequency>40</behaviour_frequency>
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>
-				<part>20</part>
+				<day>06.10.10</day>
+			</observation>
+			<observation>
+				<day>06.06.11</day>
+			</observation>
+			<observation>
 				<day>18.08.11</day>
+			</observation>
+			<observation>
+				<day>08.10.11</day>
 			</observation>
 		</data>
 	</mowing>
 	<ground>
+		<description>Zone of open ground</description>
 		<picture>pictures/park/ground.png</picture>
 		<stepDeley>0</stepDeley>
 		<debugLevel>1</debugLevel>
@@ -74,12 +97,22 @@
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>
-				<part>20</part>
+				<day>20.10.10</day>
+			</observation>
+			<observation>
+				<day>16.06.11</day>
+			</observation>
+			<observation>
 				<day>26.09.11</day>
+			</observation>
+			<observation>
+				<day>20.10.11</day>
 			</observation>
 		</data>
 	</ground>
 	<grass2>
+		<description url='https://en.wikipedia.org/wiki/Lamium_album'>Lamium album grass cover</description>
+		<icon></icon>
 		<picture>pictures/park/lamium.png</picture>
 		<stepDeley>2</stepDeley>
 		<debugLevel>1</debugLevel>
@@ -87,12 +120,22 @@
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>
-				<part>20</part>
+				<day>20.10.10</day>
+			</observation>
+			<observation>
+				<day>16.06.11</day>
+			</observation>
+			<observation>
 				<day>28.09.11</day>
+			</observation>
+			<observation>
+				<day>20.10.11</day>
 			</observation>
 		</data>
 	</grass2>
 	<grass3>
+		<description url='https://en.wikipedia.org/wiki/Glechoma_hederacea'>Gleсhoma hederacea grass cover</description>
+		<icon></icon>
 		<picture>pictures/park/glehoma.png</picture>
 		<stepDeley>2</stepDeley>
 		<debugLevel>1</debugLevel>
@@ -100,8 +143,13 @@
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>
-				<part>20</part>
+				<day>16.06.11</day>
+			</observation>
+			<observation>
 				<day>29.09.11</day>
+			</observation>
+			<observation>
+				<day>20.10.11</day>
 			</observation>
 		</data>
 	</grass3>
@@ -113,12 +161,19 @@
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>
-				<part>20</part>
+				<day>16.06.11</day>
+			</observation>
+			<observation>
 				<day>29.09.11</day>
+			</observation>
+			<observation>
+				<day>20.10.11</day>
 			</observation>
 		</data>
 	</grass4>
 	<activity>
+		<description>Changing activity of individuals on a stage according field observation data</description>
+		<icon></icon>
 		<signal>stop</signal>
 		<steps>6500</steps>
 		<debugLevel>1</debugLevel>
@@ -1253,6 +1308,7 @@
 	</data>
 	</activity>
   <death>
+	<description>Remove individuals from stage according field observations</description>
 	<debugLevel>1</debugLevel>
 	<signal>kill</signal>
 	<!-- individuals will have been killed une time per this number of steps -->
@@ -1263,20 +1319,22 @@
      <selectionType>percents</selectionType>
 		<data>
 			<observation>
-				<part>20</part>
+				<part>10</part>
 				<day>18.08.11</day>
 			</observation>
 			<observation>
-				<part>20</part>
+				<part>10</part>
 				<day>17.04.12</day>
 			</observation>
 			<observation>
-				<part>20</part>
+				<part>10</part>
 				<day>01.08.12</day>
 			</observation>
 		</data>
     </death>
 	<morisitaCounter>
+		<description>Count Morisita index</description>
+		<icon></icon>
 		<debugLevel>1</debugLevel>
 		<refreshTime>20</refreshTime>
 		<plotSize>8</plotSize>

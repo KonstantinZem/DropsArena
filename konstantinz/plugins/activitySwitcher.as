@@ -16,18 +16,18 @@ public class activitySwitcher extends Plugin{
 	
 	private var dispatchedObjects:Vector.<Suspender>//Ссылка на массив с управляемыми объектами
 	private var stopedObjects:Array;//Список остановленных в данный момент особей
+	private var optionPosition:Array;
 	private var suspendTime:int;//Время на которое нужно остановить особь
 	private var numberOfData:int;//Количество наблюдений (переключений) в конфигурационном файле
 	private var cycleCounter:int;
-	private var activeIndividualsNumber:String;
 	private var currentActivitIndNumber:int = 1;//Позиция в таблице активности где надо искать текущее число особей, которых необходимо остановить
+	private var activeIndividualsNumber:String;
 	private var timerStatement:String;
 	private var signalType:String;
 	private var selectionType:String;//percents or items
 	private var killStoped:String;//Будудт ли подвержены случайной смерти неактивные особи
 	private var dataPath:String;
 	private var stopingTimer:Timer;//Этот таймер включается сразу после запуска плагина и заставляет особей останавливаться через заданный промежуток времени
-	private var optionPosition:Array;
 	private var calendarData:String
 	private var firstInit:String
 	
@@ -63,30 +63,29 @@ public class activitySwitcher extends Plugin{
 		}
 	
 	 override public function initSpecial():void{
+		 var time:int;
 		 
 		 dispatchedObjects = root.indSuspender;//Чтобы дальше root не встречался в тексте
 		
 		 dataPath = 'plugins.' + pluginName + '.data.observation';
 		 calendarData = dataPath + '.day';
 				
-				optionPosition = new Array(0,0,0,0,0);
+		 optionPosition = new Array(0,0,0,0,0);
 				
-				currentDay = configuration.getOption(calendarData, optionPosition);//Берем из аттрибутов дату наблюдения
+		 currentDay = configuration.getOption(calendarData, optionPosition);//Берем из аттрибутов дату наблюдения
 				
-				var time:int;
-				
-				signalType = configuration.getOption(optionPath + 'signal');
+		signalType = configuration.getOption(optionPath + 'signal');
 								
-				if(signalType=='kill'){//Если плагин настроен чтобы убивать особей
-					killStoped = configuration.getOption(optionPath + 'killStoped');//Узнаем, должны ли мы убивать всех подряд или только активных осоей
+		if(signalType=='kill'){//Если плагин настроен чтобы убивать особей
+		   killStoped = configuration.getOption(optionPath + 'killStoped');//Узнаем, должны ли мы убивать всех подряд или только активных осоей
 				
-					if(killStoped !='true' && killStoped !='false'){//Если опция killStoped напсиана неправильно
-						messenger.message('killStoped: ' + killStoped + '. ' + errorType.varIsIncorrect, 0);
-						killStoped = 'false';//Заменяем неправильное значение на значение по умолчанию 
-						}
-					}
+			if(killStoped !='true' && killStoped !='false'){//Если опция killStoped напсиана неправильно
+			   messenger.message('killStoped: ' + killStoped + '. ' + errorType.varIsIncorrect, 0);
+			   killStoped = 'false';//Заменяем неправильное значение на значение по умолчанию 
+			   }
+			}
 				
-				selectionType = configuration.getOption(optionPath + 'selectionType');
+		selectionType = configuration.getOption(optionPath + 'selectionType');
 				
 				if(selectionType != 'percents' && selectionType != 'items'){
 					selectionType = 'percents';
@@ -319,10 +318,7 @@ public class activitySwitcher extends Plugin{
 				throw new IllegalOperationError(errorType.tooSmall + '. Number of individals less then critical');
 				}
 			
-			counter = stopedObjects.length;
-			
-			
-			for(var i:int = 0; i< counter; i++){//Пробигаемся по списку особей, которых надо остановить
+			for(var i:int = 0; i< stopedObjects.length; i++){//Пробигаемся по списку особей, которых надо остановить
 				
 				if(dispatchedObjects[stopedObjects[i]] != null){
 				

@@ -12,8 +12,8 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 			
 			currentPlaceQuality = populationArea[currentX][currentY].speedDeleyA;
 			
-			newPosition['x'] = currentX;
-			newPosition['y'] = currentY;
+			newPosition.x = currentX;
+			newPosition.y = currentY;
 			
 			var indDirection:int = 0;
 			
@@ -31,9 +31,9 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 				if(currentX > populationArea.length-2){
 					
 					if((currentX - viewDistance) > 0 && populationArea[currentX - viewDistance][currentY].speedDeleyA > currentPlaceQuality){
-						newPosition['x'] = currentX - viewDistance;
+						newPosition.x = currentX - viewDistance;
 						}else{
-							newPosition['x'] = currentX--;
+							newPosition.x = currentX - stepLength;
 							}
 					
 					}
@@ -41,7 +41,7 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 						if((currentX - viewDistance) < (populationArea.length -2) && populationArea[currentX + viewDistance][currentY].speedDeleyA > currentPlaceQuality){
 						newPosition[0] = currentX + viewDistance;
 						}else{
-							newPosition['x']++;
+							newPosition.x = newPosition.x + stepLength;
 							}
 						}
 				break;
@@ -51,9 +51,9 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 					}
 					else{
 						if((currentX - viewDistance) > 0 && populationArea[currentX - viewDistance][currentY].speedDeleyA > currentPlaceQuality){
-						newPosition['x'] = currentX - viewDistance;
+						newPosition.x = currentX - viewDistance;
 						}else{
-							newPosition['x'] = currentX--;
+							newPosition.x = currentX - stepLength;
 							}
 					}
 				break;
@@ -61,16 +61,16 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 				
 				if(currentY > super.populationArea[0].length-2){
 					if((currentY - viewDistance) > 0 && populationArea[currentX][currentY - viewDistance].speedDeleyA > currentPlaceQuality){
-						newPosition['y'] = currentY - viewDistance;
+						newPosition.y = currentY - viewDistance;
 						}else{
-							newPosition['y']--;
+							newPosition.y = newPosition.y - stepLength;
 							}
 					}
 					else{
 						if((currentY + viewDistance)< (populationArea[0].length - 2) && populationArea[currentX][currentY + viewDistance].speedDeleyA > currentPlaceQuality){
-						newPosition['y'] = currentY + viewDistance;
+						newPosition.y = currentY + viewDistance;
 						}else{
-							newPosition['y']++;;
+							newPosition.y = newPosition.y + stepLength;
 							}
 						}
 				break;
@@ -80,9 +80,9 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 					}
 					else{
 						if((currentY - viewDistance) > 0 && populationArea[currentX][currentY - viewDistance].speedDeleyA > currentPlaceQuality){
-						newPosition['y'] = currentY - viewDistance;
+						newPosition.y = currentY - viewDistance;
 						}else{
-							newPosition['y']--;
+							newPosition.y = newPosition.y - stepLength;
 							}
 						}
 				break;
@@ -92,7 +92,7 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 			
 			}catch(err:Error){
 				msgString = err.message;
-				messenger.message(msgString, super.ERROR_MARK);
+				messenger.message(msgString, modelEvent.ERROR_MARK);
 				}	
 			return newPosition;
 			}

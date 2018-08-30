@@ -32,17 +32,18 @@ package konstantinz.community.comStage{
 		private var currentChessDeskJ:int;//Номер столбца текущего квадрата
 		private var previosChessDeskI:int;
 		private var previosChessDeskJ:int
+		private var stepLength:int;//Длинна шага особи
 		private var indDirection:int;//Текущие направление
 		private var deleySteps:int;//количество ходов, которые надо пропустить для замедления движения
 		private var chessDesk:Array; //Ссылка на внешний массив с координатами и условиями среды
 		private var msgString:String;
-		private var indStatus:String;
 		private var debugLevel:String;
+		private var indStatus:String;//Так как особи могут подаваться внешние команды, надо всегда знать может ли особь эти команды выполнить
 		private var currentBehaviourName:String;//Переключаться поведение будет только если название поведения из пришедшего сообщения будет отличаться от записанного сюда
 		private var myBehaviour:BaseMotionBehaviour;
 		private var modelEvent:ModelEvent;
 		private var indConfiguration:ConfigurationContainer;
-		private var messanger:Messenger;
+		private var messenger:Messenger;
 		private var errorType:ModelErrors;//Контейнер для ошибок;
 		private var timerForIndividuals:Timer; //Не самое удачное решение, снабдить каждую особь своим таймером, но сделать один из главного класса у меня не получается
 				
@@ -59,8 +60,8 @@ package konstantinz.community.comStage{
 			try{
 				indConfiguration = behaviour;
 				debugLevel = indConfiguration.getOption('main.debugLevel');
-				messanger = new Messenger(debugLevel);
-				messanger.setMessageMark('Individual');
+				messenger = new Messenger(debugLevel);
+				messenger.setMessageMark('Individual');
 				modelEvent = new ModelEvent();//Будем брать основные константы от сюда
 				indNumber = args[0];
 				
@@ -71,10 +72,18 @@ package konstantinz.community.comStage{
 				if(args[0]==undefined){
 					indNumber = Math.round(Math.random()*1000);;
 					msgString = 'Individual ' + errorType.idUndefined + ' There were set random name ' + indNumber;
-					messanger.message(msgString, modelEvent.INFO_MARK);
+					messenger.message(msgString, modelEvent.INFO_MARK);
 					}
 				
-				adultAge = int(indConfiguration.getOption('main.adultAge'))
+				stepLength = int(indConfiguration.getOption('main.stepLength'));
+				
+				if(stepLength <= 0){
+					stepLength = 1;
+					msgString = 'Step length: ' + errorType.varIsIncorrect;
+					messenger.message(msgString, modelEvent.ERROR_MARK);
+					}
+				
+				adultAge = int(indConfiguration.getOption('main.adultAge'));
 				offspringsQuant = int(indConfiguration.getOption('main.offspringsQuant'))//Количество оставленных потомков
 				maturingDeley = 0;
 
@@ -89,6 +98,7 @@ package konstantinz.community.comStage{
 
 				myBehaviour = motionBehaviour.newBehaviour;
 				myBehaviour.setIndividualNumber(indNumber);
+				myBehaviour.setStepLength(stepLength);
 			
 				if(args[1]==undefined||args[2]==undefined){
 					currentChessDeskI = 0;//Если не указано начальное положение особи, начинаем двигаться с верхнего левого угла (первый квадрат)
@@ -106,11 +116,13 @@ package konstantinz.community.comStage{
 				lifeStart = new Date();
 				
 				msgString = 'Individual ' + indNumber + ' has created. \n It current position is '+ currentChessDeskI+ ':' + currentChessDeskJ;
-				messanger.message(msgString, modelEvent.INIT_MSG_MARK);
+				messenger.message(msgString, modelEvent.INIT_MSG_MARK);
+				
+				indStatus = 'active';
 			
 			}catch(error:ArgumentError){
 				msgString = error.message;
-				messanger.message(msgString, modelEvent.ERROR_MARK);
+				messenger.message(msgString, modelEvent.ERROR_MARK);
 				}
 			}
 /////////////////////////Private//////////////////////////////////////////////////////////////////////
@@ -128,7 +140,7 @@ package konstantinz.community.comStage{
 					if(adultAge==0){//После этого adultAge станет меньше нуля и сообщение появлятся не должно
 						adultAge--;
 						msgString= 'Individual ' + indNumber + ' now adult';
-						messanger.message(msgString, modelEvent.INFO_MARK);
+						messenger.message(msgString, modelEvent.INFO_MARK);
 					}
 					return true;
 				}
@@ -171,7 +183,7 @@ package konstantinz.community.comStage{
 				IndividualEvent.maturing();
 				
 				msgString = 'Maturing in '+ currentChessDeskI+ ':'+ currentChessDeskJ;
-				messanger.message(msgString, modelEvent.DEBUG_MARK);
+				messenger.message(msgString, modelEvent.DEBUG_MARK);
 				maturingDeley = int(indConfiguration.getOption('main.maturingDeley'));
 			
 			}
@@ -192,7 +204,7 @@ package konstantinz.community.comStage{
 						
 			var amIAdult:Boolean = isIndividualAdult();//Стоит здесь, так как взрослеть особь должна в не зависимости от того, стоит она на месте или движется
 			
-			if(deleySteps==0){//И если отстояли на месте положенное количество тиков таймера, двигаемся дальше
+			if(indStatus != 'dead' && deleySteps==0){//И если отстояли на месте положенное количество тиков таймера, двигаемся дальше
 				
 				deleySteps = myBehaviour.getPlaceQuality(currentChessDeskI,currentChessDeskJ);//Смотрим на новой клетке число ходов
 			
@@ -217,21 +229,25 @@ package konstantinz.community.comStage{
 			  
 			  if(chessDesk[currentChessDeskI][currentChessDeskJ].behaviourModel != ''){//Если в новом квадарте указанно поведение, которое особь должна начать проявлять
 				motionBehaviour.switchBehaviour(chessDesk[currentChessDeskI][currentChessDeskJ].behaviourModel);//Включаем этот тип
-					}
+				}
 		}
 			
 		private function killIndividual():void{//Убирает особь со сцены
 			//функция относительно платформонезависимая, так как таймеры и слушатели событий есть и в других языках
+			indStatus = 'dead';//Теперь, если кто то попытается обратится к особи, он будет по крайне мере знать, что она присмерти
 			var deltaTime:int;
 				
-			lifeEnd=new Date();
+			lifeEnd = new Date();
 			timerForIndividuals.stop();//Выключаем таймер
 			timerForIndividuals.removeEventListener(TimerEvent.TIMER, internalMoveImpuls);//И отсоединяемся от него
 				
-			deltaTime = lifeEnd.getTime()-lifeStart.getTime();
+			deltaTime = lifeEnd.getTime() - lifeStart.getTime();
+			
 			msgString = 'Individual ' + indNumber + ' is dead. R.I.P. \n' + 'It lived ' + Math.round((deltaTime)*0.00006) + ' min';
-			messanger.message(msgString, modelEvent.INFO_MARK);
-			messanger = null;
+			messenger.message(msgString, modelEvent.INFO_MARK);
+			
+			//individualPicture = null;
+			messenger = null;
 			motionBehaviour = null;
 			indConfiguration = null;
 			lifeEnd = null;
@@ -240,29 +256,31 @@ package konstantinz.community.comStage{
 			IndividualEvent.death();//Умерла
 				
 			errorType = null;
-		}
+			}
 			
 ////////////////////////////Public////////////////////////////////////////////////////
 		
 		public function externalTimer():void{
-			timerForIndividuals.stop()
+			timerForIndividuals.stop();
 			msgString = 'Individual number '+ indNumber + ': ' + 'Internal timer has stoped';
-			messanger.message(msgString, modelEvent.DEBUG_MARK);
+			messenger.message(msgString, modelEvent.DEBUG_MARK);
 			}
 			
 		public function doStep():void{//Заставляем особь двигаться по внешнему таймеру
-			nextStep();
+			if(indStatus != 'dead'){//Если она может двигаться
+				nextStep();
+				}
 			}
 		
 		public function stop():void{//Так особь можно заставить остановится
-			msgString = 'Individual number '+ indNumber + ' has been stoped'
-			messanger.message(msgString, modelEvent.DEBUG_MARK);
+			msgString = 'Individual number '+ indNumber + ' has been stoped';
+			messenger.message(msgString, modelEvent.DEBUG_MARK);
 			individualPicture.markIndividual('stoped');
 			}
 		
 		public function start():void{//Так особь можно заставить двигаться снова
 			msgString = 'Individual number '+ indNumber + ' has been started';
-			messanger.message(msgString, modelEvent.DEBUG_MARK);
+			messenger.message(msgString, modelEvent.DEBUG_MARK);
 			individualPicture.markIndividual('nothing');
 			}
 		
@@ -280,17 +298,21 @@ package konstantinz.community.comStage{
 			indNumber = newNumber;
 			myBehaviour.setIndividualNumber(newNumber);
 			msgString = 'Individual has change it number from ' + oldNumber + ' to ' + newNumber;
-			messanger.message(msgString, modelEvent.DEBUG_MARK);
+			messenger.message(msgString, modelEvent.DEBUG_MARK);
 		}
 	
 		public function kill():void{
-			msgString = 'Individual ' + indNumber + 'has killed';
-			messanger.message(msgString, modelEvent.INFO_MARK);
-			killIndividual();
-		}
+			if(indStatus != 'dead'){//Если она может двигаться
+				msgString = 'Individual ' + indNumber + 'has killed';
+				messenger.message(msgString, modelEvent.INFO_MARK);
+				killIndividual();
+				}
+			}
 		
 		public function markPresenceInPlot():void{
-			chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals += indStatus;
+			if(indStatus != 'dead'){//Если она может двигаться
+				chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals += indStatus;
+				}
 			}
 	
 			

@@ -19,6 +19,7 @@ mxmlc=$sdk'bin/mxmlc'
 cp ../bin/plugins/cover.swf ../bin/plugins/grass.swf
 cp ../bin/plugins/cover.swf ../bin/plugins/ground.swf
 cp ../bin/plugins/cover.swf ../bin/plugins/stones.swf
+cp ../bin/plugins/cover.swf ../bin/plugins/mowing.swf
 cp ../bin/plugins/activity.swf ../bin/plugins/death.swf
 
 

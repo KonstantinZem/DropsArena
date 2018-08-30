@@ -126,7 +126,7 @@ package{
 			messenger.setMessageMark('Main');
 			messenger.addEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);
 						
-			versionText = new myVersion('0.7',debugLevel);
+			versionText = new myVersion('0.8',debugLevel);
 			modelEvent = new ModelEvent();//Будем брать основные константы от сюда
 			
 			if(configuration.getOption('main.behaviourSwitching.enable') == 'true'){

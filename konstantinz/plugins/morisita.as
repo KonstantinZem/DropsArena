@@ -32,7 +32,11 @@ package konstantinz.plugins{
 			}
 	
 		override public function startPlugin(e:ModelEvent):void{
+			if(individuals.length > 0){
 			refreshTimer.start();
+			}else{
+				setTimeout(refreshTimer.start, 0)
+				}
 			}
 	
 		public override function initSpecial():void{
@@ -99,17 +103,19 @@ package konstantinz.plugins{
 				getPlotPosition();//Составляем его чтобы в дальнейшем не расчитывать позиции которые уже не изменятся а просто брать уже готовые координаты
 				}
 		
-			drvCounter = indDrivers.length;
-			for(var i:int = 0; i< drvCounter;i++){//Перед тем как расчитать индекс приостанавливаем особей на некоторое время
+			for(var i:int = 0; i< indDrivers.length;i++){//Перед тем как расчитать индекс приостанавливаем особей на некоторое время
 				indDrivers[i].stopIndividual(500);
 				}
 				
 				clearStage();//Очищаем массив сцены от информации о прибывании там особе, так как отметка от пристутсвия особи часто остается в уже пустой ячейки
 				
-			indCounter = individuals.length;
-			for(var j:int = 0; j< indCounter;j++){
-				individuals[j].markPresenceInPlot();//Даем особям команду обозначить те квадраты в которых они уже находятся
+			
+			for(var j:int = 0; j< individuals.length;j++){
+				if(indDrivers[j].indState() !='stoped'){
+					individuals[j].markPresenceInPlot();//Даем особям команду обозначить те квадраты в которых они уже находятся
+					}
 				}
+			
 				
 			morisita = morisitaIndex();//Высчитываем индекс Мориситы
 			

@@ -18,7 +18,7 @@ public class MomentalDeath extends BaseMotionBehaviour{
 				}
 				indSuspender = suspender;
 		}catch(e:Error){
-			trace(e.message);
+			messenger.message(e.message, modelEvent.ERROR_MARK);
 			}
 		}
 	public function killIndividual():void{
@@ -26,9 +26,15 @@ public class MomentalDeath extends BaseMotionBehaviour{
 			if(indSuspender == null){
 				throw new Error('Individual suspender not set');
 				}
-		indSuspender.killIndividual();
+			if(!indSuspender.hasOwnProperty('killIndividual')){
+				throw new Error('killIndividual not found');
+				}
+			
+			indSuspender.killIndividual();
+
 		}catch(e:Error){
-			trace(e.message);
+			msgString = 'Individual ' + individualName + ': ' + e.message;
+			messenger.message(msgString, modelEvent.ERROR_MARK);
 			}
 		}
 
