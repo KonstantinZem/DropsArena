@@ -35,7 +35,7 @@ package konstantinz.plugins{
 			if(individuals.length > 0){
 			refreshTimer.start();
 			}else{
-				setTimeout(refreshTimer.start, 0)
+				setTimeout(refreshTimer.start, 5);
 				}
 			}
 	

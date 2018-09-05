@@ -71,7 +71,7 @@
 		<color>0xf4e17f</color>
 		<behaviour_model>MomentalDeath</behaviour_model>
 		<!--behaviour_frequency individual will change it's behaviour in each second cell-->
-		<behaviour_frequency>40</behaviour_frequency>
+		<behaviour_frequency>10</behaviour_frequency>
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>

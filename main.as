@@ -63,7 +63,7 @@ package{
 				behaviourChoicer.getConditionsMeaning(e.target.msg);
 				stageEvent.message = e.target.msg
 				stageEvent.target = e.target.messageMark;
-				stageEvent.newStatistic();
+				stageEvent.newStatistic();//Рассылаем информацию о новой статистике например плагинам
 				
 			    }
         
@@ -79,10 +79,11 @@ package{
 			messenger = null;
 			
 			counter = individuals.length;
+			
 			for(var i:int = 0;i< counter;i++){//Полностью останавливаем особей и убираем их со сцены
 				indSuspender[i].stopIndividual(0);
 				commStage.removeChild(individuals[i].individualPicture.individualBody);
-			}
+				}
 			indSuspender.length = 0;
 
 			model.removeChild(commStage);
@@ -218,13 +219,28 @@ package{
 						rootEventHandler:ModelEvent.SECOND_CLICK
 						},
 						{
-						sendFromRootObject:'startStopButtonEvent',
+						sendFromRootObject:'stageEvent',//При нажатии на кнопку старт плагины стартуют
 						sendToPluginObject:'startPlugin',
 						rootEventHandler:ModelEvent.FIRST_CLICK
 						},
 						{
 						sendFromRootObject:'stageEvent',
-						sendToPluginObject:'onNewStatistic',
+						sendToPluginObject:'suspendPlugin',
+						rootEventHandler:ModelEvent.SECOND_CLICK
+						},
+						{
+						sendFromRootObject:'startStopButtonEvent',//При нажатии на кнопку старт плагины стартуют
+						sendToPluginObject:'startPlugin',
+						rootEventHandler:ModelEvent.FIRST_CLICK
+						},
+						{
+						sendFromRootObject:'reloadButtonEvent',//При нажатии на кнопку перезапуска плагины останавливаются
+						sendToPluginObject:'suspendPlugin',
+						rootEventHandler:ModelEvent.CLICKING
+						},
+						{
+						sendFromRootObject:'stageEvent',
+						sendToPluginObject:'onNewStatistic',//Плагины будут получать информацию от главной программы, которые могут служить сигналом для его включения или выключения
 						rootEventHandler:ModelEvent.NEW_STATISTIC
 							}];
 				
@@ -351,6 +367,7 @@ package{
 			var counter:int;
 			
 			try{
+				stageEvent.clicking('second_click');//На время, пока будут удалятся особи, приостанавливаем действие плагинов, чтобы они не натыкались на несуществующих особей
 				
 				if(individual > individuals.length){
 					individual = individuals.length;
@@ -377,7 +394,9 @@ package{
 					messenger.removeEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);//Перестаем за ними следить
 					Accumulator.instance.stopRefresh();//И выключаем таймер
 					showMessageWindow();
+					
 				}
+				stageEvent.clicking('first_click');//Когда все готово, запускаем плагины обратно
 			}catch(e:Error){
 				messenger.message(e.message, modelEvent.ERROR_MARK);
 				}

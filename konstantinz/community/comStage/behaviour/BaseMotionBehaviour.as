@@ -112,7 +112,7 @@ package konstantinz.community.comStage.behaviour{
 		
 
 		public function getNewState():String{//На основе выбранного алгоритма поведения определяется новое состояние особи
-			var newState:String = 'nothing'
+			var newState:String = 'nothing';
 			
 			try{
 				

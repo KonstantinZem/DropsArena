@@ -43,7 +43,7 @@ public class activitySwitcher extends Plugin{
 		
 	override public function suspendPlugin(e:ModelEvent):void{
 		msgString = 'Suspend plugin';
-		messenger.message(msgString, 2);
+		messenger.message(msgString, modelEvent.INFO_MARK);
 		stopingTimer.stop();
 		}
 	

@@ -61,7 +61,7 @@
 				if(root==null){
 					throw new Error('Plugin loader not mounted in main program yet');
 					}
-				var counter:int = pluginsList.length
+				var counter:int = pluginsList.length;
 				
 				for(var i:int = 0; i< counter;i++){
 					plugins[i] = new Loader();//Создаем на каждый плагин по загрузчику
@@ -168,7 +168,7 @@
 			}
 			
 		private function linkRootAndPlugisByEvents(pluginNumber:int):void{
-
+			try{
 			if(pluginsEventsList.length>0){//Если нам передали список объектов, которые нужно связать событиями
 				for(var i:int = 0;i<pluginsEventsList.length;i++){
 					if(pluginsEventsList[i].sendToRootObject != undefined){//Если есть событие которое надо отослать в главную программу
@@ -192,6 +192,9 @@
 								}
 							}
 						}
+					}
+				}catch(e:Error){
+					messenger.message(e.message, modelEvent.ERROR_MARK)
 					}
 				}
 			
