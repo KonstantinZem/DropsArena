@@ -36,7 +36,7 @@ public class activitySwitcher extends Plugin{
 		killStoped = 'false';
 		activeOnLoad = 'true';
 		pluginEvent = new DispatchEvent();
-		suspendTime = 5000;
+		suspendTime = 5000;//Устанавливаем время, на которое останавливается особь по умолчанию. Таким образом, через расчитанные промежутки времени особи будут останавливаться на пол секунды
 		numberOfData = 0;
 		messenger.setMessageMark('Activity switcher plugin');
 		}
@@ -62,8 +62,8 @@ public class activitySwitcher extends Plugin{
 		stopInd();
 		}
 	
-	 override public function initSpecial():void{
-		 var time:int;
+	 override public function initSpecial():void{//Функция initSpecial() есть во всех плагинах и содержит специфичные переменные и функции которые надо запустить сразу после запуска плагина
+		 var time:int;//Время на которое будут останавливаться особи
 		 
 		 dispatchedObjects = root.indSuspender;//Чтобы дальше root не встречался в тексте
 		
@@ -109,9 +109,9 @@ public class activitySwitcher extends Plugin{
 							statMessageHead = 'inactive_ind_numb';
 				}
 				
-				time = setTimingQant();
+				time = setTimingQant();//Расчитываем время, через которое будет срабатывать таймер
 				
-				stopingTimer = new Timer(time);
+				stopingTimer = new Timer(time);//Создаем таймер, который будет периодически останавливать особей
 				
 				if(switchingType == 'timer'){
 					stopingTimer.addEventListener(TimerEvent.TIMER, stopIndByTimer);
@@ -127,31 +127,31 @@ public class activitySwitcher extends Plugin{
 				setTimeout(pluginEvent.ready, 500);//Сообщение о том что плагин полностью готов к работе принимается функцией onPluginsJobeFinish в pluginLoader
 		}
 	
-	private function setTimingQant():int{//Расчитываем время между переключениями
+	private function setTimingQant():int{//Расчитываем время между остановками особей
 		try{
 			var stepsFromConfig:String = configuration.getOption(optionPath + 'steps');//Из конфига получаем количество шагов которые должен отработать плагин
-			var numberOfSteps:int;//Временной промежуток для таймера
+			var timeBetwinSteps:int;//Время между остановками особей
 			activeIndividualsNumber = dataPath + '.part';
 			
-			var timeQant:int;
+			var timeQant:int;//Время между переключениями
 			
-			numberOfData = getNumberOfData(activeIndividualsNumber);//Получаем количество заданных вариантов
+			numberOfData = getNumberOfData(activeIndividualsNumber);//Получаем количество заданных в конфиге наблюдений за активностью
 			
 			if(dispatchedObjects[0] == undefined){
 				throw new ReferenceError('Can not find dispatchedObjects');
 				}else{
-					timeQant = dispatchedObjects[0].getTimeQuant();//Получаем время переключения активности из первого драйвера особи
+					timeQant = dispatchedObjects[0].getTimeQuant();//Получаем время между переключениями активности из первого драйвера особи
 					}
 		
 			if(stepsFromConfig == 'Error'){
 				throw new ArgumentError('Number of steps:' + errorType.varIsIncorrect + '. Get it from lifeTime option'); 
 				}else{
-					numberOfSteps = Math.round((int(stepsFromConfig)/numberOfData)*timeQant);//Расчитываем временной промежуток для таймера как (Количество шагов/Количество вариантов)*время таймера
+					timeBetwinSteps = Math.round((int(stepsFromConfig)/numberOfData)*timeQant);//Расчитываем время между остановками особей как (Количество шагов/Количество вариантов)*время таймера
 					}
 		
 			}catch(e:ArgumentError){
 				messenger.message(e.message, modelEvent.ERROR_MARK);
-				numberOfSteps = int(configuration.getOption('main.lifeTime'));//Если для особии количество шагов не заданно, принимаем его как время жизн
+				timeBetwinSteps = int(configuration.getOption('main.lifeTime'));//Если для особии количество шагов не заданно, принимаем его как время жизн
 				}
 			
 			catch(e:ReferenceError){
@@ -160,7 +160,7 @@ public class activitySwitcher extends Plugin{
 				timeQant = 20;//Если не удалось получить информацию о частоте срабатывания таймера от драйвера особи, задаем таймер сами
 				}
 			
-			return numberOfSteps;
+			return timeBetwinSteps;
 		}
 	
 	private function getNumberOfData(dataPath:String):int{

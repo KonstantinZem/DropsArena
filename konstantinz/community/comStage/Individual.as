@@ -311,7 +311,8 @@ package konstantinz.community.comStage{
 		
 		public function markPresenceInPlot():void{
 			if(indStatus != 'dead'){//Если она может двигаться
-				chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals += indStatus;
+				//chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals += indStatus;
+				chessDesk[currentChessDeskI][currentChessDeskJ].cashe += indStatus;
 				}
 			}
 	

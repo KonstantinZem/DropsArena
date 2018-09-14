@@ -8,13 +8,13 @@
 	<indQuntaty>200</indQuntaty>
 	<lifeTime>7000</lifeTime>
 	<lifeQuant>1</lifeQuant>
-	<adultAge>1500</adultAge>
+	<adultAge>1000</adultAge>
 	<maturingDeley>1000</maturingDeley>
 	<offspringsQuant>10</offspringsQuant>
 	<dropSize>12</dropSize>>
 	<!-- initPosition of individual can be left-top, left-bottom,  right-top, right-bottom, center and random -->
 	<initPosition>left-top</initPosition>
-	<statRefreshTime>10</statRefreshTime>
+	<statRefreshTime>5</statRefreshTime>
 	<stepLength>2</stepLength>
 	<pluginsList>plugins/mowing.swf;plugins/ground.swf;plugins/grass.swf;plugins/grass2.swf;plugins/grass3.swf;plugins/grass4.swf;plugins/activity.swf;plugins/death.swf;plugins/morisitaCounter.swf</pluginsList>
 	<arePluginsActiveOnLoading>false</arePluginsActiveOnLoading>
@@ -71,7 +71,7 @@
 		<color>0xf4e17f</color>
 		<behaviour_model>MomentalDeath</behaviour_model>
 		<!--behaviour_frequency individual will change it's behaviour in each second cell-->
-		<behaviour_frequency>10</behaviour_frequency>
+		<behaviour_frequency>30</behaviour_frequency>
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>
@@ -175,7 +175,8 @@
 		<description>Changing activity of individuals on a stage according field observation data</description>
 		<icon></icon>
 		<signal>stop</signal>
-		<steps>6500</steps>
+		<!--Individual lives as long as 6 yearth, but my observings is only tree-->
+		<steps>3500</steps>
 		<debugLevel>1</debugLevel>
 		<selectionType>percents</selectionType>
 		<!--switching_event define the event making plugin work. Can be timer or calendar_data-->
@@ -1336,7 +1337,7 @@
 		<description>Count Morisita index</description>
 		<icon></icon>
 		<debugLevel>1</debugLevel>
-		<refreshTime>20</refreshTime>
+		<refreshTime>5</refreshTime>
 		<plotSize>8</plotSize>
 	</morisitaCounter>
 </plugins>

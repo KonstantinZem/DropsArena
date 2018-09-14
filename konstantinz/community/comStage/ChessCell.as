@@ -10,9 +10,10 @@ public class ChessCell{
 	public var speedDeleyA:int;
 	public var speedDeleyY:int;
 	public var lifeQuant:int;
-	public var numberOfIndividuals:String;
 	public var individualName:int;
+	public var numberOfIndividuals:String;
 	public var behaviourModel:String;
+	public var cashe:String;
 	
 	public function ChessCell(){
 	
