@@ -37,7 +37,7 @@ package konstantinz.community.comStage{
 						throw new Error(errorType.paramError);
 						}
 					}
-				this.squSize = int(extOptions.getOption('main.dropSize'));
+				squSize = int(extOptions.getOption('main.individualSize'));
 				if(squSize<CRITICAL_LEVEL){//Если мы рискуем получить слишком много слишком мелких квадратов
 					throw new Error(errorType.tooSmall + ' ' + errorType.unstableWarning);//Лучше сразу выбросить ошибку, чтобы не повесить комп
 					}

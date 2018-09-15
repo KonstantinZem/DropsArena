@@ -11,7 +11,7 @@
 	<adultAge>1000</adultAge>
 	<maturingDeley>1000</maturingDeley>
 	<offspringsQuant>10</offspringsQuant>
-	<dropSize>12</dropSize>>
+	<individualSize>12</individualSize>
 	<!-- initPosition of individual can be left-top, left-bottom,  right-top, right-bottom, center and random -->
 	<initPosition>left-top</initPosition>
 	<statRefreshTime>5</statRefreshTime>

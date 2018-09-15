@@ -89,8 +89,12 @@ package konstantinz.community.comStage{
 
 				chessDesk = desk;
 			
-				individualPicture = new IndividualGraphicInterface();
-				individualPicture.setIndividualSize(int(indConfiguration.getOption('main.dropSize')));
+				individualPicture = new IndividualGraphicInterface(
+					2,
+					int(indConfiguration.getOption('main.individualSize')),//Максимальный размер особи
+					adultAge
+					);
+					
 				individualPicture.drawIndividual();
 			
 				motionBehaviour = new MotionBehaviourSwitcher(chessDesk);
@@ -203,6 +207,7 @@ package konstantinz.community.comStage{
 			deleySteps--;//Уменьшаем количество пропущеных ходов
 						
 			var amIAdult:Boolean = isIndividualAdult();//Стоит здесь, так как взрослеть особь должна в не зависимости от того, стоит она на месте или движется
+			var indAgeState:String = 'young';
 			
 			if(indStatus != 'dead' && deleySteps==0){//И если отстояли на месте положенное количество тиков таймера, двигаемся дальше
 				
@@ -211,6 +216,8 @@ package konstantinz.community.comStage{
 				var amIAlong:Boolean = isIndividualAlong();
 			
 				if(amIAdult){
+					indAgeState = 'adult';
+				
 					if(!amIAlong){
 						if(chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals =='AA'){//Если встретились две взрослые
 						maturing();
@@ -222,8 +229,11 @@ package konstantinz.community.comStage{
 				currentChessDeskJ = myBehaviour.getNewPosition(currentChessDeskI,currentChessDeskJ).y;
 				chessDesk[currentChessDeskI][currentChessDeskJ].individualName = indNumber;
 			
-				individualPicture.individualBody.x = chessDesk[currentChessDeskI][currentChessDeskJ].sqrX;
-				individualPicture.individualBody.y = chessDesk[currentChessDeskI][currentChessDeskJ].sqrY;
+				individualPicture.nextStep(//Передаем координаты, куда особи надо переместится на следующем шаге
+					chessDesk[currentChessDeskI][currentChessDeskJ].sqrX + 1,
+					chessDesk[currentChessDeskI][currentChessDeskJ].sqrY +1,
+					indAgeState//Взрослая ли уже особь или еще надо расти
+					);
 				
 			  }
 			  
@@ -246,7 +256,6 @@ package konstantinz.community.comStage{
 			msgString = 'Individual ' + indNumber + ' is dead. R.I.P. \n' + 'It lived ' + Math.round((deltaTime)*0.00006) + ' min';
 			messenger.message(msgString, modelEvent.INFO_MARK);
 			
-			//individualPicture = null;
 			messenger = null;
 			motionBehaviour = null;
 			indConfiguration = null;
@@ -260,7 +269,7 @@ package konstantinz.community.comStage{
 			
 ////////////////////////////Public////////////////////////////////////////////////////
 		
-		public function externalTimer():void{
+		public function externalTimer():void{ //Возможность управлять особью при помощью внешнего таймера
 			timerForIndividuals.stop();
 			msgString = 'Individual number '+ indNumber + ': ' + 'Internal timer has stoped';
 			messenger.message(msgString, modelEvent.DEBUG_MARK);
@@ -311,7 +320,6 @@ package konstantinz.community.comStage{
 		
 		public function markPresenceInPlot():void{
 			if(indStatus != 'dead'){//Если она может двигаться
-				//chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals += indStatus;
 				chessDesk[currentChessDeskI][currentChessDeskJ].cashe += indStatus;
 				}
 			}
