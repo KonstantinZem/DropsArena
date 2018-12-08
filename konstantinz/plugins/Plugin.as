@@ -17,6 +17,8 @@ public class Plugin extends Sprite{
 	protected var statisticFromRoot:Array;
 	protected var currentDay:String;
 	protected var alreadyInited:String;
+	protected var switchingInterval:int;//Интервал между включениями плагина
+	protected var processingTimes:int//Количество циклов, оставшиеся до следующего срабатывания
 	
 	protected var errorType:ModelErrors;
 	protected var modelEvent:ModelEvent
@@ -46,7 +48,7 @@ public class Plugin extends Sprite{
 	public function initPlugin(e:ModelEvent):void{//Функция запускается сообщением PLUGIN_LOADED из pluginLoader
 			
 		if(alreadyInited != 'true'){//Чтобы не инициироваться по сто раз после прихода сообшщения от других плагинов
-			dispatchedObjects = root.indSuspender;//Чтобы дальше root не встречался в тексте
+			dispatchedObjects = root.individuals;//Чтобы дальше root не встречался в тексте
 			configuration = root.configuration;
 			optionPath = 'plugins.'+ pluginName + '.';//Формируем путь к настройкам в XML файле на основе имя файла плагина
 			communityStage = root.commStage;
@@ -60,6 +62,12 @@ public class Plugin extends Sprite{
 			messenger.message(msgString, modelEvent.INIT_MSG_MARK);
 				
 			switchingType = configuration.getOption(optionPath + 'switching_event');
+			switchingInterval = int(configuration.getOption(optionPath + 'switchingInterval'));
+				
+				if(switchingInterval == 0){
+					msgString = 'Plugin ' + pluginName + ' switching interval not set. Plugin will start one time';
+					messenger.message(msgString, modelEvent.INIT_MSG_MARK);
+					}
 				
 				if(switchingType != 'timer' && switchingType != 'calendar_data'){//Если в конфиге тип переключения не указан или указан неправильно
 					switchingType = 'timer';//даем переменной значение по умолчанию timer
@@ -82,6 +90,16 @@ public class Plugin extends Sprite{
 		
 		}
 	
+	public function process():void{
+	
+		if(switchingInterval > 0 && processingTimes == switchingInterval){
+			startPluginJobe();
+			processingTimes = 0;
+			}else{
+				processingTimes ++;
+				}
+		}
+	
 	public function startPlugin(e:ModelEvent):void{
 		
 		}
@@ -90,7 +108,7 @@ public class Plugin extends Sprite{
 		
 		}
 		
-	public function onNewStatistic(e:ModelEvent):void{
+	public function onNewStatistic(e:ModelEvent):void{//За счет этой функции плагин периодически запускается 
 		if(switchingType == 'calendar_data' && e.target != pluginName){//Если к нам не пришло наше собственное сообщение
 			statisticFromRoot = e.target.message.split(':');
 			

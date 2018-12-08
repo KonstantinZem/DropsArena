@@ -13,6 +13,8 @@ package{
     
     import flash.display.Sprite;
 	import flash.events.Event; 
+	import flash.events.TimerEvent; 
+	import flash.utils.Timer;
 	import konstantinz.community.comStage.*;
 	import konstantinz.community.comStage.behaviour.BehaviourChoicer;
 	import konstantinz.community.auxilarity.*;
@@ -21,7 +23,10 @@ package{
     public class main extends Sprite{
 		
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
-		private const CRITIAL_IND_NUMBER:int = 5;//Минимально подходящие для отслеживания статистики количество особей
+		private const MIN_INDIVIDUAL_CRITICAL_NUMBER:int = 5;//Минимально подходящие для отслеживания статистики количество особей
+		private const MAX_INDIVIDUAL_CRITICAL_NUMBER:int = 3000;
+		private const PAUSE_AFTER_CYCLE:int = 5;//Время паузы между циклами передвижения особей
+		private const DEAD_INDIVIDUALS_REMOVING_INTERVAL:int = 100;
 		
 		private var stgHeight:int;
 		private var stgWidth:int;
@@ -37,8 +42,9 @@ package{
 		private var eventsForPlugins:Object;
 		private var eventsForPluginsList:Array;
 		private var modelEvent:ModelEvent;
+		private var stepTimer:Timer;
+		private var numberOfCycles:int;
 		
-		public var indSuspender:Vector.<Suspender>//Структура, через которую особей можно на нужное время останавливать
 		public var individuals:Vector.<Individual>;
 		public var model:Sprite;
 		public var plugins:PluginLoader;
@@ -51,7 +57,6 @@ package{
 		public var stageEvent:DispatchEvent;
 
 		public function main(){
-			
 			stgHeight = parent.stage.stageHeight;
 			stgWidth = parent.stage.stageWidth;
 			initConfig();	
@@ -79,15 +84,11 @@ package{
 			messenger = null;
 			
 			counter = individuals.length;
-			
-			for(var i:int = 0;i< counter;i++){//Полностью останавливаем особей и убираем их со сцены
-				indSuspender[i].stopIndividual(0);
-				commStage.removeChild(individuals[i].individualPicture.individualBody);
-				}
-			indSuspender.length = 0;
 
 			model.removeChild(commStage);
+			if(plugins != null){
 			model.removeChild(plugins);
+		}
 			
 			statusBar.clear();
 			startStopButton.clear();
@@ -118,6 +119,7 @@ package{
 			var initPosition:String;//Каким образом будут добавлятся первые особи
 			var intX:int = 0;//Первоначальная координата по x
 			var intY:int = 0;//Первоначальная координата по y
+			numberOfCycles = 0;
 			
 			configuration.removeEventListener(ConfigurationContainer.LOADED, init);//Эти листенеры уже отработали и не неужны
 			configuration.removeEventListener(ConfigurationContainer.LOADING_ERROR, init);
@@ -127,8 +129,11 @@ package{
 			messenger.setMessageMark('Main');
 			messenger.addEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);
 						
-			versionText = new myVersion('0.85',debugLevel);
+			versionText = new myVersion('0.95',debugLevel);
 			modelEvent = new ModelEvent();//Будем брать основные константы от сюда
+			
+			stepTimer = new Timer(PAUSE_AFTER_CYCLE);
+			stepTimer.addEventListener(TimerEvent.TIMER, makeToStepNextIndividual);
 			
 			if(configuration.getOption('main.behaviourSwitching.enable') == 'true'){
 			
@@ -152,7 +157,6 @@ package{
 			indNumber = int(configuration.getOption('main.indQuntaty'));
 			
 			individuals = new Vector.<Individual>(indNumber);
-			indSuspender = new Vector.<Suspender>(indNumber);
 			
 			statRefreshTime = configuration.getOption('main.statRefreshTime');
 			Accumulator.instance.setDebugLevel(debugLevel);
@@ -303,14 +307,10 @@ package{
 			
 			for (var i:int = 0; i< indNumber; i++){
 				individuals[i] = new Individual(commStage.chessDesk,configuration,i,indX,indY);
-				indSuspender[i] = new Suspender(individuals[i],commStage.chessDesk,configuration)
 				
 				commStage.addChild(individuals[i].individualPicture.individualBody);
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
-				individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
-				individuals[i].motionBehaviour.setSuspender(indSuspender[i]);
-				
-				indSuspender[i].stopIndividual(0);//Останавливаем особей. Потом они запустятся кнопкой Старт
+				individuals[i].externalTimer();
 			}
 			msgString = IND_NUMB + individuals.length;
 			messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
@@ -330,12 +330,9 @@ package{
 				indYRnd = Math.round(Math.random() * chessDeskLengthY);
 				
 				individuals[i] = new Individual(commStage.chessDesk,configuration,i,indXRnd,indYRnd);
-				indSuspender[i] = new Suspender(individuals[i],commStage.chessDesk,configuration);
 				commStage.addChild(individuals[i].individualPicture.individualBody);
 				
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
-				individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
-				individuals[i].motionBehaviour.setSuspender(indSuspender[i]);
 			}
 			msgString = IND_NUMB + individuals.length;
 			messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
@@ -350,53 +347,50 @@ package{
 					var newX:int = e.target.currentChessDeskI;
 					var newY:int = e.target.currentChessDeskJ;
 					individuals[i] = new Individual(commStage.chessDesk, configuration, i,newX,newY);
-					indSuspender[i] = new Suspender(individuals[i],commStage.chessDesk,configuration);
 					
 					commStage.addChild(individuals[i].individualPicture.individualBody);
 					
 					individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
-					individuals[i].IndividualEvent.addEventListener(ModelEvent.DEATH, removeIndividuals);
-					individuals[i].motionBehaviour.setSuspender(indSuspender[i]);
+					individuals[i].externalTimer();
 				}
 				msgString = IND_NUMB + individuals.length;
 			    messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
-		}
+			}
 		
-		private function removeIndividuals(e:Event):void{
-			var individual:int = e.target.individual;//Получаем номер особи, которую надо удалить
+		private function removeIndividuals():void{
 			var counter:int;
-			
+			var removedInd:int = 0
 			try{
-				stageEvent.clicking('second_click');//На время, пока будут удалятся особи, приостанавливаем действие плагинов, чтобы они не натыкались на несуществующих особей
-				
-				if(individual > individuals.length){
-					individual = individuals.length;
+				for(var i:int = 0; i< individuals.length; i++){
+					if(individuals[i].statement() == 'dead'){
+						commStage.removeChild(individuals[i].individualPicture.individualBody);
+						individuals[i] = null;//Убираем из массива особей
+						removedInd++;
+						}
 					}
-				individuals[individual].IndividualEvent.removeEventListener(ModelEvent.DEATH, removeIndividuals);
-				commStage.removeChild(individuals[individual].individualPicture.individualBody);
-				individuals[individual] = null;//Убираем из массива особей
-				indSuspender[individual] = null;//И связанные с ними драйверы
-			
-				indSuspender.splice(individual,1);//Ужимаем массивы
-				individuals.splice(individual,1);
+				
+				counter = individuals.length;	
+				for(i= 0; i< individuals.length; i++){
+					if(!individuals[i]){
+						individuals.splice(i,1);
+						i = 0;
+					}	
+				}
+				
+				if(!individuals[0]){
+						individuals.splice(0,1);
+						i = 0;
+					}
 			
 				counter = individuals.length;
-				for(var i:int = 0; i< counter; i++){
-					individuals[i].setName(i);//После ужимания массива делаем так, чтобы имя особи совпадало с ее позицией
+				for(i = 0; i< counter; i++){
+					individuals[i].name(i);//После ужимания массива делаем так, чтобы имя особи совпадало с ее позицией
 				}
 			
 				msgString = 'Now number of individuals is ' + individuals.length;
 				messenger.message(msgString, modelEvent.INFO_MARK);
 				msgString = IND_NUMB + individuals.length;
 				messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
-			
-				if(individuals.length < CRITIAL_IND_NUMBER){//Если особей слишком мало
-					messenger.removeEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);//Перестаем за ними следить
-					Accumulator.instance.stopRefresh();//И выключаем таймер
-					showMessageWindow();
-					
-				}
-				stageEvent.clicking('first_click');//Когда все готово, запускаем плагины обратно
 			}catch(e:Error){
 				messenger.message(e.message, modelEvent.ERROR_MARK);
 				}
@@ -406,7 +400,7 @@ package{
 			}
 		
 		private function onPluginsLoading(e:ModelEvent):void{
-			if(plugins.loaderEvent.pluginName=='last'){
+			if(plugins.loaderEvent.pluginName =='last'){
 				addChild(startStopButton);//Когда плагины загрузились, показываем кнопку старта. Иначе могут случатся ошибки, когда плагин еще не загрузился а юзер уже пытается его остановить кнопкой
 				addChild(reloadButton);
 				plugins.loaderEvent.removeEventListener(ModelEvent.PLUGIN_LOADED, onPluginsLoading);//Когда плагины загрузились, больше не нужно ждать сообщений об окончании загрузки
@@ -423,19 +417,21 @@ package{
 			
 			counter = individuals.length;
 			for(var i:int = 0; i< counter; i++){
-				indSuspender[i].stopIndividual(1);
+				individuals[i].statement('moving');
 				}
+			
 			msgString = 'Individuals begin to move';
 			messenger.message(msgString, modelEvent.INFO_MARK);
 			Accumulator.instance.startRefresh();
+			stepTimer.start();
 			}
 		
 		private function onStopClick(e:ModelEvent):void{//Действия по нажатию на кнопку стоп
 			var counter:int;
-			
+			stepTimer.stop();
 			counter = individuals.length;
 			for(var i:int = 0; i< counter; i++){
-				indSuspender[i].stopIndividual(0);
+				individuals[i].statement('suspend');
 				}
 			msgString = 'Individuals has stoped';
 			messenger.message(msgString, modelEvent.INFO_MARK);
@@ -445,18 +441,20 @@ package{
 			}
 		
 		private function onReloadClick(e:ModelEvent):void{//При нажатии на кнопку перезагрузки модели
-			
 			removeAllObjects();//Очищаем все объекты модели
 			initConfig();//Запускаем программу с самого начала
+			stepTimer.stop();
 			}
 			
 		private function onConditionsChange(e:Event):void{
 			var condition:String = e.target.behaviourName;
-			var counter:int;
+			//var counter:int;
 			
-			counter = individuals.length;
-			for(var i :int = 0; i< counter; i++){
-				individuals[i].motionBehaviour.switchBehaviour(condition)
+			//counter = individuals.length;
+			for(var i :int = 0; i< individuals.length; i++){
+				if(individuals[i] != null){
+				individuals[i].behaviour(condition);
+				}
 				}
 			}
 		
@@ -467,6 +465,31 @@ package{
 			msgWindow.x = 100;
 			msgWindow.y = 100;
 			}
-
+		
+		private function makeToStepNextIndividual(e:Event):void{
+			indNumber = individuals.length;
+			numberOfCycles++;
+			
+			if(indNumber < MAX_INDIVIDUAL_CRITICAL_NUMBER && indNumber > MIN_INDIVIDUAL_CRITICAL_NUMBER){
+			for(var i:int = 0; i< indNumber; i++){
+				individuals[i].doStep();
+				}
+			}else{
+				showMessageWindow();
+				Accumulator.instance.stopRefresh();
+				msgString = 'Emulation has finished. Number of individuals is ' + individuals.length;
+				messenger.message(msgString, modelEvent.INFO_MARK);
+				}
+			
+			if(numberOfCycles > DEAD_INDIVIDUALS_REMOVING_INTERVAL){
+				removeIndividuals();
+				numberOfCycles = 0;
+				}
+		if(plugins != null){	
+			for(i = 0; i < plugins.plugins.length; i++ ){
+				plugins.plugins[i].content.plEntry.process();
+				}
+			}
+		}
     }
 }

@@ -12,6 +12,7 @@
 package konstantinz.community.comStage{
 	
 	import flash.events.TimerEvent; 
+	import flash.events.Event; 
 	import flash.utils.*;
 	import konstantinz.community.comStage.*;
 	import konstantinz.community.comStage.behaviour.*;
@@ -19,9 +20,11 @@ package konstantinz.community.comStage{
 
 	public class Individual{
 		//Класс, описывающий поведение отдельного организма в сообществе
+		private const YSIGN:String = 'Y';//Young
+		private const ASIGN:String = 'A';//Adult
 		
 		private var tickInterval:int = 20;//Интервал между тиками таймера
-		private var lifeStart:Date
+		private var lifeStart:Date;
 		private var lifeEnd:Date;
 		private var date:Date;
 		private var indNumber:int;
@@ -32,6 +35,7 @@ package konstantinz.community.comStage{
 		private var currentChessDeskJ:int;//Номер столбца текущего квадрата
 		private var previosChessDeskI:int;
 		private var previosChessDeskJ:int
+		private var lifeTime:int;
 		private var stepLength:int;//Длинна шага особи
 		private var indDirection:int;//Текущие направление
 		private var deleySteps:int;//количество ходов, которые надо пропустить для замедления движения
@@ -40,40 +44,52 @@ package konstantinz.community.comStage{
 		private var debugLevel:String;
 		private var indStatus:String;//Так как особи могут подаваться внешние команды, надо всегда знать может ли особь эти команды выполнить
 		private var currentBehaviourName:String;//Переключаться поведение будет только если название поведения из пришедшего сообщения будет отличаться от записанного сюда
-		private var myBehaviour:BaseMotionBehaviour;
-		private var modelEvent:ModelEvent;
+		
 		private var indConfiguration:ConfigurationContainer;
 		private var messenger:Messenger;
+		
+		private var myBehaviour:BaseMotionBehaviour;
+		private var motionBehaviour:MotionBehaviourSwitcher;
+		private var stepDispatcher:StepDispatcher;
+		
+		private var modelEvent:ModelEvent;
 		private var errorType:ModelErrors;//Контейнер для ошибок;
 		private var timerForIndividuals:Timer; //Не самое удачное решение, снабдить каждую особь своим таймером, но сделать один из главного класса у меня не получается
-				
+		
 		public var IndividualEvent:DispatchEvent;
-		public var motionBehaviour:MotionBehaviourSwitcher;
 		public var individualPicture:IndividualGraphicInterface;
 		
 		
-		function Individual(desk:Array, behaviour:ConfigurationContainer, ...args){
+		function Individual(desk:Array, configuration:ConfigurationContainer, ...args){
 
 			IndividualEvent = new DispatchEvent();
 			errorType = new ModelErrors();
 			
 			try{
-				indConfiguration = behaviour;
+				indConfiguration = configuration;
 				debugLevel = indConfiguration.getOption('main.debugLevel');
 				messenger = new Messenger(debugLevel);
 				messenger.setMessageMark('Individual');
 				modelEvent = new ModelEvent();//Будем брать основные константы от сюда
 				indNumber = args[0];
 				
+				stepDispatcher = new StepDispatcher();
+				
+				stepDispatcher.addEventListener(StepDispatcher.DO_STEP, step);
+				stepDispatcher.addEventListener(StepDispatcher.SUSPEND, markSuspendede);
+				lifeTime = int(indConfiguration.getOption('main.lifeTime'));
+				stepDispatcher.setLifeTime(lifeTime);
+				
 				previosChessDeskI = 0;
 				previosChessDeskJ = 0;
 				
-			
 				if(args[0]==undefined){
-					indNumber = Math.round(Math.random()*1000);;
+					indNumber = Math.round(Math.random()*1000);
 					msgString = 'Individual ' + errorType.idUndefined + ' There were set random name ' + indNumber;
 					messenger.message(msgString, modelEvent.INFO_MARK);
 					}
+				
+				stepDispatcher.setIndividualNumber (indNumber);
 				
 				stepLength = int(indConfiguration.getOption('main.stepLength'));
 				
@@ -103,6 +119,7 @@ package konstantinz.community.comStage{
 				myBehaviour = motionBehaviour.newBehaviour;
 				myBehaviour.setIndividualNumber(indNumber);
 				myBehaviour.setStepLength(stepLength);
+				motionBehaviour.setSuspender(stepDispatcher);
 			
 				if(args[1]==undefined||args[2]==undefined){
 					currentChessDeskI = 0;//Если не указано начальное положение особи, начинаем двигаться с верхнего левого угла (первый квадрат)
@@ -131,8 +148,6 @@ package konstantinz.community.comStage{
 			}
 /////////////////////////Private//////////////////////////////////////////////////////////////////////
 		
-		
-		
 		private function isIndividualAdult():Boolean{
 			//функция полностью платформонезависимая
 			//Определяет повзрослела ли особь
@@ -152,29 +167,21 @@ package konstantinz.community.comStage{
 		
 		private function isIndividualAlong():Boolean{//Есть ли в заданном квадрате кто либо еще
 			//Функция платформонезависимая
-			var YSIGN:String = 'Y';//Young
-			var ASIGN:String = 'A';//Adult
 			
 			if(adultAge < 0){
 				chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals +=ASIGN;//Делаем в квадрате отметку своего присутсвия
 				indStatus = ASIGN;
 			}else{
 				chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals +=YSIGN;//В квадрате побывала молодая особь
-				indStatus =YSIGN;
+				indStatus = YSIGN;
 				}
 			
 			if(chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals.length == 2 && chessDesk[currentChessDeskI][currentChessDeskJ].individualName != indNumber){//Если встретились две особи
-				
-				if(deleySteps > 2){//если перемещение происходит слишком быстро, не переключаем цвета
-					individualPicture.markIndividual('collision');//Визуально отмечаем факт встречи особей
-					}
-				
 				return false;
+				
 				}else{
-					 individualPicture.markIndividual('nothing'); //Визуально показываем, что ничего не произошло					
-					 
-					 return true;
-				}
+					return true;
+					}
 			}
 
 		
@@ -197,34 +204,38 @@ package konstantinz.community.comStage{
 			}
 		private function internalMoveImpuls(event:TimerEvent):void{//Заставляем особь двигаться по собственному таймеру
 			nextStep();
+			stepDispatcher.stepDone();
 			}
 		
 		
 		private function nextStep():void{
-		
-			individualPicture.markIndividual('nothing');
+
 			//функция платформонезавмсимая, при условии, что кто то будет читать переменную individual.x и individual.y и на изменять сведения о положении особи
-			deleySteps--;//Уменьшаем количество пропущеных ходов
+			if(deleySteps > 0){
+				deleySteps--;//Уменьшаем количество пропущеных ходов
+			}
 						
 			var amIAdult:Boolean = isIndividualAdult();//Стоит здесь, так как взрослеть особь должна в не зависимости от того, стоит она на месте или движется
 			var indAgeState:String = 'young';
 			
-			if(indStatus != 'dead' && deleySteps==0){//И если отстояли на месте положенное количество тиков таймера, двигаемся дальше
+			if(stepDispatcher.getState() == 'moving' && deleySteps==0){//И если отстояли на месте положенное количество тиков таймера, двигаемся дальше
 				
 				deleySteps = myBehaviour.getPlaceQuality(currentChessDeskI,currentChessDeskJ);//Смотрим на новой клетке число ходов
 			
 				var amIAlong:Boolean = isIndividualAlong();
-			
-				if(amIAdult){
-					indAgeState = 'adult';
-				
+	
 					if(!amIAlong){
+					  individualPicture.markIndividual('collision');//Визуально отмечаем факт встречи особей
+					  if(amIAdult){
+					    indAgeState = 'adult'
 						if(chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals =='AA'){//Если встретились две взрослые
-						maturing();
+						   maturing();
+					       }
 						}
-					}
-				}
-			
+					}else{
+						individualPicture.markIndividual('nothing');
+						}
+						
 				currentChessDeskI = myBehaviour.getNewPosition(currentChessDeskI,currentChessDeskJ).x;
 				currentChessDeskJ = myBehaviour.getNewPosition(currentChessDeskI,currentChessDeskJ).y;
 				chessDesk[currentChessDeskI][currentChessDeskJ].individualName = indNumber;
@@ -234,17 +245,21 @@ package konstantinz.community.comStage{
 					chessDesk[currentChessDeskI][currentChessDeskJ].sqrY +1,
 					indAgeState//Взрослая ли уже особь или еще надо расти
 					);
-				
-			  }
+				}
 			  
 			  if(chessDesk[currentChessDeskI][currentChessDeskJ].behaviourModel != ''){//Если в новом квадарте указанно поведение, которое особь должна начать проявлять
 				motionBehaviour.switchBehaviour(chessDesk[currentChessDeskI][currentChessDeskJ].behaviourModel);//Включаем этот тип
 				}
+				if(stepDispatcher.getState() == 'dead'){
+				  killIndividual();
+				  }
 		}
 			
 		private function killIndividual():void{//Убирает особь со сцены
 			//функция относительно платформонезависимая, так как таймеры и слушатели событий есть и в других языках
-			indStatus = 'dead';//Теперь, если кто то попытается обратится к особи, он будет по крайне мере знать, что она присмерти
+			stepDispatcher.setState('dead');//Теперь, если кто то попытается обратится к особи, он будет по крайне мере знать, что она присмерти
+			individualPicture.markIndividual('dead');
+		
 			var deltaTime:int;
 				
 			lifeEnd = new Date();
@@ -255,16 +270,6 @@ package konstantinz.community.comStage{
 			
 			msgString = 'Individual ' + indNumber + ' is dead. R.I.P. \n' + 'It lived ' + Math.round((deltaTime)*0.00006) + ' min';
 			messenger.message(msgString, modelEvent.INFO_MARK);
-			
-			messenger = null;
-			motionBehaviour = null;
-			indConfiguration = null;
-			lifeEnd = null;
-			lifeStart = null;
-			IndividualEvent.individual = indNumber;//Посылаем сообщение о том что особь с этим номером
-			IndividualEvent.death();//Умерла
-				
-			errorType = null;
 			}
 			
 ////////////////////////////Public////////////////////////////////////////////////////
@@ -276,11 +281,17 @@ package konstantinz.community.comStage{
 			}
 			
 		public function doStep():void{//Заставляем особь двигаться по внешнему таймеру
-			if(indStatus != 'dead'){//Если она может двигаться
-				nextStep();
-				}
+			stepDispatcher.doStep();
+			}
+		private function step(e:Event):void{//Вызывается из indDispatcher каждй раз, когда из него приходит событие StepDispatcher.DO_STEP
+			nextStep();
+			stepDispatcher.stepDone();
 			}
 		
+		private function markSuspendede(e:Event):void{
+			individualPicture.markIndividual('stoped');
+			}
+			
 		public function stop():void{//Так особь можно заставить остановится
 			msgString = 'Individual number '+ indNumber + ' has been stoped';
 			messenger.message(msgString, modelEvent.DEBUG_MARK);
@@ -297,34 +308,52 @@ package konstantinz.community.comStage{
 			return tickInterval;
 			}
 		
-		//Сюда надо ввести еще 2 функции: indSleep() и indWakeUp() первая из них останавливает таймер и особь замирает. Вторая включает таймер и особь начинает двигаться
-		public function getName():int{
+		public function name(newNumber:int = -1):int{
+			if(newNumber > 0){
+				var oldNumber:int = indNumber;
+				indNumber = newNumber;
+				myBehaviour.setIndividualNumber(newNumber);
+				stepDispatcher.setIndividualNumber (newNumber);
+				msgString = 'Individual has change it number from ' + oldNumber + ' to ' + newNumber;
+				messenger.message(msgString, modelEvent.DEBUG_MARK);
+				}
 			return indNumber;
-			}
-		
-		public function setName(newNumber:int):void{
-			var oldNumber:int = indNumber;
-			indNumber = newNumber;
-			myBehaviour.setIndividualNumber(newNumber);
-			msgString = 'Individual has change it number from ' + oldNumber + ' to ' + newNumber;
-			messenger.message(msgString, modelEvent.DEBUG_MARK);
 		}
 	
 		public function kill():void{
-			if(indStatus != 'dead'){//Если она может двигаться
+			if(stepDispatcher.getState() != 'dead'){//Если она может двигаться
 				msgString = 'Individual ' + indNumber + 'has killed';
 				messenger.message(msgString, modelEvent.INFO_MARK);
 				killIndividual();
 				}
 			}
-		
-		public function markPresenceInPlot():void{
-			if(indStatus != 'dead'){//Если она может двигаться
-				chessDesk[currentChessDeskI][currentChessDeskJ].cashe += indStatus;
-				}
+		public function statement(statementName:String = 'empty', statementLength:int = 0):String{
+				switch(statementName){
+					case 'suspend':
+					stepDispatcher.setState ('suspend', statementLength);
+					break
+					case 'empty':
+					
+					break;
+					default:
+						msgString = 'Wrong statement name ' + statementName;
+						messenger.message(msgString, modelEvent.ERROR_MARK);
+					break
+					}
+				
+				return stepDispatcher.getState();
 			}
-	
-			
-		}
-
+		
+		public function behaviour(newBehaviour:String = 'empty'):String{
+			var currentBehaviourName:String = 'undefined'
+				if(motionBehaviour != null){
+					if(newBehaviour == 'empty'){
+						currentBehaviourName = motionBehaviour.getCurrentBehaviour()
+					}else{
+						motionBehaviour.switchBehaviour(newBehaviour);
+						}
+					}
+				return currentBehaviourName;
+			}
+	}
 }

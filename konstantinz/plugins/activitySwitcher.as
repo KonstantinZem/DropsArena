@@ -4,7 +4,6 @@ import flash.events.Event
 
 	import flash.display.Sprite;
 	import flash.errors.IllegalOperationError;
-	import flash.events.TimerEvent; 
 	import flash.utils.*;
 	import konstantinz.community.auxilarity.*;
 	import konstantinz.community.comStage.*;
@@ -14,20 +13,17 @@ public class activitySwitcher extends Plugin{
 	private const CRITIAL_IND_NUMBER:int = 3;//До какого количество особей плагин будет работать
 	private const MAX_OPTIONS_LIST_SIZE:int = 1000;//Чтобы небыло бесконечных поисковых циклов, их надо ограничить
 	
-	private var dispatchedObjects:Vector.<Suspender>//Ссылка на массив с управляемыми объектами
+	private var dispatchedObjects:Vector.<Individual>//Ссылка на массив с управляемыми объектами
 	private var stopedObjects:Array;//Список остановленных в данный момент особей
 	private var optionPosition:Array;
-	private var suspendTime:int;//Время на которое нужно остановить особь
 	private var numberOfData:int;//Количество наблюдений (переключений) в конфигурационном файле
 	private var cycleCounter:int;
 	private var currentActivitIndNumber:int = 1;//Позиция в таблице активности где надо искать текущее число особей, которых необходимо остановить
 	private var activeIndividualsNumber:String;
-	private var timerStatement:String;
 	private var signalType:String;
 	private var selectionType:String;//percents or items
 	private var killStoped:String;//Будудт ли подвержены случайной смерти неактивные особи
 	private var dataPath:String;
-	private var stopingTimer:Timer;//Этот таймер включается сразу после запуска плагина и заставляет особей останавливаться через заданный промежуток времени
 	private var calendarData:String
 	private var firstInit:String
 	
@@ -36,26 +32,8 @@ public class activitySwitcher extends Plugin{
 		killStoped = 'false';
 		activeOnLoad = 'true';
 		pluginEvent = new DispatchEvent();
-		suspendTime = 5000;//Устанавливаем время, на которое останавливается особь по умолчанию. Таким образом, через расчитанные промежутки времени особи будут останавливаться на пол секунды
 		numberOfData = 0;
 		messenger.setMessageMark('Activity switcher plugin');
-		}
-		
-	override public function suspendPlugin(e:ModelEvent):void{
-		msgString = 'Suspend plugin';
-		messenger.message(msgString, modelEvent.INFO_MARK);
-		stopingTimer.stop();
-		}
-	
-	override public function startPlugin(e:ModelEvent):void{
-		
-		msgString = 'Restart plugin ';
-		messenger.message(msgString, modelEvent.INFO_MARK);
-		
-		if(switchingType == 'timer'){
-			stopingTimer.start();
-			}
-			
 		}
 		
 	override public function startPluginJobe():void{
@@ -63,18 +41,17 @@ public class activitySwitcher extends Plugin{
 		}
 	
 	 override public function initSpecial():void{//Функция initSpecial() есть во всех плагинах и содержит специфичные переменные и функции которые надо запустить сразу после запуска плагина
-		 var time:int;//Время на которое будут останавливаться особи
 		 
-		 dispatchedObjects = root.indSuspender;//Чтобы дальше root не встречался в тексте
+		 dispatchedObjects = root.individuals;//Чтобы дальше root не встречался в тексте
 		
 		 dataPath = 'plugins.' + pluginName + '.data.observation';
 		 calendarData = dataPath + '.day';
 				
-		 optionPosition = new Array(0,0,0,0,0);
+		 optionPosition = new Array(0,0,0,0,0);//Положение нужной нам опции в узле. Воовще это не хороше лазить по XML файлу вслепую без учета имен тегов
 				
 		 currentDay = configuration.getOption(calendarData, optionPosition);//Берем из аттрибутов дату наблюдения
 				
-		signalType = configuration.getOption(optionPath + 'signal');
+		 signalType = configuration.getOption(optionPath + 'signal');
 								
 		if(signalType=='kill'){//Если плагин настроен чтобы убивать особей
 		   killStoped = configuration.getOption(optionPath + 'killStoped');//Узнаем, должны ли мы убивать всех подряд или только активных осоей
@@ -109,58 +86,11 @@ public class activitySwitcher extends Plugin{
 							statMessageHead = 'inactive_ind_numb';
 				}
 				
-				time = setTimingQant();//Расчитываем время, через которое будет срабатывать таймер
-				
-				stopingTimer = new Timer(time);//Создаем таймер, который будет периодически останавливать особей
-				
-				if(switchingType == 'timer'){
-					stopingTimer.addEventListener(TimerEvent.TIMER, stopIndByTimer);
-					}
-				
-				if(activeOnLoad=='true' && switchingType == 'timer'){
-					stopingTimer.start();
-					}
-					
+				activeIndividualsNumber = dataPath + '.part';
+				numberOfData = getNumberOfData(activeIndividualsNumber);//Получаем количество заданных в конфиге наблюдений за активностью
 				cycleCounter = 1;
 				msgString = 'cycle: ' + cycleCounter;
-				
-				setTimeout(pluginEvent.ready, 500);//Сообщение о том что плагин полностью готов к работе принимается функцией onPluginsJobeFinish в pluginLoader
-		}
-	
-	private function setTimingQant():int{//Расчитываем время между остановками особей
-		try{
-			var stepsFromConfig:String = configuration.getOption(optionPath + 'steps');//Из конфига получаем количество шагов которые должен отработать плагин
-			var timeBetwinSteps:int;//Время между остановками особей
-			activeIndividualsNumber = dataPath + '.part';
-			
-			var timeQant:int;//Время между переключениями
-			
-			numberOfData = getNumberOfData(activeIndividualsNumber);//Получаем количество заданных в конфиге наблюдений за активностью
-			
-			if(dispatchedObjects[0] == undefined){
-				throw new ReferenceError('Can not find dispatchedObjects');
-				}else{
-					timeQant = dispatchedObjects[0].getTimeQuant();//Получаем время между переключениями активности из первого драйвера особи
-					}
-		
-			if(stepsFromConfig == 'Error'){
-				throw new ArgumentError('Number of steps:' + errorType.varIsIncorrect + '. Get it from lifeTime option'); 
-				}else{
-					timeBetwinSteps = Math.round((int(stepsFromConfig)/numberOfData)*timeQant);//Расчитываем время между остановками особей как (Количество шагов/Количество вариантов)*время таймера
-					}
-		
-			}catch(e:ArgumentError){
-				messenger.message(e.message, modelEvent.ERROR_MARK);
-				timeBetwinSteps = int(configuration.getOption('main.lifeTime'));//Если для особии количество шагов не заданно, принимаем его как время жизн
-				}
-			
-			catch(e:ReferenceError){
-				msgString = e.message;
-				messenger.message(msgString, modelEvent.ERROR_MARK);
-				timeQant = 20;//Если не удалось получить информацию о частоте срабатывания таймера от драйвера особи, задаем таймер сами
-				}
-			
-			return timeBetwinSteps;
+				setTimeout(pluginEvent.ready, 50);//Сообщение о том что плагин полностью готов к работе принимается функцией onPluginsJobeFinish в pluginLoader
 		}
 	
 	private function getNumberOfData(dataPath:String):int{
@@ -190,20 +120,13 @@ public class activitySwitcher extends Plugin{
 			}
 		return numberOfData;
 		}
-	
-	private function stopIndByTimer(e:TimerEvent):void{
-	
-		if(switchingType == 'timer'){
-			stopInd();
-			}
-		}
-			
+
 	private function stopInd():void{
 		
 		optionPosition[3] = currentActivitIndNumber;
 		//Узнать размер таймера у особи, посмотреть число ходов в конфиге, запускать паузы по таймеру и не ждать ответа от драйверов особей
 		try{
-			var currentActivity:int;
+			var currentActivity:int;//Количество особей, которых нужно остановить в этот цикл
 		
 			if(currentActivitIndNumber > (numberOfData - 2)){
 				
@@ -221,7 +144,6 @@ public class activitySwitcher extends Plugin{
 					}
 							
 				stopOnly(currentActivity, selectionType);
-				
 
 				msgString = 'Current stoped individuals part is ' +  currentActivitIndNumber + ':'+ currentActivity;
 				messenger.message(msgString, 3);
@@ -325,8 +247,8 @@ public class activitySwitcher extends Plugin{
 					switch(signalType){
 						case 'stop':	
 						
-							if(dispatchedObjects[stopedObjects[i]].hasOwnProperty('stopIndividual')){
-								dispatchedObjects[stopedObjects[i]].stopIndividual(suspendTime);//Останавливаем особь на нужное время
+							if(dispatchedObjects[stopedObjects[i]].hasOwnProperty('statement')){
+								dispatchedObjects[stopedObjects[i]].statement('suspend', processingTimes - 2);//Останавливаем особь на нужное время
 							}
 							else{
 								throw new ReferenceError('Can not find function stopIndividual. It seems, that individual now not exist');
@@ -335,14 +257,14 @@ public class activitySwitcher extends Plugin{
 						
 						case 'kill':
 							
-							if(dispatchedObjects[stopedObjects[i]].hasOwnProperty('killIndividual')){
+							if(dispatchedObjects[stopedObjects[i]].hasOwnProperty('kill')){
 								
 								if(killStoped =='true'){//Если можно, убиваем всех особей из выборки
-									dispatchedObjects[stopedObjects[i]].killIndividual();
+									dispatchedObjects[stopedObjects[i]].kill();
 									
 									}else{
-										if(dispatchedObjects[stopedObjects[i]].indState()=='moved'){
-											dispatchedObjects[stopedObjects[i]].killIndividual();//А иначе убиваем только тех, кто движеться
+										if(dispatchedObjects[stopedObjects[i]].statement() =='moved'){
+											dispatchedObjects[stopedObjects[i]].kill();//А иначе убиваем только тех, кто движеться
 											}
 									
 										}
@@ -352,7 +274,6 @@ public class activitySwitcher extends Plugin{
 										}
 						break;
 						default:
-
 							messenger.message('Wrong type of signal', modelEvent.ERROR_MARK);
 					}
 				
@@ -363,7 +284,6 @@ public class activitySwitcher extends Plugin{
 		}
 		catch(e:IllegalOperationError){
 			messenger.message(e.message, modelEvent.ERROR_MARK);
-			stopingTimer.stop();//Прекращаем работу плагина
 			messenger.message('Activity switcher plugin has finished working', 2);
 		}
 		catch(e:ReferenceError){

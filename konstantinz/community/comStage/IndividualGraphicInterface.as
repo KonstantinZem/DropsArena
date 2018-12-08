@@ -64,7 +64,10 @@ public class IndividualGraphicInterface extends Sprite{
 				ct.color = STOPEDCOLOR;
 				individualBody.transform.colorTransform = ct;
 			break;
-					
+			case 'dead'://Мертвых особей делаем невидимыми, уменьшая их размер до нуля
+					individualBody.scaleX = 0.001;
+					individualBody.scaleY = 0.001;
+			break;
 			default: 
 				ct.color = INDCOLOR;
 				individualBody.transform.colorTransform = ct;

@@ -10,43 +10,24 @@ package konstantinz.plugins{
 	
 	public class morisita extends Plugin{
 		private const BORDERCOLOR:Number = 0x000000;
-		
-		private var refreshTime:int;//Время обновления
+	
 		private var plotSize:int;//Количество пробных площадок
 		private var plotsXQuantaty:int//Колиство квадратов в ряду
 		private var plotsYQuantaty:int//Колиство квадратов в столбце
 		private var plotsPosition:Array;//Координаты площадок (чтобы не высчитывать их каждый раз заново)
 		private var plotsCells:Array;
 		private var cellSize:int;
-		private var indDrivers:Vector.<Suspender>;
-		private var individuals:Vector.<Individual>;
-		private var refreshTimer:Timer;
-		
+	
 		public function morisita (){
 			activeOnLoad = 'true';
 			messenger.setMessageMark('Morisita counter');
-			}
-			
-		override public function suspendPlugin(e:ModelEvent):void{
-			refreshTimer.stop();
-			}
-	
-		override public function startPlugin(e:ModelEvent):void{
-			if(individuals.length > 0){
-				refreshTimer.start();
-			}else{
-				setTimeout(refreshTimer.start, 5);
-				}
-			}
+			}	
 	
 		public override function initSpecial():void{
-			indDrivers = root.indSuspender;
-			individuals = root.individuals;
-				
+			
 			debugeLevel = configuration.getOption('plugins.morisitaCounter.debugLevel');
 			plotSize = int(configuration.getOption('plugins.morisitaCounter.plotSize'));
-			refreshTime = (int(configuration.getOption('plugins.morisitaCounter.refreshTime')))*1000;//Берем время обновления из конфига и переводим его в миллисекунды
-				
+	
 			cellSize = int(configuration.getOption('main.dropSize'));
 			plotsCells = new Array;
 			plotsPosition = new Array;
@@ -55,19 +36,8 @@ package konstantinz.plugins{
 			plotsXQuantaty = communityStage.chessDesk[0].length/plotSize;
 			plotsYQuantaty = communityStage.chessDesk.length/plotSize;
 			drawMorisitaPlot();
-				
-			if(refreshTime>0){
-				refreshTimer = new Timer(refreshTime);
-				refreshTimer.addEventListener(TimerEvent.TIMER, countMorisita);
-				if(activeOnLoad=='true'){
-					refreshTimer.start();
-					}
-			}else{
-				msgString = 'Refresh time not set';
-				messenger.message(msgString, modelEvent.ERROR_MARK);
-				}
 			
-				pluginEvent.ready();//Сообщение о том что плагин полностью готов к работе принимается функцией onPluginsJobeFinish в pluginLoader
+			setTimeout(pluginEvent.ready, 50);//Сообщение о том что плагин полностью готов к работе принимается функцией onPluginsJobeFinish в pluginLoader
 			}
 		
 		private function drawMorisitaPlot():void{	//Разлинеивает игровое поле в квадратики для большей наглядности
@@ -91,31 +61,25 @@ package konstantinz.plugins{
 	                xpos = 0;
 				}
 			}
+			
+		override public function startPluginJobe():void{
+			countMorisita();
+			}
 		
-		private function countMorisita(e:TimerEvent):void{
+		private function countMorisita():void{
+	
 			msgString = 'Counting Morisita index';
 			messenger.message(msgString, modelEvent.DEBUG_MARK);
 			var morisita:Number;
-			var drvCounter:int;
-			var indCounter:int
-		
+
 			if(plotsPosition.length == 0){//Если пречень координат  квадратов еще не составлялся
 				getPlotPosition();//Составляем его чтобы в дальнейшем не расчитывать позиции которые уже не изменятся а просто брать уже готовые координаты
-				}
-				
-			clearStage();//Очищаем массив сцены от информации о прибывании там особей, так как отметка от пристутсвия особи часто остается в уже пустой ячейки
-				
-			
-			for(var j:int = 0; j < individuals.length;j++){
-				individuals[j].markPresenceInPlot();//Даем особям команду обозначить те квадраты в которых они уже находятся
-				}
-			
+				}	
 				
 			morisita = morisitaIndex();//Высчитываем индекс Мориситы
 			
 			if(isNaN(morisita)){//Проверяем, можем ли мы расчитать индекс
 				msgString = 'morisita_index:-';//И если индекс уже не может быть расчитан (особей слишком мало)
-				refreshTimer.stop();//Перестаем расчитывать индекс
 				messenger.message('Stoping to count Morisita index', modelEvent.INFO_MARK);
 				}
 				else{//Если индекс расчитан
@@ -126,6 +90,7 @@ package konstantinz.plugins{
 		}
 		
 		private function getPlotPosition():int{
+			
 			var newX:int = 0;
 			var newY:int = 0;
 			var counter:int = 0;
@@ -145,20 +110,7 @@ package konstantinz.plugins{
 			}
 		}
 		
-		private function clearStage():void{
-			var counterI:int;
-			var counterJ:int;
-			
-			counterI = communityStage.chessDesk.length;
-			for(var i:int = 0; i< counterI;i++){
-				
-				counterJ = communityStage.chessDesk[i].length;
-				for(var j:int = 0;j< counterJ; j++){
-					communityStage.chessDesk[i][j].cashe = '';
-					}
-				}
-			}
-	
+
 		private function morisitaIndex():Number{
 		
 			var mIndex:Number;
@@ -172,7 +124,7 @@ package konstantinz.plugins{
 			var counter:int;
 			
 			counter = plotsPosition.length;
-	
+			
 			for (var i:int = 0; i< counter; i++){
 				newX = plotsPosition[i][0];
 				newY = plotsPosition[i][1];
@@ -198,11 +150,12 @@ package konstantinz.plugins{
 		}
 		
 		private function countIndividuals(xcrd:int,ycrd:int,plSize:int):int{//Подсчет количества особей в исследуемых площадках
+			
 			var individualsNumber:int;
 			for(var i:int = 0; i<plSize; i++){
 		
 				for(var j:int = 0; j<plSize; j++){
-					individualsNumber += communityStage.chessDesk[xcrd+i][ycrd+j].cashe.length;
+					individualsNumber += communityStage.chessDesk[xcrd+i][ycrd+j].numberOfIndividuals.length;
 					}
 				}
 			return individualsNumber;

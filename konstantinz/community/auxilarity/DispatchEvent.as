@@ -4,7 +4,7 @@
 	import flash.events.EventDispatcher;	
 	
 	//Класс предназначен для рассылки событий из тех компонентов, которые не могут рассылать их сами
-	public class DispatchEvent extends EventDispatcher {
+	public class DispatchEvent extends EventDispatcher{
 		
 		private var messanger:Messenger;
 		private var msgString:String;

@@ -4,13 +4,13 @@ package konstantinz.community.comStage.behaviour{
 
 public class MomentalDeath extends BaseMotionBehaviour{
 	
-	private var indSuspender:Suspender;
+	private var indSuspender:StepDispatcher;
 	
 	function MomentalDeath():void{
 		
 		}
 		
-	public function setSuspender(suspender:Suspender):void{
+	public function setSuspender(suspender:StepDispatcher):void{
 		
 		try{
 			if(suspender == null){

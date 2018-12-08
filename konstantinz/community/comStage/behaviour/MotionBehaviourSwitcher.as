@@ -8,7 +8,7 @@ public class MotionBehaviourSwitcher{
 	private var baseMotionBehaviour:BaseMotionBehaviour;
 	private var bestConditionsWalker:BestConditionsWalker;
 	private var momentalDeath:MomentalDeath;
-	private var indSuspender:Suspender;
+	private var indSuspender:StepDispatcher;
 	private var currentBehaviourName:String;
 	private var viewDistance:int;
 	private var populationArea:Array;
@@ -32,7 +32,8 @@ public class MotionBehaviourSwitcher{
 		
 		currentBehaviourName = 'RandomWalker';
 		}
-	public function setSuspender(suspender:Suspender):void{//Для некоторых моделей поведения надо будет обращаться к объктам вне особи
+	//public function setSuspender(suspender:Suspender):void{//Для некоторых моделей поведения надо будет обращаться к объктам вне особи
+	public function setSuspender(suspender:StepDispatcher):void{
 		indSuspender = suspender;
 		momentalDeath.setSuspender(indSuspender);
 		}
@@ -44,7 +45,7 @@ public class MotionBehaviourSwitcher{
 		
 	public function switchBehaviour(behaviourName:String):void{
 				
-			if(currentBehaviourName !=behaviourName && indSuspender.indState() != 'stoped'){
+			if(currentBehaviourName !=behaviourName && indSuspender.getState()!= 'stoped'){
 				currentBehaviourName = behaviourName;
 				
 				switch(behaviourName){
@@ -67,6 +68,9 @@ public class MotionBehaviourSwitcher{
 					
 					}
 				}
+			}
+		public function getCurrentBehaviour():String{
+			return currentBehaviourName;
 			}
 
 }

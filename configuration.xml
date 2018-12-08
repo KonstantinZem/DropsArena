@@ -5,17 +5,18 @@
 	<debugLevel>1</debugLevel>
 	<pluginEnable>true</pluginEnable>
 	<!-- indQuntaty how many individuals must to be created at the start -->
-	<indQuntaty>200</indQuntaty>
-	<lifeTime>7000</lifeTime>
+	<indQuntaty>100</indQuntaty>
+	<lifeTime>3500</lifeTime>
 	<lifeQuant>1</lifeQuant>
-	<adultAge>1000</adultAge>
-	<maturingDeley>1000</maturingDeley>
-	<offspringsQuant>10</offspringsQuant>
+	<adultAge>2000</adultAge>
+	<maturingDeley>1200</maturingDeley>
+	<offspringsQuant>3</offspringsQuant>
 	<individualSize>12</individualSize>
 	<!-- initPosition of individual can be left-top, left-bottom,  right-top, right-bottom, center and random -->
 	<initPosition>left-top</initPosition>
 	<statRefreshTime>5</statRefreshTime>
-	<stepLength>2</stepLength>
+	<stepLength>1</stepLength>
+	<!--<pluginsList>plugins/mowing.swf;plugins/ground.swf;plugins/grass.swf;plugins/grass2.swf;plugins/grass3.swf;plugins/grass4.swf;plugins/activity.swf;plugins/death.swf;plugins/morisitaCounter.swf</pluginsList>-->
 	<pluginsList>plugins/mowing.swf;plugins/ground.swf;plugins/grass.swf;plugins/grass2.swf;plugins/grass3.swf;plugins/grass4.swf;plugins/activity.swf;plugins/death.swf;plugins/morisitaCounter.swf</pluginsList>
 	<arePluginsActiveOnLoading>false</arePluginsActiveOnLoading>
 	<behaviourSwitching>
@@ -50,16 +51,16 @@
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>
-				<day>20.10.10</day>
+				<day>13.10.10</day>
 			</observation>
 			<observation>
-				<day>16.06.11</day>
+				<day>14.06.11</day>
 			</observation>
 			<observation>
-				<day>29.09.11</day>
+				<day>19.08.11</day>
 			</observation>
 			<observation>
-				<day>20.10.11</day>
+				<day>10.10.11</day>
 			</observation>
 		</data>
 	</grass>
@@ -71,7 +72,7 @@
 		<color>0xf4e17f</color>
 		<behaviour_model>MomentalDeath</behaviour_model>
 		<!--behaviour_frequency individual will change it's behaviour in each second cell-->
-		<behaviour_frequency>30</behaviour_frequency>
+		<behaviour_frequency>20</behaviour_frequency>
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>
@@ -97,16 +98,16 @@
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>
-				<day>20.10.10</day>
+				<day>13.10.10</day>
 			</observation>
 			<observation>
-				<day>16.06.11</day>
+				<day>14.06.11</day>
 			</observation>
 			<observation>
-				<day>26.09.11</day>
+				<day>19.08.11</day>
 			</observation>
 			<observation>
-				<day>20.10.11</day>
+				<day>10.10.11</day>
 			</observation>
 		</data>
 	</ground>
@@ -120,16 +121,16 @@
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>
-				<day>20.10.10</day>
+				<day>13.10.10</day>
 			</observation>
 			<observation>
-				<day>16.06.11</day>
+				<day>14.06.11</day>
 			</observation>
 			<observation>
-				<day>28.09.11</day>
+				<day>19.08.11</day>
 			</observation>
 			<observation>
-				<day>20.10.11</day>
+				<day>10.10.11</day>
 			</observation>
 		</data>
 	</grass2>
@@ -143,13 +144,16 @@
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>
-				<day>16.06.11</day>
+				<day>13.10.10</day>
 			</observation>
 			<observation>
-				<day>29.09.11</day>
+				<day>14.06.11</day>
 			</observation>
 			<observation>
-				<day>20.10.11</day>
+				<day>19.08.11</day>
+			</observation>
+			<observation>
+				<day>10.10.11</day>
 			</observation>
 		</data>
 	</grass3>
@@ -161,13 +165,16 @@
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>
-				<day>16.06.11</day>
+				<day>13.10.10</day>
 			</observation>
 			<observation>
-				<day>29.09.11</day>
+				<day>14.06.11</day>
 			</observation>
 			<observation>
-				<day>20.10.11</day>
+				<day>19.08.11</day>
+			</observation>
+			<observation>
+				<day>10.10.11</day>
 			</observation>
 		</data>
 	</grass4>
@@ -177,6 +184,8 @@
 		<signal>stop</signal>
 		<!--Individual lives as long as 6 yearth, but my observings is only tree-->
 		<steps>3500</steps>
+		<!--Step interval is number of individul steps between plugin jobe-->
+		<switchingInterval>50</switchingInterval>
 		<debugLevel>1</debugLevel>
 		<selectionType>percents</selectionType>
 		<!--switching_event define the event making plugin work. Can be timer or calendar_data-->
@@ -1337,7 +1346,7 @@
 		<description>Count Morisita index</description>
 		<icon></icon>
 		<debugLevel>1</debugLevel>
-		<refreshTime>5</refreshTime>
+		<switchingInterval>50</switchingInterval>
 		<plotSize>8</plotSize>
 	</morisitaCounter>
 </plugins>

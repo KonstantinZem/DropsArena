@@ -11,7 +11,7 @@
 		private var currentPlNumber:int;//Номер текущего плагина в списке переданном из конфига
 		private var pluginsList:Array;//Ссылка на список плагинов в списки передаваемых ролику опций
 		private var pluginsEventsList:Array
-		private var plugins:Array;
+		public var plugins:Array;
 		private var content:Array;
 		private var debugLevel:String;
 		private var msgString:String;
@@ -77,10 +77,10 @@
 		private function loadPlugins(pluginNumber:int):void{//Начинаем загрузку файлов плагинов в корневой ролик
 			
 			if(pluginNumber > pluginsList.length -1){//Когда список плагинов закончился, прерываемся
-				loaderEvent.pluginName = 'last';//Это сообщение принимается в main
+				//loaderEvent.pluginName = 'last';//Это сообщение принимается в main
 				loaderEvent.pluginLoaded();
-				msgString = 'All plugins has loaded';
-				messenger.message(msgString, modelEvent.INIT_MSG_MARK);
+				//msgString = 'All plugins has loaded';
+				//messenger.message(msgString, modelEvent.INIT_MSG_MARK);
 				}
            else{
 				plugins[pluginNumber].contentLoaderInfo.addEventListener(Event.COMPLETE, onPluginFileDownloading);//Это событие должно придти от URLRequest 
@@ -177,7 +177,7 @@
 								msgString ='Plugin '+ currentPlNumber+ '.' + pluginsEventsList[i].sendFromPluginObject + 'component exist but not initilazed yet';
 								messenger.message(msgString, modelEvent.INIT_MSG_MARK);
 								}else{
-									msgString = 'Try to set lstener to ' + plugins[pluginNumber].content.plEntry[pluginsEventsList[i].sendFromPluginObject]
+									msgString = 'Try to set listener to ' + plugins[pluginNumber].content.plEntry[pluginsEventsList[i].sendFromPluginObject]
 									messenger.message(msgString, modelEvent.DEBUG_MARK);
 									plugins[pluginNumber].content.plEntry[pluginsEventsList[i].sendFromPluginObject].addEventListener(pluginsEventsList[i].pluginEventHandler, root[pluginsEventsList[i].sendToRootObject]);//Соединям плагин с определенной функцией в главной программе
 									}
@@ -208,9 +208,14 @@
 					if(root==null){
 						throw new Error('Plugin loader not mounted in main program yet');
 					}
-					if(currentPlNumber <= pluginsList.length-1){//Если мы не достигли конца списка плагинов
+					if(currentPlNumber < pluginsList.length){//Если мы не достигли конца списка плагинов
 						loadPlugins(currentPlNumber);//После загрузки очередного плагина загружаем следующий
-						}
+						}else{
+							loaderEvent.pluginName = 'last';//Это сообщение принимается в main
+							loaderEvent.pluginLoaded();
+							msgString = 'All plugins has loaded';
+							messenger.message(msgString, modelEvent.INIT_MSG_MARK);
+							}
 				}catch(e:Error){
 					msgString = e.message;
 					messenger.message(msgString, modelEvent.ERROR_MARK);

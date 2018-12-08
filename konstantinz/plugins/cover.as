@@ -124,8 +124,6 @@ public class cover extends Plugin{
 					
 					}
 				}
-		
-		refreshIndividualsSetting();
 		pluginEvent.ready();//Сообщаем о том, что все уже сделано,
 	}
 	
@@ -199,15 +197,6 @@ public class cover extends Plugin{
 					
 					}
 					aux = new Array(0,1,2,3,4,5,6,7,8,9);
-				}
-			}
-		}
-	
-	private function refreshIndividualsSetting():void{
-		
-		for(var i:int = 1; i < root.indSuspender.length; i++){//Если не вычислять длинну массива с indSuspender каждый раз, может вылитеть ошибка: особи могут и умирать по комманде перейдя в квадрат и дляинна массива будет меняться
-			if(root.indSuspender[i] && root.indSuspender[i].indState() != 'stoped'){
-				root.indSuspender[i].doOnlyOneStep();
 				}
 			}
 		}
