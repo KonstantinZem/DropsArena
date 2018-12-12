@@ -15,7 +15,7 @@ public class activitySwitcher extends Plugin{
 	
 	private var dispatchedObjects:Vector.<Individual>//Ссылка на массив с управляемыми объектами
 	private var stopedObjects:Array;//Список остановленных в данный момент особей
-	private var optionPosition:Array;
+	private var activityObservationPosition:Array;
 	private var numberOfData:int;//Количество наблюдений (переключений) в конфигурационном файле
 	private var cycleCounter:int;
 	private var currentActivitIndNumber:int = 1;//Позиция в таблице активности где надо искать текущее число особей, которых необходимо остановить
@@ -24,9 +24,10 @@ public class activitySwitcher extends Plugin{
 	private var selectionType:String;//percents or items
 	private var killStoped:String;//Будудт ли подвержены случайной смерти неактивные особи
 	private var dataPath:String;
-	private var calendarData:String
-	private var firstInit:String
-	
+	private var durationDataPath:String;
+	private var calendarData:String;
+	private var firstInit:String;
+
 	public function activitySwitcher(){
 		firstInit = 'true';
 		killStoped = 'false';
@@ -46,10 +47,9 @@ public class activitySwitcher extends Plugin{
 		
 		 dataPath = 'plugins.' + pluginName + '.data.observation';
 		 calendarData = dataPath + '.day';
-				
-		 optionPosition = new Array(0,0,0,0,0);//Положение нужной нам опции в узле. Воовще это не хороше лазить по XML файлу вслепую без учета имен тегов
-				
-		 currentDay = configuration.getOption(calendarData, optionPosition);//Берем из аттрибутов дату наблюдения
+		 durationDataPath = dataPath + '.duration';
+		 activityObservationPosition = new Array(0,0,0,0,0);//Положение нужной нам опции в узле. Воовще это не хороше лазить по XML файлу вслепую без учета имен тегов
+		 currentDay = configuration.getOption(calendarData, activityObservationPosition);//Берем из аттрибутов дату наблюдения
 				
 		 signalType = configuration.getOption(optionPath + 'signal');
 								
@@ -90,7 +90,10 @@ public class activitySwitcher extends Plugin{
 				numberOfData = getNumberOfData(activeIndividualsNumber);//Получаем количество заданных в конфиге наблюдений за активностью
 				cycleCounter = 1;
 				msgString = 'cycle: ' + cycleCounter;
-				setTimeout(pluginEvent.ready, 50);//Сообщение о том что плагин полностью готов к работе принимается функцией onPluginsJobeFinish в pluginLoader
+				
+				if(alreadyInited == 'fals'){
+				   setTimeout(pluginEvent.ready, 50);//Сообщение о том что плагин полностью готов к работе принимается функцией onPluginsJobeFinish в pluginLoader
+				   }
 		}
 	
 	private function getNumberOfData(dataPath:String):int{
@@ -101,7 +104,7 @@ public class activitySwitcher extends Plugin{
 		
 			while(optionValue != 'Error'){
 				
-				optionValue = configuration.getOption(activeIndividualsNumber, optionPosition);
+				optionValue = configuration.getOption(activeIndividualsNumber, activityObservationPosition);
 				
 				if(optionValue == null){
 					throw new Error('OptionValue is null');
@@ -111,7 +114,7 @@ public class activitySwitcher extends Plugin{
 					}
 			
 				numberOfData++;
-				optionPosition[3] = numberOfData;
+				activityObservationPosition[3] = numberOfData;
 			}
 			
 		}catch(e:Error){
@@ -123,7 +126,7 @@ public class activitySwitcher extends Plugin{
 
 	private function stopInd():void{
 		
-		optionPosition[3] = currentActivitIndNumber;
+		activityObservationPosition[3] = currentActivitIndNumber;
 		//Узнать размер таймера у особи, посмотреть число ходов в конфиге, запускать паузы по таймеру и не ждать ответа от драйверов особей
 		try{
 			var currentActivity:int;//Количество особей, которых нужно остановить в этот цикл
@@ -139,8 +142,16 @@ public class activitySwitcher extends Plugin{
 						}
 				}else{
 					currentActivitIndNumber++;
-					currentActivity = int(configuration.getOption(activeIndividualsNumber, optionPosition));
-					currentDay = configuration.getOption(calendarData, optionPosition);//Берем из конфига следующую дату
+					currentDuration = int(configuration.getOption(durationDataPath, activityObservationPosition));
+					
+					if(currentDuration > 0){
+						setNewSwitchingInterval(currentDuration);
+						
+					}else if(switchingIntervalHasChanged == 'true'){
+						setNewSwitchingInterval(0);//0 - значит вернуть предыдущий интервал
+						}
+					currentActivity = int(configuration.getOption(activeIndividualsNumber, activityObservationPosition));
+					currentDay = configuration.getOption(calendarData, activityObservationPosition);//Берем из конфига следующую дату
 					}
 							
 				stopOnly(currentActivity, selectionType);

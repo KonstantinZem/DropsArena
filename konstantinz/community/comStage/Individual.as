@@ -330,11 +330,14 @@ package konstantinz.community.comStage{
 		public function statement(statementName:String = 'empty', statementLength:int = 0):String{
 				switch(statementName){
 					case 'suspend':
-					stepDispatcher.setState ('suspend', statementLength);
+						stepDispatcher.setState ('suspend', statementLength);
 					break
 					case 'empty':
-					
+						
 					break;
+					case 'moving':
+						stepDispatcher.setState ('moving');
+					break
 					default:
 						msgString = 'Wrong statement name ' + statementName;
 						messenger.message(msgString, modelEvent.ERROR_MARK);

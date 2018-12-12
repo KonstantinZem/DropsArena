@@ -21,7 +21,7 @@ package konstantinz.community.comStage{
 		public var indNumber:int//Номер особи, посылающей событие
 		
 		function StepDispatcher(){
-			indState = "moving";
+			indState = 'moving';
 			indNumber = 0;
 			lifeTime = IMMORTAL_SIGHN;
 			messenger = new Messenger('3');

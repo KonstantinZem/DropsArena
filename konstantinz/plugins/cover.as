@@ -112,6 +112,7 @@ public class cover extends Plugin{
 			if(behaviourFrequency > 0){
 				initBehaviourShema();
 				}
+			pluginEvent.ready();//Сообщаем о том, что все уже сделано,
 			}else{
 				counterI = coverShema.length;
 				for(var i:int = 0; i< counterI; i++){
@@ -124,7 +125,10 @@ public class cover extends Plugin{
 					
 					}
 				}
-		pluginEvent.ready();//Сообщаем о том, что все уже сделано,
+		
+		//if(alreadyInited == 'fals'){
+			//pluginEvent.ready();//Сообщаем о том, что все уже сделано,
+		//	}
 	}
 	
 	private function initCoverShema():void{

@@ -5,18 +5,17 @@
 	<debugLevel>1</debugLevel>
 	<pluginEnable>true</pluginEnable>
 	<!-- indQuntaty how many individuals must to be created at the start -->
-	<indQuntaty>100</indQuntaty>
-	<lifeTime>3500</lifeTime>
+	<indQuntaty>600</indQuntaty>
+	<lifeTime>273000</lifeTime>
 	<lifeQuant>1</lifeQuant>
-	<adultAge>2000</adultAge>
-	<maturingDeley>1200</maturingDeley>
-	<offspringsQuant>3</offspringsQuant>
+	<adultAge>50000</adultAge>
+	<maturingDeley>50000</maturingDeley>
+	<offspringsQuant>10</offspringsQuant>
 	<individualSize>12</individualSize>
 	<!-- initPosition of individual can be left-top, left-bottom,  right-top, right-bottom, center and random -->
-	<initPosition>left-top</initPosition>
-	<statRefreshTime>5</statRefreshTime>
+	<initPosition>random</initPosition>
+	<statRefreshTime>35</statRefreshTime>
 	<stepLength>1</stepLength>
-	<!--<pluginsList>plugins/mowing.swf;plugins/ground.swf;plugins/grass.swf;plugins/grass2.swf;plugins/grass3.swf;plugins/grass4.swf;plugins/activity.swf;plugins/death.swf;plugins/morisitaCounter.swf</pluginsList>-->
 	<pluginsList>plugins/mowing.swf;plugins/ground.swf;plugins/grass.swf;plugins/grass2.swf;plugins/grass3.swf;plugins/grass4.swf;plugins/activity.swf;plugins/death.swf;plugins/morisitaCounter.swf</pluginsList>
 	<arePluginsActiveOnLoading>false</arePluginsActiveOnLoading>
 	<behaviourSwitching>
@@ -45,7 +44,7 @@
 		<description>Aegopodium podagraria grass cover</description>
 		<icon></icon>
 		<picture>pictures/park/aegopodium.png</picture>
-		<stepDeley>6</stepDeley>
+		<stepDeley>10</stepDeley>
 		<debugLevel>1</debugLevel>
 		<color>0x007100</color>
 		<switching_event>calendar_data</switching_event>
@@ -72,7 +71,7 @@
 		<color>0xf4e17f</color>
 		<behaviour_model>MomentalDeath</behaviour_model>
 		<!--behaviour_frequency individual will change it's behaviour in each second cell-->
-		<behaviour_frequency>20</behaviour_frequency>
+		<behaviour_frequency>30</behaviour_frequency>
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>
@@ -185,7 +184,7 @@
 		<!--Individual lives as long as 6 yearth, but my observings is only tree-->
 		<steps>3500</steps>
 		<!--Step interval is number of individul steps between plugin jobe-->
-		<switchingInterval>50</switchingInterval>
+		<switchingInterval>378</switchingInterval>
 		<debugLevel>1</debugLevel>
 		<selectionType>percents</selectionType>
 		<!--switching_event define the event making plugin work. Can be timer or calendar_data-->
@@ -301,15 +300,9 @@
 			</observation>
 			<observation>
 				<part>0</part>
-				<day>05.10.10</day>
-			</observation>
-			<observation>
-				<part>0</part>
 				<day>06.10.10</day>
-			</observation>
-			<observation>
-				<part>0</part>
-				<day>06.10.10</day>
+				<!--This aquial to two hours of moawing working-->
+				<duration>15</duration>
 			</observation>
 			<observation>
 				<part>6</part>
@@ -594,6 +587,8 @@
 			<observation>
 				<part>0</part>
 				<day>06.06.11</day>
+				<!--This aquial to two hours of moawing working-->
+				<duration>15</duration>
 			</observation>
 			<observation>
 				<part>0</part>
@@ -666,6 +661,8 @@
 			<observation>
 				<part>0</part>
 				<day>18.08.11</day>
+				<!--This aquial to two hours of moawing working-->
+				<duration>15</duration>
 			</observation>
 			<observation>
 				<part>12</part>
@@ -746,6 +743,8 @@
 			<observation>
 				<part>21</part>
 				<day>08.10.11</day>
+				<!--This aquial to two hours of moawing working-->
+				<duration>15</duration>
 			</observation>
 			<observation>
 				<part>33</part>
@@ -1329,15 +1328,15 @@
      <selectionType>percents</selectionType>
 		<data>
 			<observation>
-				<part>10</part>
+				<part>5</part>
 				<day>18.08.11</day>
 			</observation>
 			<observation>
-				<part>10</part>
+				<part>5</part>
 				<day>17.04.12</day>
 			</observation>
 			<observation>
-				<part>10</part>
+				<part>5</part>
 				<day>01.08.12</day>
 			</observation>
 		</data>

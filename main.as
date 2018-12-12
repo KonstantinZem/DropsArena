@@ -87,8 +87,8 @@ package{
 
 			model.removeChild(commStage);
 			if(plugins != null){
-			model.removeChild(plugins);
-		}
+				model.removeChild(plugins);
+				}
 			
 			statusBar.clear();
 			startStopButton.clear();
@@ -333,6 +333,7 @@ package{
 				commStage.addChild(individuals[i].individualPicture.individualBody);
 				
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
+				individuals[i].externalTimer();
 			}
 			msgString = IND_NUMB + individuals.length;
 			messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
@@ -448,14 +449,14 @@ package{
 			
 		private function onConditionsChange(e:Event):void{
 			var condition:String = e.target.behaviourName;
-			//var counter:int;
+			var counter:int;
 			
-			//counter = individuals.length;
+			counter = individuals.length;
 			for(var i :int = 0; i< individuals.length; i++){
 				if(individuals[i] != null){
 				individuals[i].behaviour(condition);
 				}
-				}
+			  }
 			}
 		
 		private function showMessageWindow():void{
@@ -475,6 +476,7 @@ package{
 				individuals[i].doStep();
 				}
 			}else{
+				stepTimer.stop();
 				showMessageWindow();
 				Accumulator.instance.stopRefresh();
 				msgString = 'Emulation has finished. Number of individuals is ' + individuals.length;

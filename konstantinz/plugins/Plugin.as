@@ -13,11 +13,14 @@ public class Plugin extends Sprite{
 	protected var debugeLevel:String;
 	protected var statMessageHead:String;
 	protected var switchingType:String;//timer переключается по сигналам от таймера or calendar_data - переключается по сигналам от другого плагина
+	protected var switchingIntervalHasChanged:String;//Этот флаг поднимается, если на какое то время интервал между включениями плагина меняется со значения по умолчанию
 	protected var msgString:String;
 	protected var statisticFromRoot:Array;
 	protected var currentDay:String;
+	protected var currentDuration:int;//Переменная создана на тот случай, если для какого то отдельного наблдения нужно указать точное количество шагов
 	protected var alreadyInited:String;
 	protected var switchingInterval:int;//Интервал между включениями плагина
+	protected var previosSvitchingInterval:int//Сюда будем сохранять предыдущий интервал между переключениями, чтобы позднее к нему вернуться
 	protected var processingTimes:int//Количество циклов, оставшиеся до следующего срабатывания
 	
 	protected var errorType:ModelErrors;
@@ -75,11 +78,28 @@ public class Plugin extends Sprite{
 					messenger.message(msgString, modelEvent.INFO_MARK);
 					}
 			
-			alreadyInited = 'true';//Помечаем что мы уже инициированы
-			initSpecial();
 			
+			initSpecial();
+			alreadyInited = 'true';//Помечаем что мы уже инициированы
 			}
 		
+		}
+	
+	protected function setNewSwitchingInterval(newInterval:int):void{//Если надо где то задать особый интервал между переключениями плагина
+		
+		if(newInterval == 0){
+			
+			switchingIntervalHasChanged = 'false';
+			msgString = '[' + currentDay + ']' + ' Switching interval has changed from ' + switchingInterval + ' steps to ' + previosSvitchingInterval + ' steps';
+			messenger.message(msgString, modelEvent.INFO_MARK);
+			switchingInterval = previosSvitchingInterval;
+		}else{
+			switchingIntervalHasChanged = 'true';
+			previosSvitchingInterval = switchingInterval;//Возвращаем ранее сохраненное значение интервала переключения
+			switchingInterval = newInterval
+			msgString = '[' + currentDay + ']' + ' Switching interval has changed from ' + previosSvitchingInterval + ' steps to ' + newInterval + ' steps';
+			messenger.message(msgString, modelEvent.INFO_MARK);
+			}
 		}
 		
 	public function initSpecial():void{//В этой функции будут инициироваться объекты и переменные, специфические для конкретного типа плагинов
