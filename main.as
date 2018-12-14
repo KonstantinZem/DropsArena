@@ -44,6 +44,7 @@ package{
 		private var modelEvent:ModelEvent;
 		private var stepTimer:Timer;
 		private var numberOfCycles:int;
+		private var individualPictures:Vector.<IndividualGraphicInterface>
 		
 		public var individuals:Vector.<Individual>;
 		public var model:Sprite;
@@ -157,6 +158,7 @@ package{
 			indNumber = int(configuration.getOption('main.indQuntaty'));
 			
 			individuals = new Vector.<Individual>(indNumber);
+			individualPictures = new Vector.<IndividualGraphicInterface>(indNumber);
 			
 			statRefreshTime = configuration.getOption('main.statRefreshTime');
 			Accumulator.instance.setDebugLevel(debugLevel);
@@ -307,10 +309,18 @@ package{
 			
 			for (var i:int = 0; i< indNumber; i++){
 				individuals[i] = new Individual(commStage.chessDesk,configuration,i,indX,indY);
-				
-				commStage.addChild(individuals[i].individualPicture.individualBody);
+				individualPictures[i] = new IndividualGraphicInterface(
+					2,
+					int(configuration.getOption('main.individualSize')),//Максимальный размер особи
+					int(configuration.getOption('main.adultAge'))
+					);
+				individualPictures[i].drawIndividual();
+				commStage.addChild(individualPictures[i].individualBody);
+	
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
 				individuals[i].externalTimer();
+				
+				
 			}
 			msgString = IND_NUMB + individuals.length;
 			messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
@@ -330,8 +340,14 @@ package{
 				indYRnd = Math.round(Math.random() * chessDeskLengthY);
 				
 				individuals[i] = new Individual(commStage.chessDesk,configuration,i,indXRnd,indYRnd);
-				commStage.addChild(individuals[i].individualPicture.individualBody);
-				
+				individualPictures[i] = new IndividualGraphicInterface(
+					2,
+					int(configuration.getOption('main.individualSize')),//Максимальный размер особи
+					int(configuration.getOption('main.adultAge'))
+					);
+				individualPictures[i].drawIndividual();
+				commStage.addChild(individualPictures[i].individualBody);
+		
 				individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
 				individuals[i].externalTimer();
 			}
@@ -348,9 +364,15 @@ package{
 					var newX:int = e.target.currentChessDeskI;
 					var newY:int = e.target.currentChessDeskJ;
 					individuals[i] = new Individual(commStage.chessDesk, configuration, i,newX,newY);
+					individualPictures[i] = new IndividualGraphicInterface(
+					2,
+					int(configuration.getOption('main.individualSize')),//Максимальный размер особи
+					int(configuration.getOption('main.adultAge'))
+					);
 					
-					commStage.addChild(individuals[i].individualPicture.individualBody);
-					
+					individualPictures[i].drawIndividual();
+					commStage.addChild(individualPictures[i].individualBody);
+				
 					individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
 					individuals[i].externalTimer();
 				}
@@ -364,8 +386,10 @@ package{
 			try{
 				for(var i:int = 0; i< individuals.length; i++){
 					if(individuals[i].statement() == 'dead'){
-						commStage.removeChild(individuals[i].individualPicture.individualBody);
+						
 						individuals[i] = null;//Убираем из массива особей
+						commStage.removeChild(individualPictures[i].individualBody);
+						individualPictures[i] = null
 						removedInd++;
 						}
 					}
@@ -374,12 +398,14 @@ package{
 				for(i= 0; i< individuals.length; i++){
 					if(!individuals[i]){
 						individuals.splice(i,1);
+						individualPictures.splice(i,1);
 						i = 0;
 					}	
 				}
 				
 				if(!individuals[0]){
 						individuals.splice(0,1);
+						individualPictures.splice(0,1);
 						i = 0;
 					}
 			
@@ -474,6 +500,12 @@ package{
 			if(indNumber < MAX_INDIVIDUAL_CRITICAL_NUMBER && indNumber > MIN_INDIVIDUAL_CRITICAL_NUMBER){
 			for(var i:int = 0; i< indNumber; i++){
 				individuals[i].doStep();
+				individualPictures[i].dotStep(//Передаем координаты, куда особи надо переместится на следующем шаге
+					individuals[i].placement().x,
+					individuals[i].placement().y,
+					individuals[i].statement(),
+					individuals[i].age()//Взрослая ли уже особь или еще надо расти
+					);
 				}
 			}else{
 				stepTimer.stop();

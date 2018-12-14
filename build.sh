@@ -24,6 +24,7 @@ cp ../bin/plugins/cover.swf ../bin/plugins/grass4.swf
 cp ../bin/plugins/cover.swf ../bin/plugins/ground.swf
 cp ../bin/plugins/cover.swf ../bin/plugins/stones.swf
 cp ../bin/plugins/cover.swf ../bin/plugins/mowing.swf
+cp ../bin/plugins/cover.swf ../bin/plugins/relief.swf
 cp ../bin/plugins/activity.swf ../bin/plugins/death.swf
 
 

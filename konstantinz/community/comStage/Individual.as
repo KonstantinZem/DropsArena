@@ -33,15 +33,15 @@ package konstantinz.community.comStage{
 		private var offspringsQuant:int;
 		private var currentChessDeskI:int;//Номер строки текущего квадрата
 		private var currentChessDeskJ:int;//Номер столбца текущего квадрата
-		private var previosChessDeskI:int;
-		private var previosChessDeskJ:int
 		private var lifeTime:int;
 		private var stepLength:int;//Длинна шага особи
 		private var indDirection:int;//Текущие направление
 		private var deleySteps:int;//количество ходов, которые надо пропустить для замедления движения
 		private var chessDesk:Array; //Ссылка на внешний массив с координатами и условиями среды
+		private var indPlacement:Array;
 		private var msgString:String;
 		private var debugLevel:String;
+		private var indAgeState:String
 		private var indStatus:String;//Так как особи могут подаваться внешние команды, надо всегда знать может ли особь эти команды выполнить
 		private var currentBehaviourName:String;//Переключаться поведение будет только если название поведения из пришедшего сообщения будет отличаться от записанного сюда
 		
@@ -57,8 +57,6 @@ package konstantinz.community.comStage{
 		private var timerForIndividuals:Timer; //Не самое удачное решение, снабдить каждую особь своим таймером, но сделать один из главного класса у меня не получается
 		
 		public var IndividualEvent:DispatchEvent;
-		public var individualPicture:IndividualGraphicInterface;
-		
 		
 		function Individual(desk:Array, configuration:ConfigurationContainer, ...args){
 
@@ -76,12 +74,8 @@ package konstantinz.community.comStage{
 				stepDispatcher = new StepDispatcher();
 				
 				stepDispatcher.addEventListener(StepDispatcher.DO_STEP, step);
-				stepDispatcher.addEventListener(StepDispatcher.SUSPEND, markSuspendede);
 				lifeTime = int(indConfiguration.getOption('main.lifeTime'));
 				stepDispatcher.setLifeTime(lifeTime);
-				
-				previosChessDeskI = 0;
-				previosChessDeskJ = 0;
 				
 				if(args[0]==undefined){
 					indNumber = Math.round(Math.random()*1000);
@@ -104,14 +98,11 @@ package konstantinz.community.comStage{
 				maturingDeley = 0;
 
 				chessDesk = desk;
-			
-				individualPicture = new IndividualGraphicInterface(
-					2,
-					int(indConfiguration.getOption('main.individualSize')),//Максимальный размер особи
-					adultAge
-					);
-					
-				individualPicture.drawIndividual();
+				
+				indPlacement = new Array();
+				indPlacement.x = 0;
+				indPlacement.y = 0;
+				indPlacement.direction = 0;
 			
 				motionBehaviour = new MotionBehaviourSwitcher(chessDesk);
 				motionBehaviour.setViewDistance(int(indConfiguration.getOption('main.behaviourSwitching.viewDistance')));
@@ -176,7 +167,7 @@ package konstantinz.community.comStage{
 				indStatus = YSIGN;
 				}
 			
-			if(chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals.length == 2 && chessDesk[currentChessDeskI][currentChessDeskJ].individualName != indNumber){//Если встретились две особи
+			if(chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals.length >= 2 && chessDesk[currentChessDeskI][currentChessDeskJ].individualName != indNumber){//Если встретились две особи
 				return false;
 				
 				}else{
@@ -216,7 +207,7 @@ package konstantinz.community.comStage{
 			}
 						
 			var amIAdult:Boolean = isIndividualAdult();//Стоит здесь, так как взрослеть особь должна в не зависимости от того, стоит она на месте или движется
-			var indAgeState:String = 'young';
+			indAgeState = 'young';
 			
 			if(stepDispatcher.getState() == 'moving' && deleySteps==0){//И если отстояли на месте положенное количество тиков таймера, двигаемся дальше
 				
@@ -225,7 +216,8 @@ package konstantinz.community.comStage{
 				var amIAlong:Boolean = isIndividualAlong();
 	
 					if(!amIAlong){
-					  individualPicture.markIndividual('collision');//Визуально отмечаем факт встречи особей
+					  stepDispatcher.setState('collision');
+					  
 					  if(amIAdult){
 					    indAgeState = 'adult'
 						if(chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals =='AA'){//Если встретились две взрослые
@@ -233,18 +225,15 @@ package konstantinz.community.comStage{
 					       }
 						}
 					}else{
-						individualPicture.markIndividual('nothing');
+						 stepDispatcher.setState('moving');
 						}
 						
 				currentChessDeskI = myBehaviour.getNewPosition(currentChessDeskI,currentChessDeskJ).x;
 				currentChessDeskJ = myBehaviour.getNewPosition(currentChessDeskI,currentChessDeskJ).y;
 				chessDesk[currentChessDeskI][currentChessDeskJ].individualName = indNumber;
-			
-				individualPicture.nextStep(//Передаем координаты, куда особи надо переместится на следующем шаге
-					chessDesk[currentChessDeskI][currentChessDeskJ].sqrX + 1,
-					chessDesk[currentChessDeskI][currentChessDeskJ].sqrY +1,
-					indAgeState//Взрослая ли уже особь или еще надо расти
-					);
+				
+				indPlacement.x = chessDesk[currentChessDeskI][currentChessDeskJ].sqrX + 1;
+				indPlacement.y = chessDesk[currentChessDeskI][currentChessDeskJ].sqrY +1;
 				}
 			  
 			  if(chessDesk[currentChessDeskI][currentChessDeskJ].behaviourModel != ''){//Если в новом квадарте указанно поведение, которое особь должна начать проявлять
@@ -256,18 +245,17 @@ package konstantinz.community.comStage{
 		}
 			
 		private function killIndividual():void{//Убирает особь со сцены
+			var deltaTime:int;
 			//функция относительно платформонезависимая, так как таймеры и слушатели событий есть и в других языках
 			stepDispatcher.setState('dead');//Теперь, если кто то попытается обратится к особи, он будет по крайне мере знать, что она присмерти
-			individualPicture.markIndividual('dead');
-		
-			var deltaTime:int;
 				
 			lifeEnd = new Date();
 			timerForIndividuals.stop();//Выключаем таймер
 			timerForIndividuals.removeEventListener(TimerEvent.TIMER, internalMoveImpuls);//И отсоединяемся от него
 				
 			deltaTime = lifeEnd.getTime() - lifeStart.getTime();
-			
+			chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals = '';//Освобождаем ячейку от следов своего присутсвия
+		
 			msgString = 'Individual ' + indNumber + ' is dead. R.I.P. \n' + 'It lived ' + Math.round((deltaTime)*0.00006) + ' min';
 			messenger.message(msgString, modelEvent.INFO_MARK);
 			}
@@ -287,25 +275,17 @@ package konstantinz.community.comStage{
 			nextStep();
 			stepDispatcher.stepDone();
 			}
-		
-		private function markSuspendede(e:Event):void{
-			individualPicture.markIndividual('stoped');
-			}
 			
 		public function stop():void{//Так особь можно заставить остановится
 			msgString = 'Individual number '+ indNumber + ' has been stoped';
 			messenger.message(msgString, modelEvent.DEBUG_MARK);
-			individualPicture.markIndividual('stoped');
+			stepDispatcher.setState('suspend');
 			}
 		
 		public function start():void{//Так особь можно заставить двигаться снова
 			msgString = 'Individual number '+ indNumber + ' has been started';
 			messenger.message(msgString, modelEvent.DEBUG_MARK);
-			individualPicture.markIndividual('nothing');
-			}
-		
-		public function getTickInterval():int{//Внешние модули могут узнавать частоту обновления состояния особи
-			return tickInterval;
+			stepDispatcher.setState('moving')
 			}
 		
 		public function name(newNumber:int = -1):int{
@@ -347,6 +327,14 @@ package konstantinz.community.comStage{
 				return stepDispatcher.getState();
 			}
 		
+		public function placement():Array{
+			return indPlacement;
+			}
+		
+		public function age():String{
+			return indAgeState;
+			}
+		
 		public function behaviour(newBehaviour:String = 'empty'):String{
 			var currentBehaviourName:String = 'undefined'
 				if(motionBehaviour != null){
@@ -358,5 +346,6 @@ package konstantinz.community.comStage{
 					}
 				return currentBehaviourName;
 			}
+			
 	}
 }

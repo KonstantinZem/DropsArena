@@ -12,8 +12,8 @@ package konstantinz.plugins{
 		private const BORDERCOLOR:Number = 0x000000;
 	
 		private var plotSize:int;//Количество пробных площадок
-		private var plotsXQuantaty:int//Колиство квадратов в ряду
-		private var plotsYQuantaty:int//Колиство квадратов в столбце
+		private var plotsXQuantaty:int;//Колиство квадратов в ряду
+		private var plotsYQuantaty:int;//Колиство квадратов в столбце
 		private var plotsPosition:Array;//Координаты площадок (чтобы не высчитывать их каждый раз заново)
 		private var plotsCells:Array;
 		private var cellSize:int;

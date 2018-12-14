@@ -2,7 +2,7 @@
 
 import flash.events.Event
 
-	import flash.display.Sprite;
+	//import flash.display.Sprite;
 	import flash.errors.IllegalOperationError;
 	import flash.utils.*;
 	import konstantinz.community.auxilarity.*;

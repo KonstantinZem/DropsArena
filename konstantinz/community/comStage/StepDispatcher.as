@@ -13,6 +13,7 @@ package konstantinz.community.comStage{
 		private var lifeTime:int;
 		private var pauseTime:int;
 		private var messenger:Messenger;
+		private var collisionTime:int
 		
 		public static const DO_STEP:String = 'do_step';//Событие посылается особи, внутри которой находится экземпляр этого класса
 		public static const STEP_DONE:String = 'step_done';
@@ -46,6 +47,11 @@ package konstantinz.community.comStage{
 					indState = 'dead';
 				break;
 				
+				case 'collision':
+					indState = 'collision';
+					collisionTime = 5
+				break;
+				
 				default:
 					indState = 'moving';
 				break;
@@ -72,6 +78,13 @@ package konstantinz.community.comStage{
 					indState = 'moving';
 					}
 				}
+				if(indState == 'collision'){
+					collisionTime --;
+					}
+				if(collisionTime < 0){
+					indState = 'moving';
+					collisionTime = 0;
+					}
 			}
 		public function stepDone():void{
 			dispatchEvent(new Event(StepDispatcher.STEP_DONE));

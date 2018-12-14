@@ -12,6 +12,7 @@ public class IndividualGraphicInterface extends Sprite{
 	private const STOPEDCOLOR:Number = 0x808080; 
 	private var indSize:Number;//Размер квадрата особи
 	private var growthRange:Number;//Прирост особи за один шаг
+	private var collisionMark
 	
 	public var individualBody:Sprite;
 	
@@ -36,7 +37,7 @@ public class IndividualGraphicInterface extends Sprite{
 		individualBody.graphics.drawRect(0,0,indSize,indSize);
 		}
 	
-	public function nextStep(newX:int, newY:int, growth:String = 'young'):void{
+	public function dotStep(newX:int, newY:int, statement:String, growth:String = 'young'):void{
 		
 		individualBody.x = newX;
 		individualBody.y = newY;
@@ -44,6 +45,7 @@ public class IndividualGraphicInterface extends Sprite{
 			individualBody.scaleX = individualBody.scaleX = individualBody.scaleX + growthRange;
 			individualBody.scaleY = individualBody.scaleY = individualBody.scaleY + growthRange;
 			}
+		markIndividual(statement);
 		}
 	
 	public function markIndividual(individualState:String):void{//Отмечает цветом особей в различном состоянии
@@ -55,23 +57,32 @@ public class IndividualGraphicInterface extends Sprite{
 				individualBody.transform.colorTransform = ct;
 			break; 
 					
-			case 'nothing':
+			case 'moving':
 				ct.color = INDCOLOR;
 				individualBody.transform.colorTransform = ct;
 			break; 
 					
-		    case 'stoped':
+		    case 'suspend':
 				ct.color = STOPEDCOLOR;
 				individualBody.transform.colorTransform = ct;
 			break;
 			case 'dead'://Мертвых особей делаем невидимыми, уменьшая их размер до нуля
-					individualBody.scaleX = 0.001;
-					individualBody.scaleY = 0.001;
+					individualBody.scaleX = 0.0001;
+					individualBody.scaleY = 0.0001;
 			break;
 			default: 
 				ct.color = INDCOLOR;
 				individualBody.transform.colorTransform = ct;
+				trace ('wrong statement code')
+			break;
 				}
+		}
+	
+	private function resetColor(){
+		var ct:ColorTransform = new ColorTransform();
+		ct.color = INDCOLOR;
+		individualBody.transform.colorTransform = ct;
+		collisionMark = 'false'
 		}
 		
 	

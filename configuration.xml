@@ -13,10 +13,10 @@
 	<offspringsQuant>10</offspringsQuant>
 	<individualSize>12</individualSize>
 	<!-- initPosition of individual can be left-top, left-bottom,  right-top, right-bottom, center and random -->
-	<initPosition>random</initPosition>
+	<initPosition>left-top</initPosition>
 	<statRefreshTime>35</statRefreshTime>
 	<stepLength>1</stepLength>
-	<pluginsList>plugins/mowing.swf;plugins/ground.swf;plugins/grass.swf;plugins/grass2.swf;plugins/grass3.swf;plugins/grass4.swf;plugins/activity.swf;plugins/death.swf;plugins/morisitaCounter.swf</pluginsList>
+	<pluginsList>plugins/relief.swf;plugins/mowing.swf;plugins/ground.swf;plugins/grass.swf;plugins/grass2.swf;plugins/grass3.swf;plugins/grass4.swf;plugins/activity.swf;plugins/death.swf;plugins/morisitaCounter.swf</pluginsList>
 	<arePluginsActiveOnLoading>false</arePluginsActiveOnLoading>
 	<behaviourSwitching>
 		<enable>true</enable>
@@ -40,6 +40,29 @@
 	</behaviourSwitching>
 </main>
 <plugins>
+	<relief>
+		<description>Relief</description>
+		<icon></icon>
+		<picture>pictures/park/relief.png</picture>
+		<stepDeley>10</stepDeley>
+		<debugLevel>1</debugLevel>
+		<color>0xf3f2d1</color>
+		<switching_event>calendar_data</switching_event>
+		<data>
+			<observation>
+				<day>13.10.10</day>
+			</observation>
+			<observation>
+				<day>14.06.11</day>
+			</observation>
+			<observation>
+				<day>19.08.11</day>
+			</observation>
+			<observation>
+				<day>10.10.11</day>
+			</observation>
+		</data>
+	</relief>
 	<grass>
 		<description>Aegopodium podagraria grass cover</description>
 		<icon></icon>
@@ -71,7 +94,7 @@
 		<color>0xf4e17f</color>
 		<behaviour_model>MomentalDeath</behaviour_model>
 		<!--behaviour_frequency individual will change it's behaviour in each second cell-->
-		<behaviour_frequency>30</behaviour_frequency>
+		<behaviour_frequency>60</behaviour_frequency>
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>
@@ -181,8 +204,6 @@
 		<description>Changing activity of individuals on a stage according field observation data</description>
 		<icon></icon>
 		<signal>stop</signal>
-		<!--Individual lives as long as 6 yearth, but my observings is only tree-->
-		<steps>3500</steps>
 		<!--Step interval is number of individul steps between plugin jobe-->
 		<switchingInterval>378</switchingInterval>
 		<debugLevel>1</debugLevel>
