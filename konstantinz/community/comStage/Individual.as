@@ -30,6 +30,8 @@ package konstantinz.community.comStage{
 		private var indNumber:int;
 		private var maturingDeley:int;//Промежуток между размножениями
 		private var adultAge:int;//Время взросления. Передается из настроек
+		private var amIAdult:Boolean;
+		private var amIAlong:Boolean;
 		private var offspringsQuant:int;
 		private var currentChessDeskI:int;//Номер строки текущего квадрата
 		private var currentChessDeskJ:int;//Номер столбца текущего квадрата
@@ -41,7 +43,7 @@ package konstantinz.community.comStage{
 		private var indPlacement:Array;
 		private var msgString:String;
 		private var debugLevel:String;
-		private var indAgeState:String
+		private var indAgeState:String;
 		private var indStatus:String;//Так как особи могут подаваться внешние команды, надо всегда знать может ли особь эти команды выполнить
 		private var currentBehaviourName:String;//Переключаться поведение будет только если название поведения из пришедшего сообщения будет отличаться от записанного сюда
 		
@@ -131,6 +133,7 @@ package konstantinz.community.comStage{
 				messenger.message(msgString, modelEvent.INIT_MSG_MARK);
 				
 				indStatus = 'active';
+				indAgeState = 'young';
 			
 			}catch(error:ArgumentError){
 				msgString = error.message;
@@ -178,7 +181,7 @@ package konstantinz.community.comStage{
 		
 		private function maturing():void{
 			//функция полностью платформонезависимая
-			if(maturingDeley==0){
+			if(maturingDeley <= 0){
 				
 				IndividualEvent.currentChessDeskI = currentChessDeskI;
 				IndividualEvent.currentChessDeskJ = currentChessDeskJ;
@@ -205,21 +208,22 @@ package konstantinz.community.comStage{
 			if(deleySteps > 0){
 				deleySteps--;//Уменьшаем количество пропущеных ходов
 			}
-						
-			var amIAdult:Boolean = isIndividualAdult();//Стоит здесь, так как взрослеть особь должна в не зависимости от того, стоит она на месте или движется
-			indAgeState = 'young';
+			
+			if(indAgeState == 'young'){//Если особь уже выросла, зачем это проверять лишний раз
+				amIAdult = isIndividualAdult();//Стоит здесь, так как взрослеть особь должна в не зависимости от того, стоит она на месте или движется
+				}
 			
 			if(stepDispatcher.getState() == 'moving' && deleySteps==0){//И если отстояли на месте положенное количество тиков таймера, двигаемся дальше
 				
 				deleySteps = myBehaviour.getPlaceQuality(currentChessDeskI,currentChessDeskJ);//Смотрим на новой клетке число ходов
 			
-				var amIAlong:Boolean = isIndividualAlong();
+				amIAlong = isIndividualAlong();
 	
 					if(!amIAlong){
 					  stepDispatcher.setState('collision');
 					  
 					  if(amIAdult){
-					    indAgeState = 'adult'
+					    indAgeState = 'adult';
 						if(chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals =='AA'){//Если встретились две взрослые
 						   maturing();
 					       }
@@ -260,6 +264,11 @@ package konstantinz.community.comStage{
 			messenger.message(msgString, modelEvent.INFO_MARK);
 			}
 			
+			private function step(e:Event):void{//Вызывается из indDispatcher каждй раз, когда из него приходит событие StepDispatcher.DO_STEP
+				nextStep();
+				stepDispatcher.stepDone();
+				}
+			
 ////////////////////////////Public////////////////////////////////////////////////////
 		
 		public function externalTimer():void{ //Возможность управлять особью при помощью внешнего таймера
@@ -270,10 +279,6 @@ package konstantinz.community.comStage{
 			
 		public function doStep():void{//Заставляем особь двигаться по внешнему таймеру
 			stepDispatcher.doStep();
-			}
-		private function step(e:Event):void{//Вызывается из indDispatcher каждй раз, когда из него приходит событие StepDispatcher.DO_STEP
-			nextStep();
-			stepDispatcher.stepDone();
 			}
 			
 		public function stop():void{//Так особь можно заставить остановится

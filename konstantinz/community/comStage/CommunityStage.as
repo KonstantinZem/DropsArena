@@ -37,7 +37,7 @@ package konstantinz.community.comStage{
 						throw new Error(errorType.paramError);
 						}
 					}
-				squSize = int(extOptions.getOption('main.individualSize'));
+				squSize = (stgw*int(extOptions.getOption('main.cellSize')))/100;
 				if(squSize<CRITICAL_LEVEL){//Если мы рискуем получить слишком много слишком мелких квадратов
 					throw new Error(errorType.tooSmall + ' ' + errorType.unstableWarning);//Лучше сразу выбросить ошибку, чтобы не повесить комп
 					}
@@ -65,7 +65,7 @@ package konstantinz.community.comStage{
 				var ypos:int = 0;
 				var counterI:int;
 				var counterJ:int;
-				
+					
 				chessDesk = new Array(sqrQantH);
 				
 				counterI = chessDesk.length;

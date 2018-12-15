@@ -77,10 +77,8 @@
 		private function loadPlugins(pluginNumber:int):void{//Начинаем загрузку файлов плагинов в корневой ролик
 			
 			if(pluginNumber > pluginsList.length -1){//Когда список плагинов закончился, прерываемся
-				//loaderEvent.pluginName = 'last';//Это сообщение принимается в main
 				loaderEvent.pluginLoaded();
-				//msgString = 'All plugins has loaded';
-				//messenger.message(msgString, modelEvent.INIT_MSG_MARK);
+				messenger.message(msgString, modelEvent.INIT_MSG_MARK);
 				}
            else{
 				plugins[pluginNumber].contentLoaderInfo.addEventListener(Event.COMPLETE, onPluginFileDownloading);//Это событие должно придти от URLRequest 

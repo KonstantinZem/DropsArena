@@ -5,13 +5,14 @@
 	<debugLevel>1</debugLevel>
 	<pluginEnable>true</pluginEnable>
 	<!-- indQuntaty how many individuals must to be created at the start -->
-	<indQuntaty>600</indQuntaty>
-	<lifeTime>273000</lifeTime>
+	<indQuntaty>800</indQuntaty>
+	<lifeTime>347200</lifeTime>
 	<lifeQuant>1</lifeQuant>
-	<adultAge>50000</adultAge>
-	<maturingDeley>50000</maturingDeley>
-	<offspringsQuant>10</offspringsQuant>
-	<individualSize>12</individualSize>
+	<adultAge>20300</adultAge>
+	<maturingDeley>4600</maturingDeley>
+	<offspringsQuant>25</offspringsQuant>
+	<!--Cell size in percents from stage size-->
+	<cellSize>1</cellSize>
 	<!-- initPosition of individual can be left-top, left-bottom,  right-top, right-bottom, center and random -->
 	<initPosition>left-top</initPosition>
 	<statRefreshTime>35</statRefreshTime>
@@ -61,6 +62,12 @@
 			<observation>
 				<day>10.10.11</day>
 			</observation>
+			<observation>
+				<day>12.06.12</day>
+			</observation>
+			<observation>
+				<day>02.08.12</day>
+			</observation>
 		</data>
 	</relief>
 	<grass>
@@ -84,6 +91,12 @@
 			<observation>
 				<day>10.10.11</day>
 			</observation>
+			<observation>
+				<day>12.06.12</day>
+			</observation>
+			<observation>
+				<day>02.08.12</day>
+			</observation>
 		</data>
 	</grass>
 	<mowing>
@@ -94,7 +107,7 @@
 		<color>0xf4e17f</color>
 		<behaviour_model>MomentalDeath</behaviour_model>
 		<!--behaviour_frequency individual will change it's behaviour in each second cell-->
-		<behaviour_frequency>60</behaviour_frequency>
+		<behaviour_frequency>40</behaviour_frequency>
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>
@@ -108,6 +121,12 @@
 			</observation>
 			<observation>
 				<day>08.10.11</day>
+			</observation>
+			<observation>
+				<day>11.06.12</day>
+			</observation>
+			<observation>
+				<day>01.08.12</day>
 			</observation>
 		</data>
 	</mowing>
@@ -130,6 +149,12 @@
 			</observation>
 			<observation>
 				<day>10.10.11</day>
+			</observation>
+			<observation>
+				<day>11.06.12</day>
+			</observation>
+			<observation>
+				<day>02.08.12</day>
 			</observation>
 		</data>
 	</ground>
@@ -154,6 +179,12 @@
 			<observation>
 				<day>10.10.11</day>
 			</observation>
+			<observation>
+				<day>12.06.12</day>
+			</observation>
+			<observation>
+				<day>02.08.12</day>
+			</observation>
 		</data>
 	</grass2>
 	<grass3>
@@ -177,6 +208,12 @@
 			<observation>
 				<day>10.10.11</day>
 			</observation>
+			<observation>
+				<day>12.06.12</day>
+			</observation>
+			<observation>
+				<day>02.08.12</day>
+			</observation>
 		</data>
 	</grass3>
 	<grass4>
@@ -198,6 +235,12 @@
 			<observation>
 				<day>10.10.11</day>
 			</observation>
+			<observation>
+				<day>12.06.12</day>
+			</observation>
+			<observation>
+				<day>02.08.12</day>
+			</observation>
 		</data>
 	</grass4>
 	<activity>
@@ -205,7 +248,7 @@
 		<icon></icon>
 		<signal>stop</signal>
 		<!--Step interval is number of individul steps between plugin jobe-->
-		<switchingInterval>378</switchingInterval>
+		<switchingInterval>278</switchingInterval>
 		<debugLevel>1</debugLevel>
 		<selectionType>percents</selectionType>
 		<!--switching_event define the event making plugin work. Can be timer or calendar_data-->
@@ -218,10 +261,12 @@
 			<observation>
 				<part>0</part>
 				<day>08.09.10</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>09.09.10</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>25</part>
@@ -242,26 +287,32 @@
 			<observation>
 				<part>0</part>
 				<day>20.09.10</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>83</part>
 				<day>20.09.10</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>64</part>
 				<day>21.09.10</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>45</part>
 				<day>21.09.10</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>8</part>
 				<day>24.09.10</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>64</part>
 				<day>24.09.10</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>14</part>
@@ -270,50 +321,62 @@
 			<observation>
 				<part>38</part>
 				<day>27.09.10</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>100</part>
 				<day>27.09.10</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>100</part>
 				<day>27.09.10</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>91</part>
 				<day>27.09.10</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>50</part>
 				<day>29.09.10</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>92</part>
 				<day>29.09.10</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>100</part>
 				<day>29.09.10</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>90</part>
 				<day>01.10.10</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>73</part>
 				<day>01.10.10</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>11</part>
 				<day>01.10.10</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>04.10.10</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>7</part>
 				<day>04.10.10</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>0</part>
@@ -332,10 +395,12 @@
 			<observation>
 				<part>59</part>
 				<day>20.10.10</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>100</part>
 				<day>20.10.10</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>0</part>
@@ -348,10 +413,12 @@
 			<observation>
 				<part>25</part>
 				<day>10.11.10</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>50</part>
 				<day>10.11.10</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>100</part>
@@ -360,10 +427,12 @@
 			<observation>
 				<part>25</part>
 				<day>15.11.10</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>22</part>
 				<day>15.11.10</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>17</part>
@@ -384,10 +453,12 @@
 			<observation>
 				<part>100</part>
 				<day>05.04.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>43</part>
 				<day>05.04.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>23</part>
@@ -396,14 +467,17 @@
 			<observation>
 				<part>45</part>
 				<day>07.04.11</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>76</part>
 				<day>07.04.11</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>100</part>
 				<day>07.04.11</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>22</part>
@@ -416,18 +490,22 @@
 			<observation>
 				<part>0</part>
 				<day>13.04.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>12</part>
 				<day>13.04.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>14.04.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>26</part>
 				<day>14.04.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>0</part>
@@ -436,10 +514,12 @@
 			<observation>
 				<part>21</part>
 				<day>18.04.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>18.04.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>11</part>
@@ -452,10 +532,12 @@
 			<observation>
 				<part>0</part>
 				<day>22.04.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>3</part>
 				<day>22.04.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>30</part>
@@ -464,22 +546,27 @@
 			<observation>
 				<part>39</part>
 				<day>26.04.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>44</part>
 				<day>26.04.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>81</part>
 				<day>27.04.11</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>27.04.11</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>78</part>
 				<day>27.04.11</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>65</part>
@@ -488,22 +575,27 @@
 			<observation>
 				<part>100</part>
 				<day>04.05.11</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>100</part>
 				<day>04.05.11</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>100</part>
 				<day>04.05.11</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>89</part>
 				<day>04.05.11</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>60</part>
 				<day>04.05.11</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>50</part>
@@ -516,14 +608,17 @@
 			<observation>
 				<part>61</part>
 				<day>11.05.11</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>11.05.11</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>88</part>
 				<day>11.05.11</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>28</part>
@@ -532,50 +627,62 @@
 			<observation>
 				<part>56</part>
 				<day>14.05.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>14.05.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>16.05.11</day>
+				<duration>60</duration>
 			</observation>
 			<observation>
 				<part>91</part>
 				<day>16.05.11</day>
+				<duration>60</duration>
 			</observation>
 			<observation>
 				<part>84</part>
 				<day>16.05.11</day>
+				<duration>60</duration>
 			</observation>
 			<observation>
 				<part>91</part>
 				<day>16.05.11</day>
+				<duration>60</duration>
 			</observation>
 			<observation>
 				<part>94</part>
 				<day>16.05.11</day>
+				<duration>60</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>17.05.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>42</part>
 				<day>17.05.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>43</part>
 				<day>18.05.11</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>18.05.11</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>88</part>
 				<day>18.05.11</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>58</part>
@@ -588,22 +695,27 @@
 			<observation>
 				<part>100</part>
 				<day>25.05.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>50</part>
 				<day>25.05.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>11</part>
 				<day>27.05.11</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>27.05.11</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>27.05.11</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>0</part>
@@ -618,18 +730,22 @@
 			<observation>
 				<part>0</part>
 				<day>15.06.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>18</part>
 				<day>15.06.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>16.06.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>16.06.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>0</part>
@@ -642,26 +758,32 @@
 			<observation>
 				<part>50</part>
 				<day>22.06.11</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>61</part>
 				<day>22.06.11</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>100</part>
 				<day>22.06.11</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>50</part>
 				<day>22.06.11</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>81</part>
 				<day>03.07.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>85</part>
 				<day>03.07.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>33</part>
@@ -674,10 +796,12 @@
 			<observation>
 				<part>67</part>
 				<day>23.07.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>84</part>
 				<day>23.07.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>0</part>
@@ -696,10 +820,12 @@
 			<observation>
 				<part>100</part>
 				<day>22.08.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>63</part>
 				<day>22.08.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>48</part>
@@ -708,14 +834,17 @@
 			<observation>
 				<part>0</part>
 				<day>26.09.11</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>26.09.11</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>26.09.11</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>0</part>
@@ -724,10 +853,12 @@
 			<observation>
 				<part>0</part>
 				<day>27.09.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>100</part>
 				<day>27.09.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>76</part>
@@ -770,6 +901,7 @@
 			<observation>
 				<part>33</part>
 				<day>08.10.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>62</part>
@@ -782,10 +914,12 @@
 			<observation>
 				<part>92</part>
 				<day>12.10.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>100</part>
 				<day>12.10.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>48</part>
@@ -802,18 +936,22 @@
 			<observation>
 				<part>29</part>
 				<day>19.10.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>19.10.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>88</part>
 				<day>20.10.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>70</part>
 				<day>20.10.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>22</part>
@@ -826,26 +964,32 @@
 			<observation>
 				<part>38</part>
 				<day>24.10.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>68</part>
 				<day>24.10.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>100</part>
 				<day>25.10.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>88</part>
 				<day>25.10.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>13</part>
 				<day>26.10.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>16</part>
 				<day>26.10.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>17</part>
@@ -862,18 +1006,22 @@
 			<observation>
 				<part>100</part>
 				<day>01.11.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>100</part>
 				<day>01.11.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>71</part>
 				<day>02.11.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>88</part>
 				<day>02.11.11</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>9</part>
@@ -938,74 +1086,92 @@
 			<observation>
 				<part>96</part>
 				<day>16.04.12</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>100</part>
 				<day>16.04.12</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>78</part>
 				<day>16.04.12</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>100</part>
 				<day>16.04.12</day>
+				<duration>980</duration>
 			</observation>
 			<observation>
 				<part>71</part>
 				<day>17.04.12</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>92</part>
 				<day>17.04.12</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>12</part>
 				<day>17.04.12</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>28</part>
 				<day>17.04.12</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>18.04.12</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>18.04.12</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>92</part>
 				<day>19.04.12</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>85</part>
 				<day>19.04.12</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>34</part>
 				<day>20.04.12</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>40</part>
 				<day>20.04.12</day>
+				<duration>60</duration>
 			</observation>
 			<observation>
 				<part>40</part>
 				<day>20.04.12</day>
+				<duration>60</duration>
 			</observation>
 			<observation>
 				<part>11</part>
 				<day>20.04.12</day>
+				<duration>60</duration>
 			</observation>
 			<observation>
 				<part>13</part>
 				<day>20.04.12</day>
+				<duration>60</duration>
 			</observation>
 			<observation>
 				<part>90</part>
 				<day>20.04.12</day>
+				<duration>60</duration>
 			</observation>
 			<observation>
 				<part>78</part>
@@ -1014,98 +1180,122 @@
 			<observation>
 				<part>10</part>
 				<day>25.04.12</day>
+				<duration>60</duration>
 			</observation>
 			<observation>
 				<part>11</part>
 				<day>25.04.12</day>
+				<duration>60</duration>
 			</observation>
 			<observation>
 				<part>88</part>
 				<day>25.04.12</day>
+				<duration>60</duration>
 			</observation>
 			<observation>
 				<part>100</part>
 				<day>25.04.12</day>
+				<duration>60</duration>
 			</observation>
 			<observation>
 				<part>67</part>
 				<day>26.04.12</day>
+				<duration>60</duration>
 			</observation>
 			<observation>
 				<part>91</part>
 				<day>26.04.12</day>
+				<duration>60</duration>
 			</observation>
 			<observation>
 				<part>16</part>
 				<day>26.04.12</day>
+				<duration>60</duration>
 			</observation>
 			<observation>
 				<part>100</part>
 				<day>26.04.12</day>
+				<duration>60</duration>
 			</observation>
 			<observation>
 				<part>96</part>
 				<day>26.04.12</day>
+				<duration>60</duration>
 			</observation>
 			<observation>
 				<part>93</part>
 				<day>29.04.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>100</part>
 				<day>29.04.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>69</part>
 				<day>29.04.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>5</part>
 				<day>29.04.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>29.04.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>57</part>
 				<day>29.04.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>29.04.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>24</part>
 				<day>29.04.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>100</part>
 				<day>30.04.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>61</part>
 				<day>30.04.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>86</part>
 				<day>30.04.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>30.04.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>78</part>
 				<day>30.04.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>30.04.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>12</part>
 				<day>30.04.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>63</part>
@@ -1118,10 +1308,12 @@
 			<observation>
 				<part>96</part>
 				<day>06.05.12</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>47</part>
 				<day>06.05.12</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>100</part>
@@ -1130,14 +1322,17 @@
 			<observation>
 				<part>93</part>
 				<day>07.05.12</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>20</part>
 				<day>07.05.12</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>71</part>
 				<day>07.05.12</day>
+				<duration>80</duration>
 			</observation>
 			<observation>
 				<part>32</part>
@@ -1170,42 +1365,52 @@
 			<observation>
 				<part>90</part>
 				<day>14.05.12</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>32</part>
 				<day>14.05.12</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>89</part>
 				<day>21.05.12</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>44</part>
 				<day>21.05.12</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>21.05.12</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>100</part>
 				<day>22.05.12</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>22.05.12</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>36</part>
 				<day>22.05.12</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>20</part>
 				<day>02.06.12</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>02.06.12</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>73</part>
@@ -1214,26 +1419,32 @@
 			<observation>
 				<part>100</part>
 				<day>06.06.12</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>71</part>
 				<day>06.06.12</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>06.06.12</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>48</part>
 				<day>07.06.12</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>07.06.12</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>07.06.12</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>59</part>
@@ -1242,38 +1453,48 @@
 			<observation>
 				<part>94</part>
 				<day>11.06.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>100</part>
 				<day>11.06.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>11.06.12</day>
+				<!--This aquial to two hours of moawing working-->
+				<duration>15</duration>
 			</observation>
 			<observation>
 				<part>68</part>
 				<day>11.06.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>11.06.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>6</part>
 				<day>11.06.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>11</part>
 				<day>11.06.12</day>
+				<duration>50</duration>
 			</observation>
 			<observation>
 				<part>96</part>
 				<day>12.06.12</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>50</part>
 				<day>12.06.12</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>100</part>
@@ -1294,14 +1515,17 @@
 			<observation>
 				<part>48</part>
 				<day>18.06.12</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>0</part>
 				<day>18.06.12</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>6</part>
 				<day>18.06.12</day>
+				<duration>100</duration>
 			</observation>
 			<observation>
 				<part>13</part>
@@ -1322,18 +1546,23 @@
 			<observation>
 				<part>0</part>
 				<day>01.08.12</day>
+				<!--This aquial to two hours of moawing working-->
+				<duration>15</duration>
 			</observation>
 			<observation>
 				<part>21</part>
 				<day>01.08.12</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>64</part>
 				<day>02.08.12</day>
+				<duration>150</duration>
 			</observation>
 			<observation>
 				<part>14</part>
 				<day>02.08.12</day>
+				<duration>150</duration>
 			</observation>
 	</data>
 	</activity>

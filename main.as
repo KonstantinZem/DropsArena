@@ -25,7 +25,7 @@ package{
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
 		private const MIN_INDIVIDUAL_CRITICAL_NUMBER:int = 5;//Минимально подходящие для отслеживания статистики количество особей
 		private const MAX_INDIVIDUAL_CRITICAL_NUMBER:int = 3000;
-		private const PAUSE_AFTER_CYCLE:int = 5;//Время паузы между циклами передвижения особей
+		private const PAUSE_AFTER_CYCLE:int = 2;//Время паузы между циклами передвижения особей
 		private const DEAD_INDIVIDUALS_REMOVING_INTERVAL:int = 100;
 		
 		private var stgHeight:int;
@@ -311,7 +311,7 @@ package{
 				individuals[i] = new Individual(commStage.chessDesk,configuration,i,indX,indY);
 				individualPictures[i] = new IndividualGraphicInterface(
 					2,
-					int(configuration.getOption('main.individualSize')),//Максимальный размер особи
+					commStage.chessDesk[0][0].picture.width,//Максимальный размер особи
 					int(configuration.getOption('main.adultAge'))
 					);
 				individualPictures[i].drawIndividual();
@@ -366,7 +366,7 @@ package{
 					individuals[i] = new Individual(commStage.chessDesk, configuration, i,newX,newY);
 					individualPictures[i] = new IndividualGraphicInterface(
 					2,
-					int(configuration.getOption('main.individualSize')),//Максимальный размер особи
+					commStage.chessDesk[0][0].picture.width,//Максимальный размер особи
 					int(configuration.getOption('main.adultAge'))
 					);
 					
@@ -427,6 +427,7 @@ package{
 			}
 		
 		private function onPluginsLoading(e:ModelEvent):void{
+			//trace(commStage.chessDesk[0][0].picture.width)
 			if(plugins.loaderEvent.pluginName =='last'){
 				addChild(startStopButton);//Когда плагины загрузились, показываем кнопку старта. Иначе могут случатся ошибки, когда плагин еще не загрузился а юзер уже пытается его остановить кнопкой
 				addChild(reloadButton);
@@ -504,7 +505,7 @@ package{
 					individuals[i].placement().x,
 					individuals[i].placement().y,
 					individuals[i].statement(),
-					individuals[i].age()//Взрослая ли уже особь или еще надо расти
+					individuals[i].age()
 					);
 				}
 			}else{
