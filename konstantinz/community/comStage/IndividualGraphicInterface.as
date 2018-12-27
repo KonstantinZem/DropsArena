@@ -41,7 +41,7 @@ public class IndividualGraphicInterface extends Sprite{
 		individualBody.graphics.drawRect(0,0,indSize,indSize);
 		}
 	
-	public function dotStep(newX:int, newY:int, statement:String, age = 'young'):void{
+	public function dotStep(newX:int, newY:int, statement:String, age:String = 'young'):void{
 		indAge = age;
 		individualBody.x = newX;
 		individualBody.y = newY;
@@ -88,7 +88,7 @@ public class IndividualGraphicInterface extends Sprite{
 				}
 		}
 	
-	private function resetColor(){
+	private function resetColor():void{
 		var ct:ColorTransform = new ColorTransform();
 		ct.color = INDCOLOR;
 		individualBody.transform.colorTransform = ct;

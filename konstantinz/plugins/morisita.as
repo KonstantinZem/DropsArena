@@ -41,8 +41,8 @@ package konstantinz.plugins{
 			}
 		
 		private function drawMorisitaPlot():void{	//Разлинеивает игровое поле в квадратики для большей наглядности
-			var xpos:int = 0; //Позиция квадрата на поле
-			var ypos:int = 0;
+			var xpos:int = 10; //Позиция квадрата на поле
+			var ypos:int = 10;
 
 			var morisitaPlotSize:int = communityStage.width/plotsXQuantaty;
 
@@ -58,7 +58,7 @@ package konstantinz.plugins{
 					}
 					
 					ypos = ypos+ morisitaPlotSize;
-	                xpos = 0;
+	                xpos = 10;
 				}
 			}
 			
@@ -126,11 +126,13 @@ package konstantinz.plugins{
 			counter = plotsPosition.length;
 			
 			for (var i:int = 0; i< counter; i++){
-				newX = plotsPosition[i][0];
+				newX = plotsPosition[i][0];//Берем заранее подсчитанные позиции квадратов
 				newY = plotsPosition[i][1];
 				ind = countIndividuals(newX,newY,plotSize);
-				individualsInplot.push(ind);
+				individualsInplot.push(ind);//Подсчитываем количество особей в каждом квадрате
 				}
+			//Вот здесь вставляем формулу подсчета другого варианта мориситы
+			
 			
 			allPlotsNumber = individualsInplot.length;
 				
@@ -138,12 +140,12 @@ package konstantinz.plugins{
 				allIndividuals += individualsInplot[i];
 				}
 			
-			for(i = 0; i< allPlotsNumber; i++){
+			for(i = 0; i < allPlotsNumber; i++){
 				niSumm += individualsInplot[i]*(individualsInplot[i]-1);
 				}
 			
 			mIndex = allPlotsNumber*(niSumm/(allIndividuals*(allIndividuals-1)));
-			msgString = 'source data: nidividuals '+ allIndividuals + ', plots ' + allPlotsNumber;
+			msgString = 'source data: Idividuals '+ allIndividuals + ', plots ' + allPlotsNumber;
 			messenger.message(msgString, 3);//Возвращаем индекс Мориситы с точностью 3 знака после запятой
 			
 			return mIndex.toFixed(3);
@@ -152,10 +154,11 @@ package konstantinz.plugins{
 		private function countIndividuals(xcrd:int,ycrd:int,plSize:int):int{//Подсчет количества особей в исследуемых площадках
 			
 			var individualsNumber:int;
-			for(var i:int = 0; i<plSize; i++){
+			for(var i:int = 0; i< plSize; i++){
 		
-				for(var j:int = 0; j<plSize; j++){
-					individualsNumber += communityStage.chessDesk[xcrd+i][ycrd+j].numberOfIndividuals.length;
+				for(var j:int = 0; j< plSize; j++){
+					individualsNumber += communityStage.chessDesk[xcrd+i][ycrd+j].numberOfIndividuals.adult;
+					individualsNumber += communityStage.chessDesk[xcrd+i][ycrd+j].numberOfIndividuals.young;
 					}
 				}
 			return individualsNumber;

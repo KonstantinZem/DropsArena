@@ -84,7 +84,6 @@ package konstantinz.community.comStage{
 						chessDesk[i][j].speedDeleyA = 1;//по умолчанию двигаемся без задержки 
 						chessDesk[i][j].speedDeleyY = 1;
 						chessDesk[i][j].lifeQuant = lifeQuant;
-						chessDesk[i][j].numberOfIndividuals = '';//Изначально в квадрате нет ни одной особи
 						chessDesk[i][j].behaviourModel = '';//Здесь будет хранится название модели поведения, которое будет проявлять особь, находясь на данном квадрате
 						
 						addChild(chessDesk[i][j].picture);
@@ -92,7 +91,7 @@ package konstantinz.community.comStage{
 						}
 					   ypos = ypos + squSize;
 	                   xpos = 0;
-				}
+					}
 				
 				}
 		}

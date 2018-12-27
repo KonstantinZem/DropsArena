@@ -60,12 +60,13 @@ package konstantinz.community.comStage{
 		
 		public var IndividualEvent:DispatchEvent;
 		
-		function Individual(desk:Array, configuration:ConfigurationContainer, ...args){
+		function Individual(stage:Array, configuration:ConfigurationContainer, ...args){
 
 			IndividualEvent = new DispatchEvent();
 			errorType = new ModelErrors();
 			
 			try{
+		
 				indConfiguration = configuration;
 				debugLevel = indConfiguration.getOption('main.debugLevel');
 				messenger = new Messenger(debugLevel);
@@ -98,8 +99,8 @@ package konstantinz.community.comStage{
 				adultAge = int(indConfiguration.getOption('main.adultAge'));
 				offspringsQuant = int(indConfiguration.getOption('main.offspringsQuant'))//Количество оставленных потомков
 				maturingDeley = 0;
-
-				chessDesk = desk;
+				
+				chessDesk = stage;
 				
 				indPlacement = new Array();
 				indPlacement.x = 0;
@@ -160,23 +161,57 @@ package konstantinz.community.comStage{
 			}
 		
 		private function isIndividualAlong():Boolean{//Есть ли в заданном квадрате кто либо еще
-			//Функция платформонезависимая
 			
-			if(adultAge < 0){
-				chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals +=ASIGN;//Делаем в квадрате отметку своего присутсвия
-				indStatus = ASIGN;
-			}else{
-				chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals +=YSIGN;//В квадрате побывала молодая особь
-				indStatus = YSIGN;
-				}
-			
-			if(chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals.length >= 2 && chessDesk[currentChessDeskI][currentChessDeskJ].individualName != indNumber){//Если встретились две особи
+			if(individualCounter('count', 'individuals', currentChessDeskI, currentChessDeskJ) > 1 && chessDesk[currentChessDeskI][currentChessDeskJ].individualName != indNumber){//Если встретились две особи
 				return false;
 				
 				}else{
 					return true;
 					}
 			}
+			
+		private function individualCounter(todo:String, age:String, xpos:int, ypos:int):int{
+				var indNumber:int = 0;
+				var symbolPos:int = 0;
+				var inquiry:String = todo + '_' + age;
+				
+				try{
+					switch(inquiry){
+						case 'add_adult':
+							chessDesk[xpos][ypos].numberOfIndividuals.adult ++;
+						break;
+						case 'add_young':
+							chessDesk[xpos][ypos].numberOfIndividuals.young ++;
+						break;
+						case 'remove_adult':
+							if(chessDesk[xpos][ypos].numberOfIndividuals.adult > 0){//Удаляем, если есть что удалять
+								chessDesk[xpos][ypos].numberOfIndividuals.adult --;
+								}
+						break;
+						case 'remove_young':
+							if(chessDesk[xpos][ypos].numberOfIndividuals.young > 0){//Удаляем, если есть что удалять
+								chessDesk[xpos][ypos].numberOfIndividuals.young --;
+								}
+						break;
+						case 'count_individuals':
+							indNumber = chessDesk[xpos][ypos].numberOfIndividuals.young + chessDesk[xpos][ypos].numberOfIndividuals.adult;
+						break;
+						case 'count_adult':
+							
+							indNumber = chessDesk[xpos][ypos].numberOfIndividuals.adult;
+						break;
+						default:
+							msgString = 'Wrong symbol';
+							messenger.message(msgString, modelEvent.ERROR_MARK);
+						break;
+						}
+					}catch(e:Error){
+						msgString = e.message;
+						messenger.message(msgString, modelEvent.ERROR_MARK);
+						}
+					
+					return indNumber;
+				}
 
 		
 		private function maturing():void{
@@ -224,17 +259,22 @@ package konstantinz.community.comStage{
 					  
 					  if(amIAdult){
 					    indAgeState = 'adult';
-						if(chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals =='AA'){//Если встретились две взрослые
+					   
+						if(individualCounter('count', 'adult', currentChessDeskI, currentChessDeskJ) > 2){//Если встретились две взрослые
 						   maturing();
 					       }
 						}
 					}else{
 						 stepDispatcher.setState('moving');
 						}
+				
+				individualCounter('remove', indAgeState, currentChessDeskI, currentChessDeskJ);
 						
 				currentChessDeskI = myBehaviour.getNewPosition(currentChessDeskI,currentChessDeskJ).x;
 				currentChessDeskJ = myBehaviour.getNewPosition(currentChessDeskI,currentChessDeskJ).y;
 				chessDesk[currentChessDeskI][currentChessDeskJ].individualName = indNumber;
+				
+				individualCounter('add', indAgeState, currentChessDeskI, currentChessDeskJ);
 				
 				indPlacement.x = chessDesk[currentChessDeskI][currentChessDeskJ].sqrX + 1;
 				indPlacement.y = chessDesk[currentChessDeskI][currentChessDeskJ].sqrY +1;
@@ -258,8 +298,9 @@ package konstantinz.community.comStage{
 			timerForIndividuals.removeEventListener(TimerEvent.TIMER, internalMoveImpuls);//И отсоединяемся от него
 				
 			deltaTime = lifeEnd.getTime() - lifeStart.getTime();
-			chessDesk[currentChessDeskI][currentChessDeskJ].numberOfIndividuals = '';//Освобождаем ячейку от следов своего присутсвия
-		
+			
+			individualCounter('remove', indAgeState, currentChessDeskI, currentChessDeskJ);//Освобождаем ячейку от следов своего присутсвия
+			
 			msgString = 'Individual ' + indNumber + ' is dead. R.I.P. \n' + 'It lived ' + Math.round((deltaTime)*0.00006) + ' min';
 			messenger.message(msgString, modelEvent.INFO_MARK);
 			}

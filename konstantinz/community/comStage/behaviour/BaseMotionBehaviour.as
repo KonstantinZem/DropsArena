@@ -50,8 +50,6 @@ package konstantinz.community.comStage.behaviour{
 	
 		public function getNewPosition(currentX:int, currentY:int):Array{//Класс на основе выбранного алгоритма поведения определяет новую позицию особи
 			
-			clearCell();
-			
 			newPosition.x = currentX;
 			newPosition.y = currentY;
 			
@@ -127,14 +125,6 @@ package konstantinz.community.comStage.behaviour{
 			individualName = newNumber;
 			}
 			
-		public function clearCell():void{
-			//функция полностью платформонезависимая
-			previosChessDeskI = newPosition.x;
-			previosChessDeskJ = newPosition.y;
-			populationArea[previosChessDeskI][previosChessDeskJ].numberOfIndividuals = '';
-			populationArea[previosChessDeskI][previosChessDeskJ].individualName = 0;
-			
-			}
 		public function setStepLength(stLength:int = 1):void{
 			stepLength = stLength;
 			}
