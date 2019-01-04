@@ -32,7 +32,7 @@ public class MotionBehaviourSwitcher{
 		
 		currentBehaviourName = 'RandomWalker';
 		}
-	//public function setSuspender(suspender:Suspender):void{//Для некоторых моделей поведения надо будет обращаться к объктам вне особи
+		
 	public function setSuspender(suspender:StepDispatcher):void{
 		indSuspender = suspender;
 		momentalDeath.setSuspender(indSuspender);
@@ -64,7 +64,7 @@ public class MotionBehaviourSwitcher{
 					break;
 					default:
 						newBehaviour = baseMotionBehaviour;
-					break
+					break;
 					
 					}
 				}

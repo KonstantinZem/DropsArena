@@ -211,13 +211,15 @@ public class BehaviourChoicer extends EventDispatcher{
 						rulePosition++;//Если текущий набор правил не соответсвует текущему значению факторов, переходим к следующему набору
 						isBehaviourSuitable='true';
 						}else{
-							dispatchEvent(new Event(BehaviourChoicer.BEHAVIOUR_HAS_FOUND));
+							
 							
 							behaviourType = behaviourSvitchingRules[rulePosition]['behaviour_name']; 
 							
 							behaviourName = behaviourType;
 							msgString = 'Proper behaviour has found: ' + behaviourType + '; '+ paramNamebuffer + '; ' + valueBuffer;
 							messenger.message(msgString, 2);
+							
+							dispatchEvent(new Event(BehaviourChoicer.BEHAVIOUR_HAS_FOUND));
 							break;//Если мы нашли нужное поведение, прекращаем поиск
 							}
 

@@ -49,7 +49,7 @@ package konstantinz.community.comStage.behaviour{
 			}
 	
 		public function getNewPosition(currentX:int, currentY:int):Array{//Класс на основе выбранного алгоритма поведения определяет новую позицию особи
-			
+
 			newPosition.x = currentX;
 			newPosition.y = currentY;
 			

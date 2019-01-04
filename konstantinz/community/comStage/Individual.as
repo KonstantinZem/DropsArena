@@ -37,7 +37,6 @@ package konstantinz.community.comStage{
 		private var currentChessDeskJ:int;//Номер столбца текущего квадрата
 		private var lifeTime:int;
 		private var stepLength:int;//Длинна шага особи
-		private var indDirection:int;//Текущие направление
 		private var deleySteps:int;//количество ходов, которые надо пропустить для замедления движения
 		private var chessDesk:Array; //Ссылка на внешний массив с координатами и условиями среды
 		private var indPlacement:Array;
@@ -106,6 +105,8 @@ package konstantinz.community.comStage{
 				indPlacement.x = 0;
 				indPlacement.y = 0;
 				indPlacement.direction = 0;
+				indPlacement.previousX = 0;
+				indPlacement.previousY = 0;
 			
 				motionBehaviour = new MotionBehaviourSwitcher(chessDesk);
 				motionBehaviour.setViewDistance(int(indConfiguration.getOption('main.behaviourSwitching.viewDistance')));
@@ -238,11 +239,11 @@ package konstantinz.community.comStage{
 		
 		
 		private function nextStep():void{
-
+			
 			//функция платформонезавмсимая, при условии, что кто то будет читать переменную individual.x и individual.y и на изменять сведения о положении особи
 			if(deleySteps > 0){
 				deleySteps--;//Уменьшаем количество пропущеных ходов
-			}
+				}
 			
 			if(indAgeState == 'young'){//Если особь уже выросла, зачем это проверять лишний раз
 				amIAdult = isIndividualAdult();//Стоит здесь, так как взрослеть особь должна в не зависимости от того, стоит она на месте или движется
@@ -269,6 +270,9 @@ package konstantinz.community.comStage{
 						}
 				
 				individualCounter('remove', indAgeState, currentChessDeskI, currentChessDeskJ);
+				
+				indPlacement.previousX = chessDesk[currentChessDeskI][currentChessDeskJ].sqrX + 1;//Сохраняем свое прошлое положение
+				indPlacement.previousY = chessDesk[currentChessDeskI][currentChessDeskJ].sqrY + 1;
 						
 				currentChessDeskI = myBehaviour.getNewPosition(currentChessDeskI,currentChessDeskJ).x;
 				currentChessDeskJ = myBehaviour.getNewPosition(currentChessDeskI,currentChessDeskJ).y;
@@ -277,13 +281,14 @@ package konstantinz.community.comStage{
 				individualCounter('add', indAgeState, currentChessDeskI, currentChessDeskJ);
 				
 				indPlacement.x = chessDesk[currentChessDeskI][currentChessDeskJ].sqrX + 1;
-				indPlacement.y = chessDesk[currentChessDeskI][currentChessDeskJ].sqrY +1;
+				indPlacement.y = chessDesk[currentChessDeskI][currentChessDeskJ].sqrY + 1;
 				}
 			  
 			  if(chessDesk[currentChessDeskI][currentChessDeskJ].behaviourModel != ''){//Если в новом квадарте указанно поведение, которое особь должна начать проявлять
 				motionBehaviour.switchBehaviour(chessDesk[currentChessDeskI][currentChessDeskJ].behaviourModel);//Включаем этот тип
 				}
-				if(stepDispatcher.getState() == 'dead'){
+			  
+			  if(stepDispatcher.getState() == 'dead'){
 				  killIndividual();
 				  }
 		}
@@ -385,9 +390,10 @@ package konstantinz.community.comStage{
 			var currentBehaviourName:String = 'undefined'
 				if(motionBehaviour != null){
 					if(newBehaviour == 'empty'){
-						currentBehaviourName = motionBehaviour.getCurrentBehaviour()
+						currentBehaviourName = motionBehaviour.getCurrentBehaviour();//Если функцию вызвали без параметров, это значит, что она должна просто вывести название текущей модели поведения
 					}else{
 						motionBehaviour.switchBehaviour(newBehaviour);
+						myBehaviour = motionBehaviour.newBehaviour;
 						}
 					}
 				return currentBehaviourName;

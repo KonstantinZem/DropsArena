@@ -2,18 +2,21 @@ package konstantinz.community.comStage.behaviour{
 
 public class BestConditionsWalker extends BaseMotionBehaviour{
 	
-	private var viewDistance:int = 5;//Растояние в клетках на которое простирается взгляд особи
+	private var viewDistance:int = 5;//Растояние в клетках на на котором особь будет искать зону с лучшими условиями
 	
 	public function BestConditionsWalker(){
-		
+	
 		}
 	override public function getNewPosition(currentX:int, currentY:int):Array{//Класс на основе выбранного алгоритма поведения определяет новую позицию особи
+			
 			var newPosition:Array = new Array();
 			
 			currentPlaceQuality = populationArea[currentX][currentY].speedDeleyA;
 			
 			newPosition.x = currentX;
 			newPosition.y = currentY;
+			
+			//trace('prev x:' + newPosition.x + ', y:' + newPosition.y)
 			
 			var indDirection:int = 0;
 			
@@ -39,10 +42,10 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 					}
 					else{
 						if((currentX - viewDistance) < (populationArea.length -2) && populationArea[currentX + viewDistance][currentY].speedDeleyA > currentPlaceQuality){
-						newPosition[0] = currentX + viewDistance;
-						}else{
-							newPosition.x = newPosition.x + stepLength;
-							}
+							newPosition.x = currentX + viewDistance;
+							}else{
+								newPosition.x = newPosition.x + stepLength;
+								}
 						}
 				break;
 				case 2://Идем вверх
@@ -94,12 +97,13 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 				msgString = err.message;
 				messenger.message(msgString, modelEvent.ERROR_MARK);
 				}	
+			//trace('new x:' + newPosition.x + ', y:' + newPosition.y)
 			return newPosition;
 			}
 		
 		public function setViewDistance(newViewDistance:int):void{
-			viewDistance = newViewDistance
+			viewDistance = newViewDistance;
 			}
 
-}
+	}
 }

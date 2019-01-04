@@ -22,8 +22,10 @@ package{
    
     public class main extends Sprite{
 		
+		private const CURRENT_VERSION:String = '0.97';
+		private const CURRENT_BUILD:String = '190301';
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
-		private const MIN_INDIVIDUAL_CRITICAL_NUMBER:int = 5;//Минимально подходящие для отслеживания статистики количество особей
+		private const MIN_INDIVIDUAL_CRITICAL_NUMBER:int = 0;//Минимально подходящие для отслеживания статистики количество особей
 		private const MAX_INDIVIDUAL_CRITICAL_NUMBER:int = 3000;
 		private const PAUSE_AFTER_CYCLE:int = 2;//Время паузы между циклами передвижения особей
 		private const DEAD_INDIVIDUALS_REMOVING_INTERVAL:int = 100;
@@ -41,6 +43,7 @@ package{
 		private var behaviourChoicer:BehaviourChoicer;
 		private var eventsForPlugins:Object;
 		private var eventsForPluginsList:Array;
+		private var individualCurrentState:Array;
 		private var modelEvent:ModelEvent;
 		private var stepTimer:Timer;
 		private var numberOfCycles:int;
@@ -130,7 +133,7 @@ package{
 			messenger.setMessageMark('Main');
 			messenger.addEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);
 						
-			versionText = new myVersion('0.95',debugLevel);
+			versionText = new myVersion(CURRENT_VERSION, CURRENT_BUILD, debugLevel);
 			modelEvent = new ModelEvent();//Будем брать основные константы от сюда
 			
 			stepTimer = new Timer(PAUSE_AFTER_CYCLE);
@@ -156,6 +159,16 @@ package{
 			commStage.scaleY = 0.9;
 			
 			indNumber = int(configuration.getOption('main.indQuntaty'));
+			
+			individualCurrentState = new Array();
+			individualCurrentState['currentX'] = 0;
+			individualCurrentState['currentY'] = 0;
+			individualCurrentState['previousX'] = 0;
+			individualCurrentState['previousY'] = 0;
+			individualCurrentState['behaviour'] = '';
+			individualCurrentState['statement'] = '';
+			individualCurrentState['age'] = '';
+			
 			
 			individuals = new Vector.<Individual>(indNumber);
 			individualPictures = new Vector.<IndividualGraphicInterface>(indNumber);
@@ -501,12 +514,17 @@ package{
 			if(indNumber < MAX_INDIVIDUAL_CRITICAL_NUMBER && indNumber > MIN_INDIVIDUAL_CRITICAL_NUMBER){
 			for(var i:int = 0; i< indNumber; i++){
 				individuals[i].doStep();
-				individualPictures[i].dotStep(//Передаем координаты, куда особи надо переместится на следующем шаге
-					individuals[i].placement().x,
-					individuals[i].placement().y,
-					individuals[i].statement(),
-					individuals[i].age()
-					);
+				
+				individualCurrentState.currentX = individuals[i].placement().x;
+				individualCurrentState.currentY = individuals[i].placement().y;
+				individualCurrentState.previousX = individuals[i].placement().previousX;
+				individualCurrentState.previousY = individuals[i].placement().previousY;
+				individualCurrentState.behaviour = individuals[i].behaviour();
+				individualCurrentState.statement = individuals[i].statement();
+				individualCurrentState.age = individuals[i].age();
+				
+				individualPictures[i].dotStep(individualCurrentState);//Передаем координаты, куда особи надо переместится на следующем шаге
+			
 				}
 			}else{
 				stepTimer.stop();
