@@ -14,7 +14,7 @@ public class IndividualGraphicInterface extends Sprite{
 	private const STOPEDCOLOR:Number = 0x808080; 
 	private const SCALE_COEFFICIENT:int = 4;
 	private const VECTOR_LENGTH:int = 15;
-	private const VECTOR_COLOR:Number = 0x666666;
+	private const VECTOR_COLOR:Number = 0xFD2424;
 	
 	private var indSize:Number;//Размер квадрата особи
 	private var growthRange:Number;//Прирост особи за один шаг
@@ -34,6 +34,7 @@ public class IndividualGraphicInterface extends Sprite{
 	public function IndividualGraphicInterface(minSize:int, maxSize:int=0, stepsQantaty:int=1, debugLevel:String = '3'){
 		modelEvent = new ModelEvent();//Будем брать основные константы от сюда
 		messenger = new Messenger(debugLevel);
+		messenger.setMessageMark('Individual GUI');
 		stepNumber = 0;
 		growthRange = 0;
 		indSize = 5;
@@ -51,7 +52,6 @@ public class IndividualGraphicInterface extends Sprite{
 	public function drawIndividual():void{//Рисует особь в виде цветного квадрата
 		//Функция напрямую завязана на графике
 		individualBody = new Sprite();
-		individualMoveVector = new Sprite();
 		individualPoint = new Sprite();
 		
 		individualPoint.graphics.lineStyle(1,BORDERCOLOR);
@@ -59,7 +59,7 @@ public class IndividualGraphicInterface extends Sprite{
 		individualPoint.graphics.drawRect(0,0,indSize,indSize);
 		
 		individualBody.addChild(individualPoint);
-		individualBody.addChild(individualMoveVector);
+		drawVectorArror();
 		}
 	
 	public function dotStep(currenteIndividualState:Array):void{
@@ -100,7 +100,7 @@ public class IndividualGraphicInterface extends Sprite{
 		    case 'suspend':
 				ct.color = STOPEDCOLOR;
 				individualPoint.transform.colorTransform = ct;
-				individualMoveVector.graphics.clear();
+				//individualMoveVector.graphics.clear();
 			break;
 			case 'dead'://Мертвых особей делаем невидимыми, уменьшая их размер до нуля
 					individualPoint.scaleX = 0;
@@ -121,46 +121,72 @@ public class IndividualGraphicInterface extends Sprite{
 		individualPoint.transform.colorTransform = ct;
 		}
 	
-	private function showAdditionMarks(currenteIndividualState:Array):void{
-		if(currenteIndividualState.behaviour == "BestConditionsWalker" && stepDistanceHasChanged(currenteIndividualState) == 'true'){
-			showVector(currenteIndividualState);
-			}else{
-				individualMoveVector.graphics.clear();
-				}
+	private function drawVectorArror():void{
+		var lineX:int = VECTOR_LENGTH;
+		var lineY:int = 0;
+		try{
+			individualMoveVector = new Sprite();
+	
+			if(individualBody){//А то вдруг функцию вызовут до появления individualBody
+				individualBody.addChild(individualMoveVector);
+				individualMoveVector.x = individualBody.height/2;
+				individualMoveVector.y = individualBody.width/2;
+				}else{
+					throw new Error('individualBody not exist')
+					}
+			individualMoveVector.graphics.lineStyle(1, VECTOR_COLOR);
+			individualMoveVector.graphics.lineTo(lineX, lineY);
+			individualMoveVector.graphics.moveTo(lineX, lineY);
+			individualMoveVector.graphics.lineTo(lineX - (0.2*VECTOR_LENGTH), lineY + (0.2*VECTOR_LENGTH));
+			individualMoveVector.graphics.moveTo(lineX, lineY);
+			individualMoveVector.graphics.lineTo(lineX - (0.2*VECTOR_LENGTH), lineY - (0.2*VECTOR_LENGTH));
+			
+		}catch(e:Error){
+			msgString = e.message;
+			messenger.message(msgString, modelEvent.ERROR_MARK);
+			individualBody = new Sprite();
+			}
 		}
 	
-	private function showVector(currenteIndividualState:Array):void{
-		var lineX:int = 0;
-		var lineY:int = 0;
-		
-		if(currenteIndividualState.currentY != currenteIndividualState.previousY){
-			if(currenteIndividualState.currentY < currenteIndividualState.previousY){//+
-				lineY = VECTOR_LENGTH*(-1);
-				}else{
-					lineY = VECTOR_LENGTH;
-					}
-			}
-
-		if(currenteIndividualState.currentX != currenteIndividualState.previousX){
-			if(currenteIndividualState.currentX < currenteIndividualState.previousX){
-				lineX = VECTOR_LENGTH*(-1);
-				lineY = 0;
-				}else{
-					lineX = VECTOR_LENGTH;
-					lineY = 0
-					}
-			}
-
-		if(stepNumber > 0){
-			individualMoveVector.graphics.clear();
-			stepNumber = 0;
+	private function showAdditionMarks(currenteIndividualState:Array):void{
+		if(currenteIndividualState.statement == 'moving' && currenteIndividualState.behaviour == "BestConditionsWalker" && stepDistanceHasChanged(currenteIndividualState) == 'true'){//Стрека показывается только у живой особи когда она сделала длинный шаг согласно модели поведения BestConditionWalker
+			showVector(currenteIndividualState);
 			}else{
-				stepNumber = 1;
-				individualMoveVector.graphics.lineTo(lineX, lineY);
+				hideVector();
 				}
-				if((currenteIndividualState.currentX - individualMoveVector.width) < 0 || (currenteIndividualState.currentY - individualMoveVector.height) < 0){//Чтобы линии вектров не вылазели за пределы chessDesk
-					individualMoveVector.graphics.clear();
+		}
+	private function hideVector():void{
+		if(individualMoveVector.scaleX > 0){
+			individualMoveVector.scaleX = 0;
+			individualMoveVector.scaleY = 0;
+			}
+			}
+	
+	private function showVector(currenteIndividualState:Array):void{
+		individualMoveVector.scaleX = 0.5;
+		individualMoveVector.scaleY = 0.5;
+		//Изначально вектор смотрит вправо
+		
+		if(currenteIndividualState.currentY != currenteIndividualState.previousY){//Если сделали шаг по вертекали
+			if(currenteIndividualState.currentY < currenteIndividualState.previousY){//Если сделали вверх
+				individualMoveVector.rotation = -90;
+				}else{
+					individualMoveVector.rotation = 90;
 					}
+			}
+
+		if(currenteIndividualState.currentX != currenteIndividualState.previousX){//Если сделали шаг по горизонтали
+			if(currenteIndividualState.currentX < currenteIndividualState.previousX){//Если это шаг влево
+				individualMoveVector.rotation = 180;
+				}else{
+					individualMoveVector.rotation = 0;
+					}
+			}
+		
+		if((currenteIndividualState.currentX - individualMoveVector.width) < 0 || (currenteIndividualState.currentY - individualMoveVector.height) < 0){//Чтобы линии вектров не вылазели за пределы chessDesk
+			individualMoveVector.scaleX = 0;
+			individualMoveVector.scaleY = 0;
+			}
 		}
 	
 	private function stepDistanceHasChanged(currenteIndividualState:Array):String{

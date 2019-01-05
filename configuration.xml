@@ -5,7 +5,7 @@
 	<debugLevel>1</debugLevel>
 	<pluginEnable>true</pluginEnable>
 	<!-- indQuntaty how many individuals must to be created at the start -->
-	<indQuntaty>800</indQuntaty>
+	<indQuntaty>100</indQuntaty>
 	<lifeTime>347200</lifeTime>
 	<lifeQuant>1</lifeQuant>
 	<adultAge>20300</adultAge>

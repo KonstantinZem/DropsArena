@@ -25,7 +25,7 @@ package{
 		private const CURRENT_VERSION:String = '0.97';
 		private const CURRENT_BUILD:String = '190301';
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
-		private const MIN_INDIVIDUAL_CRITICAL_NUMBER:int = 0;//Минимально подходящие для отслеживания статистики количество особей
+		private const MIN_INDIVIDUAL_CRITICAL_NUMBER:int = 1;//Минимально подходящие для отслеживания статистики количество особей
 		private const MAX_INDIVIDUAL_CRITICAL_NUMBER:int = 3000;
 		private const PAUSE_AFTER_CYCLE:int = 2;//Время паузы между циклами передвижения особей
 		private const DEAD_INDIVIDUALS_REMOVING_INTERVAL:int = 100;
