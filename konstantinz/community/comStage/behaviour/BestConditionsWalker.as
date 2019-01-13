@@ -16,8 +16,6 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 			newPosition.x = currentX;
 			newPosition.y = currentY;
 			
-			//trace('prev x:' + newPosition.x + ', y:' + newPosition.y)
-			
 			var indDirection:int = 0;
 			
 			try{

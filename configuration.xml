@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
- 
 <main>
 	<debugLevel>1</debugLevel>
 	<pluginEnable>true</pluginEnable>
-	<!-- indQuntaty how many individuals must to be created at the start -->
-	<indQuntaty>100</indQuntaty>
-	<lifeTime>347200</lifeTime>
-	<lifeQuant>1</lifeQuant>
-	<adultAge>20300</adultAge>
-	<maturingDeley>4600</maturingDeley>
-	<offspringsQuant>25</offspringsQuant>
+	<individuals>
+		<group>
+			<!--thy will become adult from five month-->
+			<number>160</number>
+			<age>13000</age>
+		</group>
+		<group>
+			<number>160</number>
+			<age>0</age>
+		</group>
+		<lifeTime>347200</lifeTime>
+		<lifeQuant>1</lifeQuant>
+		<adultAge>20300</adultAge>
+		<maturingDeley>4600</maturingDeley>
+		<offspringsQuant>25</offspringsQuant>
+	</individuals>
+	
 	<!--Cell size in percents from stage size-->
 	<cellSize>1</cellSize>
 	<!-- initPosition of individual can be left-top, left-bottom,  right-top, right-bottom, center and random -->
@@ -51,9 +60,6 @@
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>
-				<day>13.10.10</day>
-			</observation>
-			<observation>
 				<day>14.06.11</day>
 			</observation>
 			<observation>
@@ -79,9 +85,6 @@
 		<color>0x007100</color>
 		<switching_event>calendar_data</switching_event>
 		<data>
-			<observation>
-				<day>13.10.10</day>
-			</observation>
 			<observation>
 				<day>14.06.11</day>
 			</observation>
@@ -111,9 +114,6 @@
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>
-				<day>06.10.10</day>
-			</observation>
-			<observation>
 				<day>06.06.11</day>
 			</observation>
 			<observation>
@@ -138,9 +138,6 @@
 		<color>0x333333</color>
 		<switching_event>calendar_data</switching_event>
 		<data>
-			<observation>
-				<day>13.10.10</day>
-			</observation>
 			<observation>
 				<day>14.06.11</day>
 			</observation>
@@ -168,9 +165,6 @@
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>
-				<day>13.10.10</day>
-			</observation>
-			<observation>
 				<day>14.06.11</day>
 			</observation>
 			<observation>
@@ -197,9 +191,6 @@
 		<switching_event>calendar_data</switching_event>
 		<data>
 			<observation>
-				<day>13.10.10</day>
-			</observation>
-			<observation>
 				<day>14.06.11</day>
 			</observation>
 			<observation>
@@ -223,9 +214,6 @@
 		<color>0xb4e53c</color>
 		<switching_event>calendar_data</switching_event>
 		<data>
-			<observation>
-				<day>13.10.10</day>
-			</observation>
 			<observation>
 				<day>14.06.11</day>
 			</observation>
@@ -1542,6 +1530,7 @@
 			<observation>
 				<part>13</part>
 				<day>24.06.12</day>
+				<duration>15</duration>
 			</observation>
 			<observation>
 				<part>0</part>

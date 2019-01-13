@@ -25,14 +25,13 @@ package{
 		private const CURRENT_VERSION:String = '0.97';
 		private const CURRENT_BUILD:String = '190301';
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
-		private const MIN_INDIVIDUAL_CRITICAL_NUMBER:int = 1;//Минимально подходящие для отслеживания статистики количество особей
+		private const MIN_INDIVIDUAL_CRITICAL_NUMBER:int = 5;//Минимально подходящие для отслеживания статистики количество особей
 		private const MAX_INDIVIDUAL_CRITICAL_NUMBER:int = 3000;
 		private const PAUSE_AFTER_CYCLE:int = 2;//Время паузы между циклами передвижения особей
 		private const DEAD_INDIVIDUALS_REMOVING_INTERVAL:int = 100;
 		
 		private var stgHeight:int;
 		private var stgWidth:int;
-		private var indNumber:int;
 		private var debugLevel:String;
 		private var msgString:String;
 		private var statRefreshTime:String;//Время обновления статистической информации
@@ -44,9 +43,11 @@ package{
 		private var eventsForPlugins:Object;
 		private var eventsForPluginsList:Array;
 		private var individualCurrentState:Array;
+		private var individualsAgeGroups:Array;
 		private var modelEvent:ModelEvent;
 		private var stepTimer:Timer;
 		private var numberOfCycles:int;
+		private var numberOfIndividuals:int;
 		private var individualPictures:Vector.<IndividualGraphicInterface>
 		
 		public var individuals:Vector.<Individual>;
@@ -158,7 +159,8 @@ package{
 			commStage.scaleX = 0.9;
 			commStage.scaleY = 0.9;
 			
-			indNumber = int(configuration.getOption('main.indQuntaty'));
+			individualsAgeGroups = new Array();
+			individualsAgeGroups = getIndividualAgeGroups('main.individuals');
 			
 			individualCurrentState = new Array();
 			individualCurrentState['currentX'] = 0;
@@ -169,9 +171,8 @@ package{
 			individualCurrentState['statement'] = '';
 			individualCurrentState['age'] = '';
 			
-			
-			individuals = new Vector.<Individual>(indNumber);
-			individualPictures = new Vector.<IndividualGraphicInterface>(indNumber);
+			individuals = new Vector.<Individual>();
+			individualPictures = new Vector.<IndividualGraphicInterface>();
 			
 			statRefreshTime = configuration.getOption('main.statRefreshTime');
 			Accumulator.instance.setDebugLevel(debugLevel);
@@ -318,23 +319,63 @@ package{
 					}
 			}
 		
-		private function addInitIndividuals(indX:int, indY:int):void{//Добавляем первых особей
+		private function getIndividualAgeGroups(inquiryPath:String):Array{
+			var indAgeGroups:Array = new Array();
+			var groupPosition:Array = new Array(0,0,0,0);
+			var dataPathQuery:String = 'main.individuals.group';
+			var groupQuantatyQuery:String = dataPathQuery + '.number';
+			var groupAgeQuery:String = dataPathQuery + '.age';
+			var groupQuantaty:int = int(configuration.getOption(groupQuantatyQuery, groupPosition));
+			var groupAge:int = int(configuration.getOption(groupAgeQuery, groupPosition));
+			var counter:int = 0;
 			
-			for (var i:int = 0; i< indNumber; i++){
-				individuals[i] = new Individual(commStage.chessDesk,configuration,i,indX,indY);
-				individualPictures[i] = new IndividualGraphicInterface(
-					2,
-					commStage.chessDesk[0][0].picture.width,//Максимальный размер особи
-					int(configuration.getOption('main.adultAge'))
-					);
-				individualPictures[i].drawIndividual();
-				commStage.addChild(individualPictures[i].individualBody);
-	
-				individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
-				individuals[i].externalTimer();
-				
-				
+			indAgeGroups[0] = new Array();
+			indAgeGroups[0].groupQuantaty = groupQuantaty;
+			indAgeGroups[0].groupAge = groupAge;
+		
+			while(groupQuantaty > 0){//До тех пор, пока мы не достигли конца списка
+				groupPosition[2]++;
+				counter++;
+				groupQuantaty = int(configuration.getOption(groupQuantatyQuery, groupPosition));
+			    groupAge = int(configuration.getOption(groupAgeQuery, groupPosition));
+			    indAgeGroups[counter] = new Array();
+			    indAgeGroups[counter].groupQuantaty = groupQuantaty;
+				indAgeGroups[counter].groupAge = groupAge;
+				}
+			
+			indAgeGroups.pop()
+			return indAgeGroups;
 			}
+		
+		private function addInitIndividuals(indX:int, indY:int):void{//Добавляем первых особей
+			var i:int = 0;
+			var cycleCounter:int = 0;
+			
+			var numberIndividualsInGroup:int = individualsAgeGroups[0].groupQuantaty;
+		
+			for(cycleCounter; cycleCounter < individualsAgeGroups.length; cycleCounter++){
+				
+				for (i; i< numberIndividualsInGroup; i++){
+					
+					individuals[i] = new Individual(commStage.chessDesk,configuration,i,indX,indY);
+					individuals[i].age(individualsAgeGroups[cycleCounter].groupAge)
+					individualPictures[i] = new IndividualGraphicInterface(
+						2,
+						commStage.chessDesk[0][0].picture.width,//Максимальный размер особи
+						int(configuration.getOption('main.individuals.adultAge'))
+						);
+					individualPictures[i].drawIndividual();
+					individualPictures[i].age(individualsAgeGroups[cycleCounter].groupAge);
+					
+					commStage.addChild(individualPictures[i].individualBody);
+	
+					individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
+					individuals[i].externalTimer();
+					
+					}
+					numberIndividualsInGroup += individualsAgeGroups[cycleCounter].groupQuantaty;
+
+				}
 			msgString = IND_NUMB + individuals.length;
 			messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
 			
@@ -348,22 +389,38 @@ package{
 			var chessDeskLengthX:int = commStage.chessDesk.length - 1;
 			var chessDeskLengthY:int = commStage.chessDesk[1].length - 1;
 			
-			for (var i:int = 0; i< indNumber; i++){
-				indXRnd = Math.round(Math.random() * chessDeskLengthX);
-				indYRnd = Math.round(Math.random() * chessDeskLengthY);
-				
-				individuals[i] = new Individual(commStage.chessDesk,configuration,i,indXRnd,indYRnd);
-				individualPictures[i] = new IndividualGraphicInterface(
-					2,
-					int(configuration.getOption('main.individualSize')),//Максимальный размер особи
-					int(configuration.getOption('main.adultAge'))
-					);
-				individualPictures[i].drawIndividual();
-				commStage.addChild(individualPictures[i].individualBody);
+			var i:int = 0;
+			var cycleCounter:int = 0;
+			
+			var numberIndividualsInGroup:int = individualsAgeGroups[0].groupQuantaty;
 		
-				individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
-				individuals[i].externalTimer();
-			}
+			for(cycleCounter; cycleCounter < individualsAgeGroups.length; cycleCounter++){
+				
+				for (i; i< numberIndividualsInGroup; i++){
+					
+					indXRnd = Math.round(Math.random() * chessDeskLengthX);
+					indYRnd = Math.round(Math.random() * chessDeskLengthY);
+					
+					individuals[i] = new Individual(commStage.chessDesk,configuration,i,indXRnd,indYRnd);
+					individuals[i].age(individualsAgeGroups[cycleCounter].groupAge)
+					individualPictures[i] = new IndividualGraphicInterface(
+						2,
+						commStage.chessDesk[0][0].picture.width,//Максимальный размер особи
+						int(configuration.getOption('main.individuals.adultAge'))
+						);
+					individualPictures[i].drawIndividual();
+					individualPictures[i].age(individualsAgeGroups[cycleCounter].groupAge);
+					
+					commStage.addChild(individualPictures[i].individualBody);
+	
+					individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
+					individuals[i].externalTimer();
+					
+					}
+					numberIndividualsInGroup += individualsAgeGroups[cycleCounter].groupQuantaty;
+
+				}
+		
 			msgString = IND_NUMB + individuals.length;
 			messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
 			}
@@ -371,7 +428,7 @@ package{
 		private function addNewIndividuals(e:Event):void {
 
 			var startPos:int = this.individuals.length;
-			var stopPos:int = startPos + int(configuration.getOption('main.offspringsQuant'));
+			var stopPos:int = startPos + int(configuration.getOption('main.individuals.offspringsQuant'));
 				
 				for(var i:int = startPos;i<stopPos;i++){
 					var newX:int = e.target.currentChessDeskI;
@@ -380,7 +437,7 @@ package{
 					individualPictures[i] = new IndividualGraphicInterface(
 					2,
 					commStage.chessDesk[0][0].picture.width,//Максимальный размер особи
-					int(configuration.getOption('main.adultAge'))
+					int(configuration.getOption('main.individuals.adultAge'))
 					);
 					
 					individualPictures[i].drawIndividual();
@@ -508,11 +565,11 @@ package{
 			}
 		
 		private function makeToStepNextIndividual(e:Event):void{
-			indNumber = individuals.length;
+			numberOfIndividuals = individuals.length;
 			numberOfCycles++;
 			
-			if(indNumber < MAX_INDIVIDUAL_CRITICAL_NUMBER && indNumber > MIN_INDIVIDUAL_CRITICAL_NUMBER){
-			for(var i:int = 0; i< indNumber; i++){
+			if(numberOfIndividuals < MAX_INDIVIDUAL_CRITICAL_NUMBER && numberOfIndividuals > MIN_INDIVIDUAL_CRITICAL_NUMBER){
+			for(var i:int = 0; i< numberOfIndividuals; i++){
 				individuals[i].doStep();
 				
 				individualCurrentState.currentX = individuals[i].placement().x;

@@ -25,7 +25,6 @@ public class IndividualGraphicInterface extends Sprite{
 	private var modelEvent:ModelEvent;
 	private var individualMoveVector:Sprite;
 	private var individualPoint:Sprite;
-	private var stepNumber:int;
 	private var previousStepDistance:int;
 	
 	public var individualBody:Sprite;
@@ -35,7 +34,6 @@ public class IndividualGraphicInterface extends Sprite{
 		modelEvent = new ModelEvent();//Будем брать основные константы от сюда
 		messenger = new Messenger(debugLevel);
 		messenger.setMessageMark('Individual GUI');
-		stepNumber = 0;
 		growthRange = 0;
 		indSize = 5;
 		remaningSteps = stepsQantaty/SCALE_COEFFICIENT;
@@ -77,6 +75,23 @@ public class IndividualGraphicInterface extends Sprite{
 		markIndividual(currenteIndividualState.statement);
 		showAdditionMarks(currenteIndividualState);
 		
+		}
+	
+	public function age(newAge:int):void{
+		try{
+		if(!individualPoint){
+			throw new Error('Individual point not exist');
+			}
+		if(newAge > 0){
+			individualPoint.scaleX = growthRange*newAge;
+			individualPoint.scaleY = growthRange*newAge;
+			}else{
+				throw new Error('New individual age is less or equial zerro');
+				}
+			}catch(e:Error){
+				msgString = e.message;
+				messenger.message(msgString, modelEvent.ERROR_MARK);
+				}
 		}
 	
 	public function markIndividual(individualState:String):void{//Отмечает цветом особей в различном состоянии

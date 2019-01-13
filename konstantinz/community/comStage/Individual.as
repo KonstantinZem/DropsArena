@@ -76,7 +76,7 @@ package konstantinz.community.comStage{
 				stepDispatcher = new StepDispatcher();
 				
 				stepDispatcher.addEventListener(StepDispatcher.DO_STEP, step);
-				lifeTime = int(indConfiguration.getOption('main.lifeTime'));
+				lifeTime = int(indConfiguration.getOption('main.individuals.lifeTime'));
 				stepDispatcher.setLifeTime(lifeTime);
 				
 				if(args[0]==undefined){
@@ -95,8 +95,8 @@ package konstantinz.community.comStage{
 					messenger.message(msgString, modelEvent.ERROR_MARK);
 					}
 				
-				adultAge = int(indConfiguration.getOption('main.adultAge'));
-				offspringsQuant = int(indConfiguration.getOption('main.offspringsQuant'))//Количество оставленных потомков
+				adultAge = int(indConfiguration.getOption('main.individuals.adultAge'));
+				offspringsQuant = int(indConfiguration.getOption('main.individuals.offspringsQuant'))//Количество оставленных потомков
 				maturingDeley = 0;
 				
 				chessDesk = stage;
@@ -147,7 +147,7 @@ package konstantinz.community.comStage{
 		private function isIndividualAdult():Boolean{
 			//функция полностью платформонезависимая
 			//Определяет повзрослела ли особь
-			if(adultAge>0){//Если время повзрослеть еще не насталло
+			if(adultAge > 0){//Если время повзрослеть еще не насталло
 				adultAge--;//Приближаем совершеннолетие еще на шаг
 				return false;
 				}
@@ -225,7 +225,7 @@ package konstantinz.community.comStage{
 				
 				msgString = 'Maturing in '+ currentChessDeskI+ ':'+ currentChessDeskJ;
 				messenger.message(msgString, modelEvent.DEBUG_MARK);
-				maturingDeley = int(indConfiguration.getOption('main.maturingDeley'));
+				maturingDeley = int(indConfiguration.getOption('main.individuals.maturingDeley'));
 			
 			}
 			else{
@@ -382,7 +382,12 @@ package konstantinz.community.comStage{
 			return indPlacement;
 			}
 		
-		public function age():String{
+		public function age(newAge:int = 0):String{
+			if(newAge > 0){
+				lifeTime = lifeTime - newAge;
+				adultAge = adultAge - newAge;
+				stepDispatcher.setLifeTime(lifeTime);
+				}
 			return indAgeState;
 			}
 		

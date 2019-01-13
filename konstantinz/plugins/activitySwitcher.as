@@ -133,7 +133,7 @@ public class activitySwitcher extends Plugin{
 		
 			if(currentActivitIndNumber > (numberOfData - 2)){
 				
-				currentActivitIndNumber = 0;
+				currentActivitIndNumber = 0;//Если мы дошли до конца списка и Configuration container вернул ошибку int(Error) - 0
 				cycleCounter++;
 				
 					if(switchingType == 'timer'){
