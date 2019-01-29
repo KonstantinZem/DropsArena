@@ -1,6 +1,6 @@
 #!/bin/bash
 
-srcPath='/Documents/Rabochie/swf/swf_comunity/src'
+srcPath='/Documents/Rabochie/projects/swf/swf_comunity/src'
 cd $HOME$srcPath
 # путь до каталога с Flex SDK
 sdk=$HOME'/.programs/flex_sdk_4.6/'

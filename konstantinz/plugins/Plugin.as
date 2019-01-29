@@ -64,7 +64,7 @@ public class Plugin extends Sprite{
 			msgString = 'Plugin ' + pluginName + ' has loaded';
 			messenger.message(msgString, modelEvent.INIT_MSG_MARK);
 				
-			switchingType = configuration.getOption(optionPath + 'switching_event');
+			switchingType = configuration.getOption(optionPath + 'switchingEvent');
 			switchingInterval = int(configuration.getOption(optionPath + 'switchingInterval'));
 				
 				if(switchingInterval == 0){
@@ -72,9 +72,9 @@ public class Plugin extends Sprite{
 					messenger.message(msgString, modelEvent.INIT_MSG_MARK);
 					}
 				
-				if(switchingType != 'timer' && switchingType != 'calendar_data'){//Если в конфиге тип переключения не указан или указан неправильно
-					switchingType = 'timer';//даем переменной значение по умолчанию timer
-					msgString = errorType.varIsIncorrect + '. ' + errorType.defaultValue + '- timer';
+				if(switchingType != 'steps' && switchingType != 'calendar_data'){//Если в конфиге тип переключения не указан или указан неправильно
+					switchingType = 'steps';//даем переменной значение по умолчанию steps
+					msgString = errorType.varIsIncorrect + '. ' + errorType.defaultValue + '- steps';
 					messenger.message(msgString, modelEvent.INFO_MARK);
 					}
 			

@@ -23,7 +23,7 @@ package{
     public class main extends Sprite{
 		
 		private const CURRENT_VERSION:String = '0.97';
-		private const CURRENT_BUILD:String = '190301';
+		private const CURRENT_BUILD:String = '190529';
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
 		private const MIN_INDIVIDUAL_CRITICAL_NUMBER:int = 5;//Минимально подходящие для отслеживания статистики количество особей
 		private const MAX_INDIVIDUAL_CRITICAL_NUMBER:int = 3000;
