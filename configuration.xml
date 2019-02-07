@@ -17,7 +17,6 @@
 		<lifeQuant>1</lifeQuant>
 		<adultAge>20300</adultAge>
 		<maturingDeley>1600</maturingDeley>
-                <!--<maturingDeley>4600</maturingDeley>-->
 		<offspringsQuant>25</offspringsQuant>
 	</individuals>
 	
@@ -27,7 +26,7 @@
 	<initPosition>left-top</initPosition>
 	<statRefreshTime>35</statRefreshTime>
 	<stepLength>1</stepLength>
-	<pluginsList>plugins/relief.swf;plugins/mowing.swf;plugins/ground.swf;plugins/grass.swf;plugins/grass2.swf;plugins/grass3.swf;plugins/grass4.swf;plugins/activity.swf;plugins/death.swf;plugins/morisitaCounter.swf</pluginsList>
+	<pluginsList>plugins/relief.swf;plugins/mowing.swf;plugins/ground.swf;plugins/grass.swf;plugins/grass2.swf;plugins/grass3.swf;plugins/grass4.swf;plugins/activity.swf;plugins/death.swf;plugins/hybernate.swf;plugins/morisitaCounter.swf</pluginsList>
 	<arePluginsActiveOnLoading>false</arePluginsActiveOnLoading>
 	<behaviourSwitching>
 		<enable>true</enable>
@@ -245,7 +244,7 @@
 		<data>
 			<observation>
 				<part>48</part>
-				<day>20.09.10</day>
+				<day>02.09.10</day>
 			</observation>
 			<observation>
 				<part>0</part>
@@ -1556,20 +1555,18 @@
 			</observation>
 	</data>
 	</activity>
-  <death>
-	<description>Remove individuals from stage according field observations</description>
-	<debugLevel>1</debugLevel>
-	<signal>kill</signal>
-	<!-- individuals will have been killed une time per this number of steps -->
-     <steps>6500</steps>
-     <!-- killStoped will unactive individuals hawe to be killed -->
-     <killStoped>true</killStoped>
-     <switchingEvent>calendar_data</switchingEvent>
-     <selectionType>percents</selectionType>
+        <death>
+            <description>Remove individuals from stage according field observations</description>
+            <debugLevel>1</debugLevel>
+            <signal>kill</signal>
+            <!-- killStoped will unactive individuals hawe to be killed -->
+            <killStoped>true</killStoped>
+            <switchingEvent>calendar_data</switchingEvent>
+            <selectionType>percents</selectionType>
 		<data>
 			<observation>
 				<part>5</part>
-				<day>18.08.11</day>
+				<day>10.09.10</day>
 			</observation>
 			<observation>
 				<part>5</part>
@@ -1580,7 +1577,47 @@
 				<day>01.08.12</day>
 			</observation>
 		</data>
-    </death>
+        </death>
+        <hybernate>
+            <description>Send individuals to hybernation according field observations</description>
+            <debugLevel>3</debugLevel>
+            <signal>stop</signal>
+            <switchingEvent>calendar_data</switchingEvent>
+            <selectionType>percents</selectionType>
+            <switchingInterval>278</switchingInterval>
+		<data>
+             <observation>
+				<part>10</part>
+				<day>20.09.10</day>
+				<duration>15</duration>
+			</observation>
+			<observation>
+				<part>72</part>
+				<day>23.03.11</day>
+			</observation>
+			<observation>
+				<part>69</part>
+				<day>03.04.11</day>
+			</observation>
+			<observation>
+				<part>56</part>
+				<day>13.04.11</day>
+			</observation>
+			<observation>
+				<part>74</part>
+				<day>10.10.11</day>
+				<duration>7800</duration>
+			</observation>
+            <observation>
+				<part>69</part>
+				<day>28.03.12</day>
+			</observation>
+			<observation>
+				<part>57</part>
+				<day>30.03.12</day>
+			</observation>
+		</data>
+        </hybernate>
 	<morisitaCounter>
 		<description>Count Morisita index</description>
 		<icon></icon>

@@ -9,9 +9,10 @@ public class IndividualGraphicInterface extends Sprite{
 	
 	private const BORDERCOLOR:Number = 0x000000;
 	private const INDCOLOR:Number = 0xFD2424;
-	private const ADULTCOLOR:Number = 0x990000;
-	private const COLLISIONCOLOR:Number = 0xFFFF00;
-	private const STOPEDCOLOR:Number = 0x808080; 
+	private const ADULT_COLOR:Number = 0x990000;
+	private const COLLISION_COLOR:Number = 0xFFFF00;
+	private const SUSPENDET_COLOR:Number = 0x808080; 
+	private const STOP_COLOR:Number = 0xFFFFFF;
 	private const SCALE_COEFFICIENT:int = 4;
 	private const VECTOR_LENGTH:int = 15;
 	private const VECTOR_COLOR:Number = 0xFD2424;
@@ -26,6 +27,7 @@ public class IndividualGraphicInterface extends Sprite{
 	private var individualMoveVector:Sprite;
 	private var individualPoint:Sprite;
 	private var previousStepDistance:int;
+	private var currentScale:int;
 	
 	public var individualBody:Sprite;
 	
@@ -39,9 +41,10 @@ public class IndividualGraphicInterface extends Sprite{
 		remaningSteps = stepsQantaty/SCALE_COEFFICIENT;
 		if(maxSize > 0){//Если задан максимальный размер особи, 
 			indSize = minSize;//То для начала делаем особь маленькой
-			if(stepsQantaty > 1){//Если заданно количество шагов, то вычисляем прирост
+			if(stepsQantaty > 0){//Если заданно количество шагов, то вычисляем прирост
 				growthRange = ((maxSize - minSize)/stepsQantaty)/minSize;
 				}
+				trace(growthRange)
 			}else{
 				indSize = minSize;
 				}
@@ -58,6 +61,7 @@ public class IndividualGraphicInterface extends Sprite{
 		
 		individualBody.addChild(individualPoint);
 		drawVectorArror();
+		
 		}
 	
 	public function dotStep(currenteIndividualState:Array):void{
@@ -68,8 +72,9 @@ public class IndividualGraphicInterface extends Sprite{
 		
 		if(growthRange > 0 && remaningSteps > 0){
 			remaningSteps--;
-			individualPoint.scaleX = individualPoint.scaleX + growthRange;
-			individualPoint.scaleY = individualPoint.scaleY + growthRange;
+			currentScale = individualPoint.scaleX + growthRange;
+			individualPoint.scaleX = currentScale;
+			individualPoint.scaleY = currentScale;
 			}
 		
 		markIndividual(currenteIndividualState.statement);
@@ -78,6 +83,7 @@ public class IndividualGraphicInterface extends Sprite{
 		}
 	
 	public function age(newAge:int):void{
+		
 		try{
 		if(!individualPoint){
 			throw new Error('Individual point not exist');
@@ -85,6 +91,7 @@ public class IndividualGraphicInterface extends Sprite{
 		if(newAge > 0){
 			individualPoint.scaleX = growthRange*newAge;
 			individualPoint.scaleY = growthRange*newAge;
+		
 			}else{
 				throw new Error('New individual age is less or equial zerro');
 				}
@@ -99,7 +106,7 @@ public class IndividualGraphicInterface extends Sprite{
 			
 		switch(individualState) { 
 			case 'collision': 
-				ct.color = COLLISIONCOLOR;
+				ct.color = COLLISION_COLOR;
 				individualPoint.transform.colorTransform = ct;
 			break; 
 					
@@ -107,24 +114,31 @@ public class IndividualGraphicInterface extends Sprite{
 				if(indAge == 'young'){//Помечаем молодую и взрослую особей разными цветами для наглядности
 				ct.color = INDCOLOR;
 				}else{
-					ct.color = ADULTCOLOR;
+					ct.color = ADULT_COLOR;
 					}
 				individualPoint.transform.colorTransform = ct;
+				individualPoint.scaleX = currentScale;
+				individualPoint.scaleY = currentScale;
 			break; 
 					
 		    case 'suspend':
-				ct.color = STOPEDCOLOR;
+				ct.color = SUSPENDET_COLOR;
 				individualPoint.transform.colorTransform = ct;
-				//individualMoveVector.graphics.clear();
+			break;
+			case 'stop':
+				ct.color = STOP_COLOR;
+				individualPoint.transform.colorTransform = ct;
+				individualPoint.scaleX = 0.2;
+				individualPoint.scaleY = 0.2;
 			break;
 			case 'dead'://Мертвых особей делаем невидимыми, уменьшая их размер до нуля
-					individualPoint.scaleX = 0;
-					individualPoint.scaleY = 0;
+				individualPoint.scaleX = 0;
+				individualPoint.scaleY = 0;
 			break;
 			default: 
 				ct.color = INDCOLOR;
 				individualPoint.transform.colorTransform = ct;
-				msgString = 'wrong statement code';
+				msgString = 'Wrong statement code';
 				messenger.message(msgString, modelEvent.ERROR_MARK);
 			break;
 				}
@@ -178,8 +192,8 @@ public class IndividualGraphicInterface extends Sprite{
 			}
 	
 	private function showVector(currenteIndividualState:Array):void{
-		individualMoveVector.scaleX = 0.5;
-		individualMoveVector.scaleY = 0.5;
+		individualMoveVector.scaleX = individualPoint.scaleX/3;
+		individualMoveVector.scaleY = individualPoint.scaleY/3;
 		//Изначально вектор смотрит вправо
 		
 		if(currenteIndividualState.currentY != currenteIndividualState.previousY){//Если сделали шаг по вертекали

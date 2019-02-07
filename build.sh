@@ -26,6 +26,7 @@ cp ../bin/plugins/cover.swf ../bin/plugins/stones.swf
 cp ../bin/plugins/cover.swf ../bin/plugins/mowing.swf
 cp ../bin/plugins/cover.swf ../bin/plugins/relief.swf
 cp ../bin/plugins/activity.swf ../bin/plugins/death.swf
+cp ../bin/plugins/activity.swf ../bin/plugins/hybernate.swf
 
 
 cp configuration.xml ../bin

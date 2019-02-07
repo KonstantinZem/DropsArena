@@ -45,7 +45,7 @@ public class MotionBehaviourSwitcher{
 		
 	public function switchBehaviour(behaviourName:String):void{
 				
-			if(currentBehaviourName !=behaviourName && indSuspender.getState()!= 'stoped'){
+			if(currentBehaviourName != behaviourName && indSuspender.statement() != 'dead' && indSuspender.statement() != 'stop'){
 				currentBehaviourName = behaviourName;
 				
 				switch(behaviourName){
@@ -72,7 +72,6 @@ public class MotionBehaviourSwitcher{
 		public function getCurrentBehaviour():String{
 			return currentBehaviourName;
 			}
-
-}
+	}
 
 }

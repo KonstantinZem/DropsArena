@@ -73,7 +73,7 @@ package konstantinz.community.comStage{
 				modelEvent = new ModelEvent();//Будем брать основные константы от сюда
 				indNumber = args[0];
 				
-				stepDispatcher = new StepDispatcher();
+				stepDispatcher = new StepDispatcher(debugLevel);
 				
 				stepDispatcher.addEventListener(StepDispatcher.DO_STEP, step);
 				lifeTime = int(indConfiguration.getOption('main.individuals.lifeTime'));
@@ -198,7 +198,6 @@ package konstantinz.community.comStage{
 							indNumber = chessDesk[xpos][ypos].numberOfIndividuals.young + chessDesk[xpos][ypos].numberOfIndividuals.adult;
 						break;
 						case 'count_adult':
-							
 							indNumber = chessDesk[xpos][ypos].numberOfIndividuals.adult;
 						break;
 						default:
@@ -249,14 +248,14 @@ package konstantinz.community.comStage{
 				amIAdult = isIndividualAdult();//Стоит здесь, так как взрослеть особь должна в не зависимости от того, стоит она на месте или движется
 				}
 			
-			if(stepDispatcher.getState() == 'moving' && deleySteps==0){//И если отстояли на месте положенное количество тиков таймера, двигаемся дальше
+			if(stepDispatcher.statement() == 'moving' && deleySteps==0){//И если отстояли на месте положенное количество тиков таймера, двигаемся дальше
 				
 				deleySteps = myBehaviour.getPlaceQuality(currentChessDeskI,currentChessDeskJ);//Смотрим на новой клетке число ходов
 			
 				amIAlong = isIndividualAlong();
 	
 					if(!amIAlong){
-					  stepDispatcher.setState('collision');
+					  stepDispatcher.statement('collision');
 					  
 					  if(amIAdult){
 					    indAgeState = 'adult';
@@ -266,7 +265,7 @@ package konstantinz.community.comStage{
 					       }
 						}
 					}else{
-						 stepDispatcher.setState('moving');
+						 stepDispatcher.statement('moving');
 						}
 				
 				individualCounter('remove', indAgeState, currentChessDeskI, currentChessDeskJ);
@@ -288,7 +287,7 @@ package konstantinz.community.comStage{
 				motionBehaviour.switchBehaviour(chessDesk[currentChessDeskI][currentChessDeskJ].behaviourModel);//Включаем этот тип
 				}
 			  
-			  if(stepDispatcher.getState() == 'dead'){
+			  if(stepDispatcher.statement() == 'dead'){
 				  killIndividual();
 				  }
 		}
@@ -296,7 +295,7 @@ package konstantinz.community.comStage{
 		private function killIndividual():void{//Убирает особь со сцены
 			var deltaTime:int;
 			//функция относительно платформонезависимая, так как таймеры и слушатели событий есть и в других языках
-			stepDispatcher.setState('dead');//Теперь, если кто то попытается обратится к особи, он будет по крайне мере знать, что она присмерти
+			stepDispatcher.statement('dead');//Теперь, если кто то попытается обратится к особи, он будет по крайне мере знать, что она присмерти
 				
 			lifeEnd = new Date();
 			timerForIndividuals.stop();//Выключаем таймер
@@ -311,7 +310,9 @@ package konstantinz.community.comStage{
 			}
 			
 			private function step(e:Event):void{//Вызывается из indDispatcher каждй раз, когда из него приходит событие StepDispatcher.DO_STEP
-				nextStep();
+				if(stepDispatcher.statement() != 'dead'){
+					nextStep();
+					}
 				stepDispatcher.stepDone();
 				}
 			
@@ -326,19 +327,7 @@ package konstantinz.community.comStage{
 		public function doStep():void{//Заставляем особь двигаться по внешнему таймеру
 			stepDispatcher.doStep();
 			}
-			
-		public function stop():void{//Так особь можно заставить остановится
-			msgString = 'Individual number '+ indNumber + ' has been stoped';
-			messenger.message(msgString, modelEvent.DEBUG_MARK);
-			stepDispatcher.setState('suspend');
-			}
-		
-		public function start():void{//Так особь можно заставить двигаться снова
-			msgString = 'Individual number '+ indNumber + ' has been started';
-			messenger.message(msgString, modelEvent.DEBUG_MARK);
-			stepDispatcher.setState('moving')
-			}
-		
+
 		public function name(newNumber:int = -1):int{
 			if(newNumber > 0){
 				var oldNumber:int = indNumber;
@@ -350,32 +339,43 @@ package konstantinz.community.comStage{
 				}
 			return indNumber;
 		}
-	
-		public function kill():void{
-			if(stepDispatcher.getState() != 'dead'){//Если она может двигаться
-				msgString = 'Individual ' + indNumber + 'has killed';
-				messenger.message(msgString, modelEvent.INFO_MARK);
-				killIndividual();
-				}
-			}
+
 		public function statement(statementName:String = 'empty', statementLength:int = 0):String{
+			if(stepDispatcher.statement() != 'dead' && stepDispatcher.statement() != 'stop'){//Особь поменяет свое состояние только если она жива и не находится в гибернации
 				switch(statementName){
 					case 'suspend':
-						stepDispatcher.setState ('suspend', statementLength);
-					break
+						msgString = 'Individual number '+ indNumber + ' has been suspended';
+						messenger.message(msgString, modelEvent.DEBUG_MARK);
+						stepDispatcher.statement('suspend', statementLength);
+					break;
+					case 'stop':
+						msgString = 'Individual number '+ indNumber + ' has been stoped';
+						messenger.message(msgString, modelEvent.DEBUG_MARK);
+						stepDispatcher.statement('stop', statementLength);
+						individualCounter('remove', indAgeState, currentChessDeskI, currentChessDeskJ);
+					break;
+					case 'moving':
+						if(stepDispatcher.statement() != 'stop'){
+							stepDispatcher.statement('moving');
+							}
+					break;
+					case 'dead':
+						if(stepDispatcher.statement() != 'dead'){//Если особь уже не мертва
+							msgString = 'Individual ' + indNumber + 'has killed';
+							messenger.message(msgString, modelEvent.INFO_MARK);
+							killIndividual();
+							}
+					break;
 					case 'empty':
 						
 					break;
-					case 'moving':
-						stepDispatcher.setState ('moving');
-					break
 					default:
 						msgString = 'Wrong statement name ' + statementName;
 						messenger.message(msgString, modelEvent.ERROR_MARK);
 					break
 					}
-				
-				return stepDispatcher.getState();
+				}
+				return stepDispatcher.statement();
 			}
 		
 		public function placement():Array{
@@ -392,7 +392,7 @@ package konstantinz.community.comStage{
 			}
 		
 		public function behaviour(newBehaviour:String = 'empty'):String{
-			var currentBehaviourName:String = 'undefined'
+			var currentBehaviourName:String = 'undefined';
 				if(motionBehaviour != null){
 					if(newBehaviour == 'empty'){
 						currentBehaviourName = motionBehaviour.getCurrentBehaviour();//Если функцию вызвали без параметров, это значит, что она должна просто вывести название текущей модели поведения

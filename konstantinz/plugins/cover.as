@@ -125,11 +125,7 @@ public class cover extends Plugin{
 					
 					}
 				}
-		
-		//if(alreadyInited == 'fals'){
-			//pluginEvent.ready();//Сообщаем о том, что все уже сделано,
-		//	}
-	}
+		}
 	
 	private function initCoverShema():void{
 		var controllX:int;

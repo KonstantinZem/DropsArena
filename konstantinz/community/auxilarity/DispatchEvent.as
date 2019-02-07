@@ -22,6 +22,7 @@
 		public var target:String;//Имя отправителя сообщения
 		
 		public function DispatchEvent(){
+			target = '';
 			debugLevel = '1';
 			messanger = new Messenger(debugLevel);
 			modelEvent = new ModelEvent();//Будем брать основные константы от сюда

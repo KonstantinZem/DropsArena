@@ -23,7 +23,7 @@ package{
     public class main extends Sprite{
 		
 		private const CURRENT_VERSION:String = '0.97';
-		private const CURRENT_BUILD:String = '190529';
+		private const CURRENT_BUILD:String = '190208';
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
 		private const MIN_INDIVIDUAL_CRITICAL_NUMBER:int = 5;//Минимально подходящие для отслеживания статистики количество особей
 		private const MAX_INDIVIDUAL_CRITICAL_NUMBER:int = 3000;
@@ -359,6 +359,7 @@ package{
 					
 					individuals[i] = new Individual(commStage.chessDesk,configuration,i,indX,indY);
 					individuals[i].age(individualsAgeGroups[cycleCounter].groupAge)
+					
 					individualPictures[i] = new IndividualGraphicInterface(
 						2,
 						commStage.chessDesk[0][0].picture.width,//Максимальный размер особи
@@ -497,7 +498,6 @@ package{
 			}
 		
 		private function onPluginsLoading(e:ModelEvent):void{
-			//trace(commStage.chessDesk[0][0].picture.width)
 			if(plugins.loaderEvent.pluginName =='last'){
 				addChild(startStopButton);//Когда плагины загрузились, показываем кнопку старта. Иначе могут случатся ошибки, когда плагин еще не загрузился а юзер уже пытается его остановить кнопкой
 				addChild(reloadButton);

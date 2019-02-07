@@ -9,7 +9,7 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 		}
 	override public function getNewPosition(currentX:int, currentY:int):Array{//Класс на основе выбранного алгоритма поведения определяет новую позицию особи
 			
-			var newPosition:Array = new Array();
+			//var newPosition:Array = new Array();
 			
 			currentPlaceQuality = populationArea[currentX][currentY].speedDeleyA;
 			
@@ -92,10 +92,9 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 				}
 			
 			}catch(err:Error){
-				msgString = err.message;
+				msgString = 'getNewPosition() ' + err.message + '\n' + 'New position was ' + populationArea[currentX - viewDistance][currentY].sqrX + ':' + populationArea[currentX - viewDistance][currentY].sqrY;
 				messenger.message(msgString, modelEvent.ERROR_MARK);
 				}	
-			//trace('new x:' + newPosition.x + ', y:' + newPosition.y)
 			return newPosition;
 			}
 		

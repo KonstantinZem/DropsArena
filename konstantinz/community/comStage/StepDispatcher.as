@@ -13,7 +13,8 @@ package konstantinz.community.comStage{
 		private var lifeTime:int;
 		private var pauseTime:int;
 		private var messenger:Messenger;
-		private var collisionTime:int
+		private var collisionTime:int;
+		private var debugLevel:String
 		
 		public static const DO_STEP:String = 'do_step';//Событие посылается особи, внутри которой находится экземпляр этого класса
 		public static const STEP_DONE:String = 'step_done';
@@ -21,16 +22,18 @@ package konstantinz.community.comStage{
 		
 		public var indNumber:int//Номер особи, посылающей событие
 		
-		function StepDispatcher(){
+		function StepDispatcher(dbgl:String ='3'){
+			debugLevel = dbgl;
 			indState = 'moving';
 			indNumber = 0;
 			lifeTime = IMMORTAL_SIGHN;
-			messenger = new Messenger('3');
+			messenger = new Messenger(debugLevel);
 			messenger.setMessageMark('Step dispatcher');
 			messenger.message('Step dispatcher ' + indNumber  + ' has been created');
 			}
 			
-		public function setState(NewState:String, statementTime:int = 0):void{//Через эту функцию можно влиять на состояние особи
+		public function statement(NewState:String = 'nothing', statementTime:int = 0):String{//Через эту функцию можно влиять на состояние особи
+			if(indState != 'stop'){
 			switch(NewState){
 				case 'moving':
 					indState = 'moving';
@@ -42,6 +45,7 @@ package konstantinz.community.comStage{
 				break;
 				case 'stop':
 					indState = 'stop';
+					pauseTime = statementTime;
 				break;
 				case 'dead':
 					indState = 'dead';
@@ -51,30 +55,31 @@ package konstantinz.community.comStage{
 					indState = 'collision';
 					collisionTime = 5
 				break;
-				
+				case 'nothing':
+					indState = indState;
+				break
 				default:
-					indState = 'moving';
+					indState = indState;
 				break;
 				}
-			}
-		public function getState():String{
-			return indState;
+				}
+				return indState;
 			}
 		
 		public function doStep():void{//Сигнал приходит от предыдущей особи
-			if(indState != 'suspend' && pauseTime < 0){
+			if(indState != 'suspend' && pauseTime < 0){//Если уже можно передвигаться
 			  if(lifeTime != IMMORTAL_SIGHN){//Если особь не бессмертная
 				lifeTime --;
-				if(lifeTime < -1 && indState != 'dead' && indState != 'suspend'){
+				if(lifeTime < -1 && indState != 'dead' && indState != 'suspend' && indState != 'stop'){//Если жизнь особи уже истекла, но пометки о ее смерти еще нет
 					killIndividual();
 					}
 				}
-			dispatchEvent(new Event(StepDispatcher.DO_STEP));
+				dispatchEvent(new Event(StepDispatcher.DO_STEP));
 			}else{
 				pauseTime--;
 			
-				if(pauseTime < 0){
-					pauseTime = -1
+				if(pauseTime < 0){//особь сама меняет статум по истечении паузы
+					pauseTime = -1;
 					indState = 'moving';
 					}
 				}
@@ -99,6 +104,5 @@ package konstantinz.community.comStage{
 		public function setIndividualNumber(newIndNumber:int):void{
 			indNumber = newIndNumber;
 			}
-	
 	}
 }

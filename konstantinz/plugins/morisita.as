@@ -10,6 +10,7 @@ package konstantinz.plugins{
 	
 	public class morisita extends Plugin{
 		private const BORDERCOLOR:Number = 0x000000;
+		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
 	
 		private var plotSize:int;//Количество пробных площадок
 		private var plotsXQuantaty:int;//Колиство квадратов в ряду
@@ -147,6 +148,8 @@ package konstantinz.plugins{
 			mIndex = allPlotsNumber*(niSumm/(allIndividuals*(allIndividuals-1)));
 			msgString = 'source data: Idividuals '+ allIndividuals + ', plots ' + allPlotsNumber;
 			messenger.message(msgString, 3);//Возвращаем индекс Мориситы с точностью 3 знака после запятой
+			msgString = IND_NUMB + allIndividuals;
+			messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
 			
 			return mIndex.toFixed(3);
 		}
@@ -161,6 +164,7 @@ package konstantinz.plugins{
 					individualsNumber += communityStage.chessDesk[xcrd+i][ycrd+j].numberOfIndividuals.young;
 					}
 				}
+			
 			return individualsNumber;
 		}
 	}

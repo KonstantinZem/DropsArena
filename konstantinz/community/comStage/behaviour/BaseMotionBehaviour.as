@@ -14,7 +14,7 @@ package konstantinz.community.comStage.behaviour{
 		protected var msgString:String;
 		protected var modelEvent:ModelEvent;
 		
-		private var newPosition:Array = new Array();
+		protected var newPosition:Array = new Array();
 		protected var individualName:int;
 		
 		public var messenger:Messenger;
@@ -102,7 +102,7 @@ package konstantinz.community.comStage.behaviour{
 				}
 			
 			}catch(err:Error){
-				msgString = err.message;
+				msgString = 'getNewPosition() ' + err.message;
 				messenger.message(msgString, modelEvent.ERROR_MARK);
 				}	
 			return newPosition;
@@ -115,7 +115,7 @@ package konstantinz.community.comStage.behaviour{
 			try{
 				
 				}catch(err:Error){
-					msgString = err.message;
+					msgString = 'getNewState() ' + err.message;
 					messenger.message(msgString, modelEvent.ERROR_MARK);
 					}
 				return newState;
