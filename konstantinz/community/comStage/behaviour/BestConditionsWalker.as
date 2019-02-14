@@ -8,9 +8,7 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 	
 		}
 	override public function getNewPosition(currentX:int, currentY:int):Array{//Класс на основе выбранного алгоритма поведения определяет новую позицию особи
-			
-			//var newPosition:Array = new Array();
-			
+		
 			currentPlaceQuality = populationArea[currentX][currentY].speedDeleyA;
 			
 			newPosition.x = currentX;
@@ -24,8 +22,7 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 			
 			switch(indDirection){
 				case 0: //Стоим наместе
-				
-				
+
 				break;
 				case 1://Идем вниз
 				
@@ -39,7 +36,7 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 					
 					}
 					else{
-						if((currentX - viewDistance) < (populationArea.length -2) && populationArea[currentX + viewDistance][currentY].speedDeleyA > currentPlaceQuality){
+						if((currentX + viewDistance) < (populationArea.length -2) && populationArea[currentX + viewDistance][currentY].speedDeleyA > currentPlaceQuality){
 							newPosition.x = currentX + viewDistance;
 							}else{
 								newPosition.x = newPosition.x + stepLength;
@@ -88,11 +85,14 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 						}
 				break;
 				default://Стоим на месте
+					newPosition.x = currentX;
+					newPosition.y = currentY;
+				break;
 				
 				}
 			
 			}catch(err:Error){
-				msgString = 'getNewPosition() ' + err.message + '\n' + 'New position was ' + populationArea[currentX - viewDistance][currentY].sqrX + ':' + populationArea[currentX - viewDistance][currentY].sqrY;
+				msgString = 'Individual ' + individualName + ': ' + 'getNewPosition() ' + err.message + '\n' + 'New position was ' + populationArea[currentX - viewDistance][currentY].sqrX + ':' + populationArea[currentX - viewDistance][currentY].sqrY + '; dirrection: ' + indDirection;
 				messenger.message(msgString, modelEvent.ERROR_MARK);
 				}	
 			return newPosition;

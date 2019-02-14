@@ -89,7 +89,6 @@ public class Plugin extends Sprite{
 	protected function setNewSwitchingInterval(newInterval:int):void{//Если надо где то задать особый интервал между переключениями плагина
 		
 		if(newInterval == 0){
-			
 			switchingIntervalHasChanged = 'false';
 			msgString = '[' + currentDay + ']' + ' Switching interval has changed from ' + switchingInterval + ' steps to ' + previosSwitchingInterval + ' steps';
 			messenger.message(msgString, modelEvent.INFO_MARK);
@@ -98,7 +97,7 @@ public class Plugin extends Sprite{
 			switchingIntervalHasChanged = 'true';
 			previosSwitchingInterval = switchingInterval;//Возвращаем ранее сохраненное значение интервала переключения
 			switchingInterval = newInterval;
-			msgString = '[' + currentDay + ']' + ' Switching interval has changed from ' + previosSwitchingInterval + ' steps to ' + newInterval + ' steps';
+			msgString = '[' + currentDay + ']' + ' Switching interval has returned from ' + previosSwitchingInterval + ' steps to ' + newInterval + ' steps';
 			messenger.message(msgString, modelEvent.INFO_MARK);
 			}
 		}
@@ -136,6 +135,8 @@ public class Plugin extends Sprite{
 			newStatisticMsg = e.target.message.split(':');
 			
 			if(currentDay == newStatisticMsg[1]){
+				msgString = 'Plugin get new calendar data '+ e.target.message;
+				messenger.message(msgString, modelEvent.DEBUG_MARK);
 				startPluginJobe();//Запускаем основной функционал плагина
 				}
 			}

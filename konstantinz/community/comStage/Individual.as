@@ -372,9 +372,12 @@ package konstantinz.community.comStage{
 					default:
 						msgString = 'Wrong statement name ' + statementName;
 						messenger.message(msgString, modelEvent.ERROR_MARK);
-					break
+					break;
 					}
-				}
+				}else{
+					msgString = 'Individual get '+ statementName + ' but it can not switching cause has status ' + stepDispatcher.statement();
+					messenger.message(msgString, modelEvent.DEBUG_MARK);//Применять только при малом числе особей
+					}
 				return stepDispatcher.statement();
 			}
 		

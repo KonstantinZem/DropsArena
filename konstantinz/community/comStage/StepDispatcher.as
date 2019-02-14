@@ -67,7 +67,7 @@ package konstantinz.community.comStage{
 			}
 		
 		public function doStep():void{//Сигнал приходит от предыдущей особи
-			if(indState != 'suspend' && pauseTime < 0){//Если уже можно передвигаться
+			if(indState != 'suspend' && indState != 'suspend' && pauseTime < 0){//Если уже можно передвигаться
 			  if(lifeTime != IMMORTAL_SIGHN){//Если особь не бессмертная
 				lifeTime --;
 				if(lifeTime < -1 && indState != 'dead' && indState != 'suspend' && indState != 'stop'){//Если жизнь особи уже истекла, но пометки о ее смерти еще нет

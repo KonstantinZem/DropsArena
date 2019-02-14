@@ -26,8 +26,9 @@ public class IndividualGraphicInterface extends Sprite{
 	private var modelEvent:ModelEvent;
 	private var individualMoveVector:Sprite;
 	private var individualPoint:Sprite;
+	private var hybernateIndividualPoint:Sprite
 	private var previousStepDistance:int;
-	private var currentScale:int;
+	private var currentScale:Number;
 	
 	public var individualBody:Sprite;
 	
@@ -44,7 +45,6 @@ public class IndividualGraphicInterface extends Sprite{
 			if(stepsQantaty > 0){//Если заданно количество шагов, то вычисляем прирост
 				growthRange = ((maxSize - minSize)/stepsQantaty)/minSize;
 				}
-				trace(growthRange)
 			}else{
 				indSize = minSize;
 				}
@@ -54,12 +54,17 @@ public class IndividualGraphicInterface extends Sprite{
 		//Функция напрямую завязана на графике
 		individualBody = new Sprite();
 		individualPoint = new Sprite();
+		hybernateIndividualPoint = new Sprite();
 		
 		individualPoint.graphics.lineStyle(1,BORDERCOLOR);
 		individualPoint.graphics.beginFill(INDCOLOR);
 		individualPoint.graphics.drawRect(0,0,indSize,indSize);
+		hybernateIndividualPoint.graphics.beginFill(STOP_COLOR);
+		hybernateIndividualPoint.graphics.drawCircle(8, indSize,indSize);
+		hybernateIndividualPoint.graphics.endFill();
 		
 		individualBody.addChild(individualPoint);
+		individualBody.addChild(hybernateIndividualPoint);
 		drawVectorArror();
 		
 		}
@@ -72,9 +77,11 @@ public class IndividualGraphicInterface extends Sprite{
 		
 		if(growthRange > 0 && remaningSteps > 0){
 			remaningSteps--;
-			currentScale = individualPoint.scaleX + growthRange;
-			individualPoint.scaleX = currentScale;
-			individualPoint.scaleY = currentScale;
+			if(currenteIndividualState.statement != 'stop'){
+				currentScale = individualPoint.scaleX + growthRange;
+				individualPoint.scaleX = currentScale;
+				individualPoint.scaleY = currentScale;
+				}
 			}
 		
 		markIndividual(currenteIndividualState.statement);
@@ -119,6 +126,8 @@ public class IndividualGraphicInterface extends Sprite{
 				individualPoint.transform.colorTransform = ct;
 				individualPoint.scaleX = currentScale;
 				individualPoint.scaleY = currentScale;
+				individualPoint.visible = true;
+				hybernateIndividualPoint.visible = false;
 			break; 
 					
 		    case 'suspend':
@@ -128,12 +137,12 @@ public class IndividualGraphicInterface extends Sprite{
 			case 'stop':
 				ct.color = STOP_COLOR;
 				individualPoint.transform.colorTransform = ct;
-				individualPoint.scaleX = 0.2;
-				individualPoint.scaleY = 0.2;
+				individualPoint.visible = false;
+				hybernateIndividualPoint.visible = true;
 			break;
 			case 'dead'://Мертвых особей делаем невидимыми, уменьшая их размер до нуля
-				individualPoint.scaleX = 0;
-				individualPoint.scaleY = 0;
+				individualPoint.visible = false;
+				hybernateIndividualPoint.visible = false;
 			break;
 			default: 
 				ct.color = INDCOLOR;

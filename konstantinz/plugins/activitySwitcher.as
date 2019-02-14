@@ -97,8 +97,11 @@ public class activitySwitcher extends Plugin{
 				
 			activeIndividualsNumberPosition = dataPath + '.part';
 			numberOfObservingsInConfig = countAllObservings();//Получаем количество заданных в конфиге наблюдений за активностью
+			
+			setDuration();
 			cycleCounter = 1;
 			msgString = 'cycle: ' + cycleCounter;
+			
 				
 			if(alreadyInited == 'fals'){
 			   setTimeout(pluginEvent.ready, 50);//Сообщение о том что плагин полностью готов к работе принимается функцией onPluginsJobeFinish в pluginLoader
@@ -106,9 +109,10 @@ public class activitySwitcher extends Plugin{
 		}
 		
 	override public function startPluginJobe():void{//Эта функция запускается периодичски, включая основной функционал плагина
-		
 		stopInd();//Это основной функционал
 		setNewObservingPosition();
+		setDuration()
+		
 		}
 	
 	private function countAllObservings():int{
@@ -135,6 +139,8 @@ public class activitySwitcher extends Plugin{
 			msgString = e.message;
 			messenger.message(msgString, modelEvent.ERROR_MARK);
 			}
+		
+		activityObservationPosition[3] = 0;//Корректируем
 		numberOfObservingsInConfig--;//Корректируем
 		
 		msgString = 'Number of observations is ' + numberOfObservingsInConfig;
@@ -155,20 +161,32 @@ public class activitySwitcher extends Plugin{
 				
 				}else{
 					currentActivityPosition++;
-					currentDuration = int(configuration.getOption(durationDataPath, activityObservationPosition));
-					
-					if(currentDuration > 0){//Если время паузы прописано в конфиге
-						setNewSwitchingInterval(currentDuration);
-						}else if(switchingIntervalHasChanged == 'true'){
-							setNewSwitchingInterval(0);//0 - значит вернуть предыдущий интервал
-							}
 					}
 				activityObservationPosition[3] = currentActivityPosition;//Указываем на положение текущего наблюдения в конфиге
 				currentDay = configuration.getOption(calendarData, activityObservationPosition);//Берем из конфига дату наблюдения
 				
+				if(currentDay == 'Error'){//Если дошли до конца списка
+					currentActivityPosition = 0
+					activityObservationPosition[3] = currentActivityPosition;//Обнуляем счетчик. А то плагин будет стоять и ждать дату Error
+					currentDay = configuration.getOption(calendarData, activityObservationPosition);//Берем из конфига дату наблюдения
+					msgString = 'Plugin has begun new cycle';
+					messenger.message(msgString, modelEvent.DEBUG_MARK);
+					}
+				
 				msgString = 'Next observation data is ' + currentDay + ' (position ' + activityObservationPosition[3] + ')';
 				messenger.message(msgString, modelEvent.DEBUG_MARK);
 		}
+	private function setDuration():void{
+		currentDuration = int(configuration.getOption(durationDataPath, activityObservationPosition));
+		
+		if(currentDuration > 0){//Если время паузы прописано в конфиге
+			setNewSwitchingInterval(currentDuration);
+			msgString = 'Pause duration is set to ' + currentDuration;
+			messenger.message(msgString, modelEvent.DEBUG_MARK);
+			}else if(switchingIntervalHasChanged == 'true'){
+				setNewSwitchingInterval(0);//0 - значит вернуть предыдущий интервал
+				}
+	};
 
 	private function stopInd():void{//С этой функции начинает выполнятся основной функционал плагина
 		
@@ -179,7 +197,7 @@ public class activitySwitcher extends Plugin{
 			currentActiveIndividualsNumber = int(configuration.getOption(activeIndividualsNumberPosition, activityObservationPosition));			
 			stopOnly(currentActiveIndividualsNumber, selectionType);
 
-			msgString = 'Next stoped individuals part is ' +  currentDay + '(' + currentActivityPosition + '): '+ currentActiveIndividualsNumber;
+			msgString = 'Current stoped individuals part is ' +  currentDay + '(position ' + currentActivityPosition + '): '+ currentActiveIndividualsNumber;
 			messenger.message(msgString, modelEvent.DEBUG_MARK);
 				
 			if(activeIndividualsNumberPosition != 'Error'){

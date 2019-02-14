@@ -102,7 +102,7 @@ package konstantinz.community.comStage.behaviour{
 				}
 			
 			}catch(err:Error){
-				msgString = 'getNewPosition() ' + err.message;
+				msgString = 'Individual ' + individualName + ': ' + 'getNewPosition() ' + err.message;
 				messenger.message(msgString, modelEvent.ERROR_MARK);
 				}	
 			return newPosition;
@@ -115,7 +115,7 @@ package konstantinz.community.comStage.behaviour{
 			try{
 				
 				}catch(err:Error){
-					msgString = 'getNewState() ' + err.message;
+					msgString = 'Individual ' + individualName + ': ' + 'getNewState() : ' + err.message;
 					messenger.message(msgString, modelEvent.ERROR_MARK);
 					}
 				return newState;
