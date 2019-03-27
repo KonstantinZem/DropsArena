@@ -54,10 +54,34 @@ package konstantinz.community.comStage{
 				messenger.message(msgString, modelEvent.INIT_MSG_MARK);
 				}
 			catch(error:ArgumentError){
-				msgString = "<Error> " +  error.message;
+				msgString = error.message;
 				messenger.message(msgString, modelEvent.ERROR_MARK);
 				}
 				}
+				
+			public function getCellContent(i:int, j:int, mode:String='all'):String{
+				var result:String = '';
+				try{
+					switch(mode){
+						case 'all':
+							result = 'x=' + i + ';' + 'y=' + j + ';' + 'cover=' + chessDesk[i][j].coverName  + ';' + 'pause=' + chessDesk[i][j].speedDeleyA + ';' + 'behaviourModel=' + chessDesk[i][j].behaviourModel + ';' + 'adult=' + chessDesk[i][j].numberOfIndividuals['adult'] + ';' + 'yong=' + chessDesk[i][j].numberOfIndividuals['young'] 
+						break;
+						case 'only_numbers':
+							result = i + ';' + j + ';' + chessDesk[i][j].coverName + ';' + chessDesk[i][j].speedDeleyA + ';' + chessDesk[i][j].behaviourModel + ';' + chessDesk[i][j].numberOfIndividuals['adult'] + ';' + chessDesk[i][j].numberOfIndividuals['young'];
+						break;
+						case 'only_names':
+							result = 'x;y;cover;pause;behaviourModel;adult;young';
+						break;
+						default:
+							throw new Error('Mode name is wrong');
+						break;
+					}
+				}catch(error:ArgumentError){
+					msgString = error.message;
+					messenger.message(msgString, modelEvent.ERROR_MARK);
+				}
+				return result;
+				};
 			
 			private function buildNet():void{
 				//Разлинеивает игровое поле в квадратики
@@ -83,6 +107,7 @@ package konstantinz.community.comStage{
 						chessDesk[i][j].sqrY = ypos;
 						chessDesk[i][j].speedDeleyA = 1;//по умолчанию двигаемся без задержки 
 						chessDesk[i][j].speedDeleyY = 1;
+						chessDesk[i][j].coverName = 'empty';
 						chessDesk[i][j].lifeQuant = lifeQuant;
 						chessDesk[i][j].behaviourModel = '';//Здесь будет хранится название модели поведения, которое будет проявлять особь, находясь на данном квадрате
 						

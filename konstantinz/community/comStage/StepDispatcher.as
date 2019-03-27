@@ -14,7 +14,7 @@ package konstantinz.community.comStage{
 		private var pauseTime:int;
 		private var messenger:Messenger;
 		private var collisionTime:int;
-		private var debugLevel:String
+		private var debugLevel:String;
 		
 		public static const DO_STEP:String = 'do_step';//Событие посылается особи, внутри которой находится экземпляр этого класса
 		public static const STEP_DONE:String = 'step_done';

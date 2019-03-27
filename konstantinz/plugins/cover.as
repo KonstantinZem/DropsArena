@@ -75,7 +75,7 @@ public class cover extends Plugin{
 		behaviourModelName = configuration.getOption(optionPath + 'behaviour_model');//Какое поведение должна прявлять особь на закрашенных плагином участках
 		
 		if(behaviourModelName == 'Error'){//Если в конфиге не указано название модели поведения
-			behaviourModelName = '';//Оставляем название пустым
+			behaviourModelName = 'empty';//Оставляем название пустым
 			}
 		
 		if(lifequant == 0){
@@ -117,10 +117,11 @@ public class cover extends Plugin{
 				counterI = coverShema.length;
 				for(var i:int = 0; i< counterI; i++){
 					for(var j:int = 0; j< coverShema[i].length; j++){
-						xPos = coverShema[i][j]['controllX'];
-						yPos = coverShema[i][j]['controllY'];
+						xPos = coverShema[i][j].controllX;
+						yPos = coverShema[i][j].controllY;
+						communityStage.chessDesk[xPos][yPos].coverName = pluginName;
 						communityStage.chessDesk[xPos][yPos].picture.transform.colorTransform = ct;
-						communityStage.chessDesk[xPos][yPos]['behaviourModel'] = coverShema[i][j]['behaviourModel'];
+						communityStage.chessDesk[xPos][yPos].behaviourModel = coverShema[i][j].behaviourModel;
 						}
 					
 					}
@@ -156,6 +157,7 @@ public class cover extends Plugin{
 						communityStage.chessDesk[i][j].speedDeleyA += aDeley//Переопределяем скорость взрослых
 						communityStage.chessDesk[i][j].speedDeleyY += yDeley//И молодых особей
 						communityStage.chessDesk[i][j].lifeQuant += lifequant;//Переопределяем время жизни особи за ход
+						communityStage.chessDesk[i][j].coverName = pluginName;
 						controllX = i;
 						controllY =j;
 						aux['controllX'] = controllX;

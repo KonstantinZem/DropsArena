@@ -23,7 +23,7 @@ package{
     public class main extends Sprite{
 		
 		private const CURRENT_VERSION:String = '0.97';
-		private const CURRENT_BUILD:String = '190208';
+		private const CURRENT_BUILD:String = '190327';
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
 		private const MIN_INDIVIDUAL_CRITICAL_NUMBER:int = 5;//Минимально подходящие для отслеживания статистики количество особей
 		private const MAX_INDIVIDUAL_CRITICAL_NUMBER:int = 3000;
@@ -49,6 +49,7 @@ package{
 		private var numberOfCycles:int;
 		private var numberOfIndividuals:int;
 		private var individualPictures:Vector.<IndividualGraphicInterface>
+		private var dumper:Dumper;
 		
 		public var individuals:Vector.<Individual>;
 		public var model:Sprite;
@@ -59,6 +60,8 @@ package{
 		public var reloadButtonEvent:DispatchEvent;
 		public var startStopButton:KzSimpleButton;
 		public var reloadButton:KzSimpleButton;
+		public var dumpCommStageButton:KzSimpleButton;
+		public var dumpCommStageButtonEvent:DispatchEvent;
 		public var stageEvent:DispatchEvent;
 
 		public function main(){
@@ -179,6 +182,7 @@ package{
 			Accumulator.instance.setRefreshTime(int(statRefreshTime));//Устанавливаем время обновления статистики
 			
 			stageEvent = new DispatchEvent();
+			dumper = new Dumper(commStage, debugLevel);
 			
 			initGUIElements();
 						
@@ -310,6 +314,17 @@ package{
 			
 				reloadButtonEvent = reloadButton.buttonEvent;
 				reloadButtonEvent.addEventListener(ModelEvent.CLICKING, onReloadClick);
+				reloadButton.height = 30;
+				reloadButton.width = 30;
+				
+				dumpCommStageButton = new KzSimpleButton();//Кнопка снятия дампа заначений ячеек commStage
+				dumpCommStageButton.setButtonSkins('pictures/interface/dump.png');
+				dumpCommStageButton.height = 20;
+				dumpCommStageButton.width = 20;
+				dumpCommStageButtonEvent = dumpCommStageButton.buttonEvent;
+				dumpCommStageButtonEvent.addEventListener(ModelEvent.CLICKING, onDumpClick);
+				dumpCommStageButton.x = 10;
+				dumpCommStageButton.y = 10;
 			
 				statusBar = new StatusBar();
 				model.addChild(statusBar);
@@ -509,6 +524,8 @@ package{
 			var counter:int;
 			
 			if(msgWindow){//Если окно статистики уже было открыто
+				msgWindow.windowEvent.removeEventListener(ModelEvent.DONE, onCloseWindowClick);
+				msgWindow.removeChild(dumpCommStageButton);
 				removeChild(msgWindow);//Закрываем его
 				msgWindow = null;
 				}
@@ -543,6 +560,16 @@ package{
 			initConfig();//Запускаем программу с самого начала
 			stepTimer.stop();
 			}
+		
+		private function onDumpClick(e:ModelEvent):void{
+			dumper.saveDumpFile();
+		    };
+		    
+		private function onCloseWindowClick(e:ModelEvent):void{
+			msgWindow.windowEvent.removeEventListener(ModelEvent.DONE, onCloseWindowClick);
+			msgWindow.removeChild(dumpCommStageButton);
+			msgWindow = null;
+			}
 			
 		private function onConditionsChange(e:Event):void{
 			var condition:String = e.target.behaviourName;
@@ -562,7 +589,10 @@ package{
 			addChild(msgWindow);
 			msgWindow.x = 100;
 			msgWindow.y = 100;
+			msgWindow.windowEvent.addEventListener(ModelEvent.DONE, onCloseWindowClick);
+			msgWindow.addChild(dumpCommStageButton);
 			}
+			
 		
 		private function makeToStepNextIndividual(e:Event):void{
 			numberOfIndividuals = individuals.length;

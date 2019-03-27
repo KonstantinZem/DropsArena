@@ -85,7 +85,6 @@ public class Accumulator{
 			refreshTime = time*1000;//Переводим время из секунд в миллисекунды
 			refreshTimer = new Timer(refreshTime);
 			refreshTimer.addEventListener(TimerEvent.TIMER, prepareStatTable);
-			//refreshTimer.start();
 		}catch(err:Error){
 			msgString = err.message;
 			messenger.message(msgString, modelEvent.ERROR_MARK);

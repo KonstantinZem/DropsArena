@@ -5,6 +5,7 @@ package konstantinz.community.comStage{
 public class ChessCell{
 	
 	public var picture:Sprite;
+	public var coverName:String;
 	public var sqrX:int;
 	public var sqrY:int;
 	public var speedDeleyA:int;
@@ -19,6 +20,7 @@ public class ChessCell{
 		numberOfIndividuals = new Array(2);
 		numberOfIndividuals['adult'] = 0;
 		numberOfIndividuals['young'] = 0;
+		behaviourModel = '';
 		}
 }
 
