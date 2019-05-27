@@ -53,7 +53,7 @@ package konstantinz.community.comStage{
 		private var motionBehaviour:MotionBehaviourSwitcher;
 		private var stepDispatcher:StepDispatcher;
 		
-		private var modelEvent:ModelEvent;
+		private var modelEvent:ModelEvent;//А если это все брать из MotionBehaviour
 		private var errorType:ModelErrors;//Контейнер для ошибок;
 		private var timerForIndividuals:Timer; //Не самое удачное решение, снабдить каждую особь своим таймером, но сделать один из главного класса у меня не получается
 		

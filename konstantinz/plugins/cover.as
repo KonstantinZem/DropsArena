@@ -26,109 +26,140 @@ package konstantinz.plugins{
 	
 public class cover extends Plugin{
 	
-	private var aDeley:int = 1//Задержка при движении взрослых особей. Должна быть включена в интерфейс этого типа плагинов
-	private var yDeley:int = 3//Задержка при движении молодых особей. Должна быть включена в интерфейс этого типа плагинов
 	private var lifequant:int = 1; //Убыль жизни за ход. Должна быть включена в интерфейс этого типа плагинов
-	private var behaviourFrequency:int;
-	private var color:Number = 0x000000; //Определяет цвет участка с данными характеристиками
-	private var ct:ColorTransform;
-	private var imageName:String;
-	private var behaviourModelName:String;
 	private var image:Object; //Должна быть включена в интерфейс этого типа плагинов
-	private var loader:Loader;
-	private var optionPosition:Array;
-	private var coverShema:Array;//Схема напочвенного покрова может загружаться в процессе работы программы несколько раз. Чтобы не загружать битмап каждый раз, надо заранее создать схему
 	private var modelError:ModelErrors;
+	private var numberOfInitilizedTasks:int
 	
 	function cover(){
-		ct = new ColorTransform();
-		loader = new Loader();
-		messenger.setMessageMark('Ground cover plugin');
-		coverShema = new Array;
+		//messenger.setMessageMark('Ground cover plugin');
 		modelError = new ModelErrors();
 		}
 	
-	override public function initSpecial():void{
-		optionPosition = new Array(0,0,0,0,0);
+	override public function initSpecial(task:Array, taskName:String, taskNumber:int):void{
+		var currentTask:CoverTask
 		
-		dataPath = 'plugins.' + pluginName + '.data.observation';
-		calendarData = dataPath + '.day';
+		task[taskNumber]= new CoverTask();
 		
-		behaviourFrequency = int(configuration.getOption(optionPath + 'behaviour_frequency'));
-		
-		if(behaviourFrequency == 0 || behaviourFrequency < 0){
-			behaviourFrequency = 100;
-			msgString = 'Behaviour frequency: ' + modelError.varIsIncorrect;
-			messenger.message(msgString, modelEvent.ERROR_MARK);
-			}
-		
-		if(behaviourFrequency > 100){
-			behaviourFrequency = 100;
-			msgString = 'Behaviour frequency: ' + modelError.varIsIncorrect + ' It can not be greater then 100';
-			messenger.message(msgString, modelEvent.ERROR_MARK);
-			}
-		
-		imageName = configuration.getOption(optionPath + 'picture');
-		color = configuration.getOption(optionPath + 'color');
-		ct.color = color;
-		adeley = configuration.getOption(optionPath + 'stepDeley');
-		behaviourModelName = configuration.getOption(optionPath + 'behaviour_model');//Какое поведение должна прявлять особь на закрашенных плагином участках
-		
-		if(behaviourModelName == 'Error'){//Если в конфиге не указано название модели поведения
-			behaviourModelName = 'empty';//Оставляем название пустым
-			}
+		currentTask = task[taskNumber];
+		initCurrentTaskData(currentTask, taskName,  taskNumber);
 		
 		if(lifequant == 0){
 			lifequant = 1;
 			}
 		
-		currentDay = configuration.getOption(calendarData, optionPosition);//Берем из аттрибутов дату наблюдения
-			
-		loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
-		loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
-		loader.load(new URLRequest(imageName));
+		currentTask.loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
+		currentTask.loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
+		currentTask.loader.load(new URLRequest(currentTask.imageName));
 		}
+	
+	private function initCurrentTaskData(currentTask:CoverTask, taskName:String, taskNumber:int):void{
+		
+		currentTask.dataPath = 'plugins.' + pluginName + '.task.data.observation';
+		var calendarData:String = currentTask.dataPath + '.day';
+			
+		currentTask.name = taskName;
+		currentTask.number = taskNumber;
+		currentTask.observationPosition = new Array(0,0,taskNumber,0);
+		currentTask.currentDayPosition = new Array(0,0,taskNumber,0,0,0);
+
+		currentTask.coverShema = new Array();
+		currentTask.color = configuration.getOption(optionPath + 'color', currentTask.observationPosition);
+		currentTask.currentDay = configuration.getOption(calendarData, currentTask.currentDayPosition);//Берем из аттрибутов дату наблюдения
+		currentTask.behaviourFrequency = int(configuration.getOption(optionPath + 'behaviour_frequency', currentTask.observationPosition));
+		
+		if(currentTask.behaviourFrequency == 0 || currentTask.behaviourFrequency < 0){//Если в конфигурационном файле нет такой опции
+			currentTask.behaviourFrequency = 100;
+			msgString = 'Behaviour frequency: ' + modelError.varIsIncorrect;
+			messenger.message(msgString, modelEvent.ERROR_MARK);
+			}
+		
+		if(currentTask.behaviourFrequency > 100){
+			currentTask.behaviourFrequency = 100;
+			msgString = 'Behaviour frequency: ' + modelError.varIsIncorrect + ' It can not be greater then 100';
+			messenger.message(msgString, modelEvent.ERROR_MARK);
+			}
+		
+		currentTask.imageName = configuration.getOption(optionPath + 'picture', currentTask.observationPosition);
+		currentTask.aDeley = int(configuration.getOption(optionPath + 'stepDeley', currentTask.observationPosition));
+		currentTask.behaviourModelName = configuration.getOption(optionPath + 'behaviour_model', currentTask.observationPosition);//Какое поведение должна прявлять особь на закрашенных плагином участках
+		
+		if(currentTask.behaviourModelName == 'Error'){//Если в конфиге не указано название модели поведения
+			currentTask.behaviourModelName = 'empty';//Оставляем название пустым
+			}
+		
+		currentTask.switchingEvent = setSwitchingEvent(currentTask);
+		currentTask.switchingInterval = setSwitchingInterval(currentTask);
+		
+		currentTask.loader = new Loader();
+		currentTask.background = new ColorTransform();
+		currentTask.background.color = currentTask.color;
+	};
 
 	private function onIOError(error:IOErrorEvent):void{
 		msgString = "Unable to load picture: " + error.text; 
 		messenger.message(msgString, modelEvent.ERROR_MARK);
-		loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onIOError);
+		currentTask.loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onIOError);
 		pluginEvent.ready();//Сообщаем о том, что все уже сделано, ведь другие плагины тоже хотят загрузится
+		}
+
+	private function onLoadComplete(e:Event):void{//Функция запускается один раз сразу после старта плагина
+		
+		if(currentTaskNumber == task.length -1){//Дожидаемся момента, когда загрузятся все плагины
+			
+			for(var i:int = 0; i < task.length -1; i++){	
+				image = task[i].loader.contentLoaderInfo.content;//Загружаем в память картинку напочвенного покрова
+				addChild(image);
+				task[i].loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, onLoadComplete);	
+				modifyTable(task[i]);//Запускаем функционал, изменяющий структуры внутри этой программы 
+				removeChild(image);//Удаляем вспомогательную картинку с рисунком напочвенного покрова
+				task[i].loader = null;
+				}
+			image = null;
+			pluginEvent.ready();//Сообщаем о том, что все уже сделано,
+		}
+		currentTaskNumber++;
 	}
 
-	private function onLoadComplete(e:Event):void{
-		image = loader.contentLoaderInfo.content;
-		addChild(image);
-		loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, onLoadComplete);
-		modifyTable();//Запускаем функционал, изменяющий структуры внутри этой программы 
-	}
-
-	private function modifyTable():void{
+	private function modifyTable(currentTask:CoverTask):void{
+		
 		var xPos:int = 0;
 		var yPos:int = 0;
 		var counterI:int = 0;
-		if(coverShema.length == 0){//Если плагин запустился в первый раз, 
-			initCoverShema ();//то сначала создаем схему напочвенного покрова, чтобы при его последующих запусках уменьшить объем обрабатываемой информации
-			if(behaviourFrequency > 0){
-				initBehaviourShema();
+		
+		try{
+		if(currentTask.coverShema == null){
+			throw new Error('Cover shema array not initilized yet');
+			}
+		
+		if(currentTask.coverShema.length == 0){//Если плагин запустился в первый раз, 
+		
+			initCoverShema(currentTask);//то сначала создаем схему напочвенного покрова, чтобы при его последующих запусках уменьшить объем обрабатываемой информации
+			if(currentTask.behaviourFrequency > 0){
+				initBehaviourShema(currentTask);
 				}
-			pluginEvent.ready();//Сообщаем о том, что все уже сделано,
 			}else{
-				counterI = coverShema.length;
+	
+				counterI = currentTask.coverShema.length;
 				for(var i:int = 0; i< counterI; i++){
-					for(var j:int = 0; j< coverShema[i].length; j++){
-						xPos = coverShema[i][j].controllX;
-						yPos = coverShema[i][j].controllY;
+					
+					for(var j:int = 0; j< currentTask.coverShema[i].length; j++){
+						xPos = currentTask.coverShema[i][j].controllX;
+						yPos = currentTask.coverShema[i][j].controllY;
 						communityStage.chessDesk[xPos][yPos].coverName = pluginName;
-						communityStage.chessDesk[xPos][yPos].picture.transform.colorTransform = ct;
-						communityStage.chessDesk[xPos][yPos].behaviourModel = coverShema[i][j].behaviourModel;
+						communityStage.chessDesk[xPos][yPos].picture.transform.colorTransform = currentTask.background;
+						communityStage.chessDesk[xPos][yPos].behaviourModel = currentTask.coverShema[i][j].behaviourModel;
 						}
 					
 					}
 				}
+			}catch(e:Error){
+				msgString = e.message;
+				messenger.message(msgString, modelEvent.ERROR_MARK);
+			}
 		}
 	
-	private function initCoverShema():void{
+	private function initCoverShema(currentTask:CoverTask):void{
 		var controllX:int;
 		var controllY:int;
 		var bmd:BitmapData = image.bitmapData;
@@ -142,20 +173,22 @@ public class cover extends Plugin{
 				
 		var tableRoot:Array = communityStage.chessDesk;
 		counterI = tableRoot.length;
-			
+		
+		
+		
 		for(var i:int = 0; i< counterI; i++){
 				var pixelValue:String;
 				counterJ = tableRoot[i].length;
-				coverShema[i] = new Array();
+				currentTask.coverShema[i] = new Array();
 				
 				for(var j:int = 0; j<counterJ; j++){
 					var aux:Object = new Object();
 					pixelValue = bmd.getPixel(tableRoot[i][j].sqrX /2,tableRoot[i][j].sqrY /2).toString(16);
 		
 					if(pixelValue != 'ffffff'){//Если участок картинки не белый
-						communityStage.chessDesk[i][j].picture.transform.colorTransform = ct;
-						communityStage.chessDesk[i][j].speedDeleyA += aDeley//Переопределяем скорость взрослых
-						communityStage.chessDesk[i][j].speedDeleyY += yDeley//И молодых особей
+						communityStage.chessDesk[i][j].picture.transform.colorTransform = currentTask.background;
+						communityStage.chessDesk[i][j].speedDeleyA += currentTask.aDeley//Переопределяем скорость взрослых
+						communityStage.chessDesk[i][j].speedDeleyY += currentTask.yDeley//И молодых особей
 						communityStage.chessDesk[i][j].lifeQuant += lifequant;//Переопределяем время жизни особи за ход
 						communityStage.chessDesk[i][j].coverName = pluginName;
 						controllX = i;
@@ -163,37 +196,36 @@ public class cover extends Plugin{
 						aux['controllX'] = controllX;
 						aux['controllY'] = controllY;
 						aux['behaviourModel'] = '';
-						coverShema[i].push(aux);
-						
+						currentTask.coverShema[i].push(aux);
 					}
 				}	
 		}
 		bmd.dispose(); //Небольшая оптимизация, чтобы уменьшить занимаемую память
 		bmd = null;
-		removeChild(image);//Удаляем вспомогательную картинку с рисунком напочвенного покрова
+		
 		msgString = 'Individuals speed now is ' + communityStage.chessDesk[controllX][controllY].speedDeleyA;
 		messenger.message(msgString, modelEvent.INFO_MARK);
 	    msgString = 'Individuals life decriasing now is ' + communityStage.chessDesk[controllX][controllY].lifeQuant + ' points after step';
 	    messenger.message(msgString, modelEvent.INFO_MARK);
 		}
 		
-	private function initBehaviourShema():void{
+	private function initBehaviourShema(currentTask:CoverTask):void{
 		var aux:Array = new Array(0,1,2,3,4,5,6,7,8,9);//Этот массив нужен для присвоения модели поведения случайным клеткам из десяти
-		var counterI:int = coverShema.length;
+		var counterI:int = currentTask.coverShema.length;
 		var counterD:int = 0;
-		var initedCellsNumber:int = behaviourFrequency/10;
+		var initedCellsNumber:int = currentTask.behaviourFrequency/10;
 		var cellNumber:int;
 		
 		for(var i:int = 0; i < counterI; i++){
 			
-			for(var j:int = 0; j< coverShema[i].length; j = j + 10){
+			for(var j:int = 0; j< currentTask.coverShema[i].length; j = j + 10){
 				counterD = j + initedCellsNumber;
 				
 				for(var d:int = j; d < counterD; d++){
 					cellNumber = Math.round(Math.random() * (aux.length));//Выбираем случайную ячейку вспомогатеьного массива
 					
-					if(coverShema[i][aux[cellNumber] + j] != undefined){
-						coverShema[i][aux[cellNumber] + j]['behaviourModel'] = behaviourModelName;
+					if(currentTask.coverShema[i][aux[cellNumber] + j] != undefined){
+						currentTask.coverShema[i][aux[cellNumber] + j]['behaviourModel'] = currentTask.behaviourModelName;
 						}
 					aux.splice(cellNumber,1);
 					
@@ -204,12 +236,14 @@ public class cover extends Plugin{
 		}
 	
 	override public function startPluginJobe():void{
-		modifyTable();
-		optionPosition[3]++;
-		currentDay = configuration.getOption(calendarData, optionPosition);
-		if(currentDay == 'Error'){//Если мы выскочили за последнюю запись в данной секции кофига
-			optionPosition[3] = 0;
-			currentDay = configuration.getOption(calendarData, optionPosition);//Переходим к первое его записи
+		
+		modifyTable(currentTask);
+		currentTask.currentDayPosition[4]++;
+		
+		currentTask.currentDay = configuration.getOption(currentTask.dataPath + '.day', currentTask.currentDayPosition);//Берем из конфига следующую дату запуска
+		if(currentTask.currentDay == 'Error'){//Если мы выскочили за последнюю запись в данной секции кофига
+			currentTask.currentDayPosition[4] = 0;
+			currentTask.currentDay = configuration.getOption(currentTask.dataPath + '.day', currentTask.currentDayPosition);//Переходим к первое его записи
 			}
 		}
 	

@@ -5,8 +5,8 @@ package konstantinz.community.comStage.behaviour{
 	public class BaseMotionBehaviour implements MotionBehaviour{
 		
 		private var debugeLevel:String;
-		private var previosChessDeskI:int
-		private var previosChessDeskJ:int
+		private var previosChessDeskI:int;
+		private var previosChessDeskJ:int;
 		
 		protected var currentPlaceQuality:int;
 		protected var stepLength:int;

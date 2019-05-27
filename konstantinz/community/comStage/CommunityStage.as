@@ -4,11 +4,11 @@ package konstantinz.community.comStage{
 	import konstantinz.community.auxilarity.*
 
 	public class CommunityStage extends Sprite{
-		private const CRITICAL_LEVEL:int = 8; //Размер элемента, слишком мал для стабильной работы класса
+		private const CRITICAL_LEVEL:int = 1; //Размер элемента, слишком мал для стабильной работы класса
 		private const RECTCOLOR:Number = 0xFFFFFF //Цвет квадратика
 		private const BORDERCOLOR:Number = 0x000000;
 		
-		private var squSize:int;
+		private var squSize:Number;
 		private var stgHeight:int;//Высота сцены
 		private var stgWidth:int;
 		private var sqrQantH:int; //Количество квадратов в столбце
@@ -37,7 +37,7 @@ package konstantinz.community.comStage{
 						throw new Error(errorType.paramError);
 						}
 					}
-				squSize = (stgw*int(extOptions.getOption('main.cellSize')))/100;
+				squSize = (stgw*Number(extOptions.getOption('main.cellSize')))/100;
 				if(squSize<CRITICAL_LEVEL){//Если мы рискуем получить слишком много слишком мелких квадратов
 					throw new Error(errorType.tooSmall + ' ' + errorType.unstableWarning);//Лучше сразу выбросить ошибку, чтобы не повесить комп
 					}

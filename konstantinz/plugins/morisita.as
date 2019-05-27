@@ -24,10 +24,13 @@ package konstantinz.plugins{
 			messenger.setMessageMark('Morisita counter');
 			}	
 	
-		public override function initSpecial():void{
+		public override function initSpecial(task:Array, taskName:String, taskNumber:int):void{
+			task[taskNumber] = new Task();
+			currentTask = task[taskNumber];
+			initCurrentTaskData(currentTask, taskName,  taskNumber);
 			
-			debugeLevel = configuration.getOption('plugins.morisitaCounter.debugLevel');
-			plotSize = int(configuration.getOption('plugins.morisitaCounter.plotSize'));
+			debugeLevel = configuration.getOption('plugins.morisitaCounter.task.debugLevel');
+			plotSize = int(configuration.getOption('plugins.morisitaCounter.task.plotSize'));
 	
 			cellSize = int(configuration.getOption('main.dropSize'));
 			plotsCells = new Array;
@@ -39,6 +42,14 @@ package konstantinz.plugins{
 			drawMorisitaPlot();
 			
 			setTimeout(pluginEvent.ready, 50);//Сообщение о том что плагин полностью готов к работе принимается функцией onPluginsJobeFinish в pluginLoader
+			}
+		
+		private function initCurrentTaskData(currentTask:Task, taskName:String, taskNumber:int):void{
+			currentTask.name = taskName;
+			currentTask.number = taskNumber;
+			currentTask.observationPosition = new Array(0,0,taskNumber,0);
+			currentTask.switchingEvent = setSwitchingEvent(currentTask);
+			currentTask.switchingInterval = setSwitchingInterval(currentTask);
 			}
 		
 		private function drawMorisitaPlot():void{	//Разлинеивает игровое поле в квадратики для большей наглядности

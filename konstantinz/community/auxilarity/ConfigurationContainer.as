@@ -65,14 +65,19 @@
 			}
 			
 		public function getOption(optionPath:String, ...args):String{//С помощью этого вызова программа будет получать от класса запрашиваемые опции
+			var parsedPath:Array;
+			var optionValue:String;
+			var parsedPosition:Array = new Array();
+			
 			try{
 				if(currentStatus == 'busy'){
 					throw new Error('Function yet busy');
 					}
 				currentStatus = 'busy';
-			var parsedPath:Array;
-			var optionValue:String;
-			var parsedPosition:Array = new Array();
+				
+				if(optionPath == null){
+					throw new Error('Atempt to get option with null option path');
+					}
 			
 			parsedPath = parsePathString(optionPath);//Разбираем переданную строку на массив из слов
             
@@ -179,7 +184,7 @@
 					
 				}
 			}catch(e:ArgumentError){
-				msgStreeng = e.message;
+				msgStreeng = pathStrings + ': ' + e.message;
 				messenger.message(msgStreeng, modelEvent.ERROR_MARK);
 				}
 			catch(e:Error){
