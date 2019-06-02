@@ -17,12 +17,12 @@
 		<lifeQuant>1</lifeQuant>
 		<adultAge>12864</adultAge>
 		<maturingDeley>1600</maturingDeley>
-		<offspringsQuant>25</offspringsQuant>
+		<offspringsQuant>5</offspringsQuant>
 	</individuals>
 	<!--Cell size in percents from stage size-->
-	<cellSize>1</cellSize>
+	<cellSize>0.5</cellSize>
 	<!-- initPosition of individual can be left-top, left-bottom,  right-top, right-bottom, center and random -->
-	<initPosition>left-top</initPosition>
+	<initPosition>random</initPosition>
 	<statRefreshTime>35</statRefreshTime>
 	<stepLength>1</stepLength>
 	<pluginsList>plugins/cover.swf;plugins/activity.swf;plugins/morisitaCounter.swf</pluginsList>
@@ -51,41 +51,15 @@
 <plugins>
 	<cover>
 	<task>
-		<name>relief</name>
-		<icon></icon>
-		<picture>pictures/park/relief.png</picture>
-		<stepDeley>5</stepDeley>
-		<debugLevel>1</debugLevel>
-		<color>0xf3f2d1</color>
-		<switchingEvent>calendar_data</switchingEvent>
-		<data>
-			<observation>
-				<day>14.06.11</day>
-			</observation>
-			<observation>
-				<day>19.08.11</day>
-			</observation>
-			<observation>
-				<day>09.10.11</day>
-			</observation>
-			<observation>
-				<day>11.06.12</day>
-			</observation>
-			<observation>
-				<day>24.06.12</day>
-			</observation>
-		</data>
-	</task>
-	<task>
 		<name>mowing</name>
 		<description>Zone of decading mowing</description>
-		<picture>pictures/park/pocos.png</picture>
+		<picture>pictures/park/mowing.png</picture>
 		<stepDeley>0</stepDeley>
 		<debugLevel>1</debugLevel>
 		<color>0xf4e17f</color>
 		<behaviour_model>MomentalDeath</behaviour_model>
 		<!--behaviour_frequency individual will change it's behaviour in each second cell-->
-		<behaviour_frequency>40</behaviour_frequency>
+		<behaviour_frequency>20</behaviour_frequency>
 		<switchingEvent>calendar_data</switchingEvent>
 		<data>
 			<observation>
@@ -108,13 +82,25 @@
 	<task>
 		<name>ground</name>
 		<description>Zone of open ground</description>
-		<picture>pictures/park/ground.png</picture>
+		<picture>pictures/park/ground_all.png</picture>
 		<stepDeley>0</stepDeley>
 		<debugLevel>1</debugLevel>
 		<color>0x333333</color>
 		<switchingEvent>calendar_data</switchingEvent>
 		<data>
 			<observation>
+				<day>02.09.10</day>
+			</observation>
+			<observation>
+				<day>02.11.10</day>
+			</observation>
+			<observation>
+				<day>03.04.11</day>
+			</observation>
+			<observation>
+				<day>14.05.11</day>
+			</observation>
+			<observation>
 				<day>14.06.11</day>
 			</observation>
 			<observation>
@@ -122,6 +108,15 @@
 			</observation>
 			<observation>
 				<day>09.10.11</day>
+			</observation>
+			<observation>
+				<day>01.10.11</day>
+			</observation>
+			<observation>
+				<day>01.11.11</day>
+			</observation>
+			<observation>
+				<day>01.04.12</day>
 			</observation>
 			<observation>
 				<day>11.06.12</day>
@@ -132,23 +127,47 @@
 		</data>
 	</task>
 	<task>
-		<name>grass</name>
-		<description url='https://ru.wikipedia.org/wiki/%D0%A1%D0%BD%D1%8B%D1%82%D1%8C_%D0%BE%D0%B1%D1%8B%D0%BA%D0%BD%D0%BE%D0%B2%D0%B5%D0%BD%D0%BD%D0%B0%D1%8F'>[Aegopodium podagraria] grass cover zones</description>
+		<name>aegopodium_4</name>
+		<description url='https://ru.wikipedia.org/wiki/%D0%A1%D0%BD%D1%8B%D1%82%D1%8C_%D0%BE%D0%B1%D1%8B%D0%BA%D0%BD%D0%BE%D0%B2%D0%B5%D0%BD%D0%BD%D0%B0%D1%8F'>[Aegopodium podagraria] grass cover zones in spring and autumn</description>
 		<icon></icon>
-		<picture>pictures/park/aegopodium.png</picture>
+		<picture>pictures/park/4_aegopodium.png</picture>
 		<stepDeley>10</stepDeley>
 		<debugLevel>1</debugLevel>
 		<color>0x007100</color>
 		<switchingEvent>calendar_data</switchingEvent>
 		<data>
 			<observation>
+				<day>02.09.10</day>
+			</observation>
+			<observation>
+				<day>03.04.11</day>
+			</observation>
+			<observation>
+				<day>01.10.11</day>
+			</observation>
+			<observation>
+				<day>01.04.12</day>
+			</observation>
+		</data>
+	</task>
+	<task>
+		<name>aegopodium_5</name>
+		<description url='https://ru.wikipedia.org/wiki/%D0%A1%D0%BD%D1%8B%D1%82%D1%8C_%D0%BE%D0%B1%D1%8B%D0%BA%D0%BD%D0%BE%D0%B2%D0%B5%D0%BD%D0%BD%D0%B0%D1%8F'>[Aegopodium podagraria] grass cover zones in summer</description>
+		<icon></icon>
+		<picture>pictures/park/5_aegopodium.png</picture>
+		<stepDeley>10</stepDeley>
+		<debugLevel>1</debugLevel>
+		<color>0x007100</color>
+		<switchingEvent>calendar_data</switchingEvent>
+		<data>
+			<observation>
+				<day>14.05.11</day>
+			</observation>
+			<observation>
 				<day>14.06.11</day>
 			</observation>
 			<observation>
 				<day>19.08.11</day>
-			</observation>
-			<observation>
-				<day>09.10.11</day>
 			</observation>
 			<observation>
 				<day>11.06.12</day>
@@ -159,50 +178,148 @@
 		</data>
 	</task>
 	<task>
-		<name>grass2</name>
+		<name>chelidonium_4</name>
+		<description url='https://ru.wikipedia.org/wiki/%D0%A7%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB_%D0%B1%D0%BE%D0%BB%D1%8C%D1%88%D0%BE%D0%B9'>[Chelidonium majus] grass cover in spring and autumn</description>
+		<picture>pictures/park/4_chelidonium.png</picture>
+		<stepDeley>0</stepDeley>
+		<debugLevel>1</debugLevel>
+		<color>0x67b45e</color>
+		<switchingEvent>calendar_data</switchingEvent>
+		<data>
+			<observation>
+				<day>02.09.10</day>
+			</observation>
+			<observation>
+				<part>10</part>
+				<day>03.04.11</day>
+			</observation>
+			<observation>
+				<day>01.10.11</day>
+			</observation>
+			<observation>
+				<day>01.04.12</day>
+			</observation>
+		</data>
+	</task>
+	<task>
+		<name>chelidonium_5</name>
+		<description url='https://ru.wikipedia.org/wiki/%D0%A7%D0%B8%D1%81%D1%82%D0%BE%D1%82%D0%B5%D0%BB_%D0%B1%D0%BE%D0%BB%D1%8C%D1%88%D0%BE%D0%B9'>[Chelidonium majus] grass cover in summer</description>
+		<picture>pictures/park/5_chelidonium.png</picture>
+		<stepDeley>0</stepDeley>
+		<debugLevel>1</debugLevel>
+		<color>0x67b45e</color>
+		<switchingEvent>calendar_data</switchingEvent>
+		<data>
+			<observation>
+				<day>14.05.11</day>
+			</observation>
+			<observation>
+				<day>14.06.11</day>
+			</observation>
+			<observation>
+				<day>19.08.11</day>
+			</observation>
+			<observation>
+				<day>11.06.12</day>
+			</observation>
+			<observation>
+				<day>24.06.12</day>
+			</observation>
+		</data>
+	</task>
+	<task>
+		<name>taraxacum_4</name>
+		<description url='https://ru.wikipedia.org/wiki/Taraxacum_officinale'>[Taraxacum_officinale] ground cover</description>
+		<picture>pictures/park/4_taraxacum.png</picture>
+		<stepDeley>0</stepDeley>
+		<debugLevel>1</debugLevel>
+		<color>0x3def2d</color>
+		<switchingEvent>calendar_data</switchingEvent>
+		<data>
+			<observation>
+				<day>14.06.11</day>
+			</observation>
+			<observation>
+				<part>10</part>
+				<day>03.04.11</day>
+			</observation>
+			<observation>
+				<day>01.10.11</day>
+			</observation>
+			<observation>
+				<day>01.04.12</day>
+			</observation>
+		</data>
+	</task>
+	<task>
+		<name>taraxacum_5</name>
+		<description url='https://ru.wikipedia.org/wiki/Taraxacum_officinale'>[Taraxacum_officinale] ground cover</description>
+		<picture>pictures/park/5_taraxacum.png</picture>
+		<stepDeley>0</stepDeley>
+		<debugLevel>1</debugLevel>
+		<color>0x3def2d</color>
+		<switchingEvent>calendar_data</switchingEvent>
+		<data>
+			<observation>
+				<day>14.05.11</day>
+			</observation>
+			<observation>
+				<day>14.06.11</day>
+			</observation>
+			<observation>
+				<day>19.08.11</day>
+			</observation>
+			<observation>
+				<day>11.06.12</day>
+			</observation>
+			<observation>
+				<day>24.06.12</day>
+			</observation>
+		</data>
+	</task>
+	<task>
+		<name>lamium_4</name>
 		<description url='https://en.wikipedia.org/wiki/Lamium_album'>[Lamium album] grass cover zones</description>
 		<icon></icon>
-		<picture>pictures/park/lamium.png</picture>
+		<picture>pictures/park/4_lamium.png</picture>
 		<stepDeley>2</stepDeley>
 		<debugLevel>1</debugLevel>
 		<color>0x27bd71</color>
 		<switchingEvent>calendar_data</switchingEvent>
 		<data>
 			<observation>
-				<day>14.06.11</day>
+				<day>02.09.10</day>
 			</observation>
 			<observation>
-				<day>19.08.11</day>
+				<part>10</part>
+				<day>03.04.11</day>
 			</observation>
 			<observation>
-				<day>09.10.11</day>
+				<day>01.10.11</day>
 			</observation>
 			<observation>
-				<day>11.06.12</day>
-			</observation>
-			<observation>
-				<day>24.06.12</day>
+				<day>01.04.12</day>
 			</observation>
 		</data>
 	</task>
 	<task>
-		<name>grass3</name>
-		<description url='https://en.wikipedia.org/wiki/Glechoma_hederacea'>[Gleсhoma hederacea] grass cover zones</description>
+		<name>lamium_5</name>
+		<description url='https://en.wikipedia.org/wiki/Lamium_album'>[Lamium album] grass cover zones</description>
 		<icon></icon>
-		<picture>pictures/park/glehoma.png</picture>
+		<picture>pictures/park/5_lamium.png</picture>
 		<stepDeley>2</stepDeley>
 		<debugLevel>1</debugLevel>
-		<color>0x2b6334</color>
+		<color>0x27bd71</color>
 		<switchingEvent>calendar_data</switchingEvent>
 		<data>
 			<observation>
+				<day>14.05.11</day>
+			</observation>
+			<observation>
 				<day>14.06.11</day>
 			</observation>
 			<observation>
 				<day>19.08.11</day>
-			</observation>
-			<observation>
-				<day>09.10.11</day>
 			</observation>
 			<observation>
 				<day>11.06.12</day>
@@ -213,8 +330,8 @@
 		</data>
 	</task>
 	<task>
-		<name>grass4</name>
-		<picture>pictures/park/poa.png</picture>
+		<name>poa_5</name>
+		<picture>pictures/park/5_poa.png</picture>
 		<description url='https://ru.wikipedia.org/wiki/%D0%9C%D1%8F%D1%82%D0%BB%D0%B8%D0%BA_%D0%BE%D0%B4%D0%BD%D0%BE%D0%BB%D0%B5%D1%82%D0%BD%D0%B8%D0%B9'>[Poa] grass cover zones</description>
 		<stepDeley>1</stepDeley>
 		<debugLevel>1</debugLevel>
@@ -222,13 +339,13 @@
 		<switchingEvent>calendar_data</switchingEvent>
 		<data>
 			<observation>
+				<day>14.05.11</day>
+			</observation>
+			<observation>
 				<day>14.06.11</day>
 			</observation>
 			<observation>
 				<day>19.08.11</day>
-			</observation>
-			<observation>
-				<day>09.10.11</day>
 			</observation>
 			<observation>
 				<day>11.06.12</day>
@@ -1643,7 +1760,7 @@
 			<description url='https://en.wikipedia.org/wiki/Morisita%27s_overlap_index'>Count [Morisita index]</description>
 			<icon></icon>
 			<debugLevel>1</debugLevel>
-			<switchingInterval>50</switchingInterval>
+			<switchingInterval>160</switchingInterval>
 			<plotSize>8</plotSize>
 		</task>
 	</morisitaCounter>

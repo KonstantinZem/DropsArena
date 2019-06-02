@@ -32,7 +32,6 @@ public class cover extends Plugin{
 	private var numberOfInitilizedTasks:int
 	
 	function cover(){
-		//messenger.setMessageMark('Ground cover plugin');
 		modelError = new ModelErrors();
 		}
 	
@@ -173,17 +172,15 @@ public class cover extends Plugin{
 				
 		var tableRoot:Array = communityStage.chessDesk;
 		counterI = tableRoot.length;
-		
-		
-		
-		for(var i:int = 0; i< counterI; i++){
+	
+		for(var i:int = 0; i< counterI; i++){//Проходимся по пикселам прикрепленной картинки
 				var pixelValue:String;
 				counterJ = tableRoot[i].length;
 				currentTask.coverShema[i] = new Array();
 				
-				for(var j:int = 0; j<counterJ; j++){
+				for(var j:int = 0; j < counterJ; j++){
 					var aux:Object = new Object();
-					pixelValue = bmd.getPixel(tableRoot[i][j].sqrX /2,tableRoot[i][j].sqrY /2).toString(16);
+					pixelValue = bmd.getPixel(tableRoot[i][j].sqrX /1.7, tableRoot[i][j].sqrY /1.7).toString(16);
 		
 					if(pixelValue != 'ffffff'){//Если участок картинки не белый
 						communityStage.chessDesk[i][j].picture.transform.colorTransform = currentTask.background;
