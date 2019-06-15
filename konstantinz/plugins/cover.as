@@ -184,9 +184,9 @@ public class cover extends Plugin{
 		
 					if(pixelValue != 'ffffff'){//Если участок картинки не белый
 						communityStage.chessDesk[i][j].picture.transform.colorTransform = currentTask.background;
-						communityStage.chessDesk[i][j].speedDeleyA += currentTask.aDeley//Переопределяем скорость взрослых
-						communityStage.chessDesk[i][j].speedDeleyY += currentTask.yDeley//И молодых особей
-						communityStage.chessDesk[i][j].lifeQuant += lifequant;//Переопределяем время жизни особи за ход
+						communityStage.chessDesk[i][j].speedDeleyA = currentTask.aDeley//Переопределяем скорость взрослых
+						communityStage.chessDesk[i][j].speedDeleyY = currentTask.yDeley//И молодых особей
+						communityStage.chessDesk[i][j].lifeQuant = lifequant;//Переопределяем время жизни особи за ход
 						communityStage.chessDesk[i][j].coverName = pluginName;
 						controllX = i;
 						controllY =j;

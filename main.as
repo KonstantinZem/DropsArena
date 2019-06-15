@@ -22,8 +22,8 @@ package{
    
     public class main extends Sprite{
 		
-		private const CURRENT_VERSION:String = '0.97';
-		private const CURRENT_BUILD:String = '190327';
+		private const CURRENT_VERSION:String = '0.98';
+		private const CURRENT_BUILD:String = '190614';
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
 		private const MIN_INDIVIDUAL_CRITICAL_NUMBER:int = 5;//Минимально подходящие для отслеживания статистики количество особей
 		private const MAX_INDIVIDUAL_CRITICAL_NUMBER:int = 3000;
@@ -34,7 +34,8 @@ package{
 		private var stgWidth:int;
 		private var debugLevel:String;
 		private var msgString:String;
-		private var statRefreshTime:String;//Время обновления статистической информации
+		private var statRefreshTime:int;//Время обновления статистической информации
+		private var fieldRefreshTime:int;//Время обновления графики на поле -- нужно чтобы разгрузить программу
 		private var versionText:Sprite;
 		private var statusBar:StatusBar;
 		private var msgWindow:TextWindow;
@@ -47,6 +48,7 @@ package{
 		private var modelEvent:ModelEvent;
 		private var stepTimer:Timer;
 		private var numberOfCycles:int;
+		private var fieldRrefreshCountdown:int;
 		private var numberOfIndividuals:int;
 		private var individualPictures:Vector.<IndividualGraphicInterface>
 		private var dumper:Dumper;
@@ -177,9 +179,10 @@ package{
 			individuals = new Vector.<Individual>();
 			individualPictures = new Vector.<IndividualGraphicInterface>();
 			
-			statRefreshTime = configuration.getOption('main.statRefreshTime');
+			statRefreshTime = int(configuration.getOption('main.statRefreshTime'));
+			fieldRefreshTime = int(configuration.getOption('main.fieldRefreshTime'));
 			Accumulator.instance.setDebugLevel(debugLevel);
-			Accumulator.instance.setRefreshTime(int(statRefreshTime));//Устанавливаем время обновления статистики
+			Accumulator.instance.setRefreshTime(statRefreshTime);//Устанавливаем время обновления статистики
 			
 			stageEvent = new DispatchEvent();
 			dumper = new Dumper(commStage, debugLevel);
@@ -599,9 +602,35 @@ package{
 			numberOfCycles++;
 			
 			if(numberOfIndividuals < MAX_INDIVIDUAL_CRITICAL_NUMBER && numberOfIndividuals > MIN_INDIVIDUAL_CRITICAL_NUMBER){
-			for(var i:int = 0; i< numberOfIndividuals; i++){
-				individuals[i].doStep();
-				
+				for(var i:int = 0; i< numberOfIndividuals; i++){
+					individuals[i].doStep();
+					}
+					refreshIndividualPictures();
+				}else{
+					stepTimer.stop();
+					showMessageWindow();
+					Accumulator.instance.stopRefresh();
+					msgString = 'Emulation has finished. Number of individuals is ' + individuals.length;
+					messenger.message(msgString, modelEvent.INFO_MARK);
+					}
+			
+			if(numberOfCycles > DEAD_INDIVIDUALS_REMOVING_INTERVAL){//Выждав нужное количество шагов
+				removeIndividuals();//Убираем с поля погибших особей
+				numberOfCycles = 0;
+				}
+			
+			if(plugins != null){	
+				for(i = 0; i < plugins.plugins.length; i++ ){
+					plugins.plugins[i].content.plEntry.process();
+					}
+				}
+			}
+	
+	private function refreshIndividualPictures():void{
+		var counter:int = individualPictures.length;
+		
+		if(fieldRrefreshCountdown == 0){
+			for(var i:int = 0; i < counter; i++){
 				individualCurrentState.currentX = individuals[i].placement().x;
 				individualCurrentState.currentY = individuals[i].placement().y;
 				individualCurrentState.previousX = individuals[i].placement().previousX;
@@ -611,25 +640,11 @@ package{
 				individualCurrentState.age = individuals[i].age();
 				
 				individualPictures[i].dotStep(individualCurrentState);//Передаем координаты, куда особи надо переместится на следующем шаге
-			
-				}
-			}else{
-				stepTimer.stop();
-				showMessageWindow();
-				Accumulator.instance.stopRefresh();
-				msgString = 'Emulation has finished. Number of individuals is ' + individuals.length;
-				messenger.message(msgString, modelEvent.INFO_MARK);
-				}
-			
-			if(numberOfCycles > DEAD_INDIVIDUALS_REMOVING_INTERVAL){
-				removeIndividuals();
-				numberOfCycles = 0;
-				}
-		if(plugins != null){	
-			for(i = 0; i < plugins.plugins.length; i++ ){
-				plugins.plugins[i].content.plEntry.process();
-				}
 			}
-		}
+			fieldRrefreshCountdown = fieldRefreshTime;
+		}else{
+			fieldRrefreshCountdown--;
+			}
+	};
     }
 }

@@ -6,11 +6,11 @@
 	<individuals>
 		<group>
 			<!--thy will become adult from five month-->
-			<number>160</number>
+			<number>6</number>
 			<age>10404</age>
 		</group>
 		<group>
-			<number>160</number>
+			<number>6</number>
 			<age>4824</age>
 		</group>
 		<lifeTime>42320</lifeTime>
@@ -20,10 +20,11 @@
 		<offspringsQuant>5</offspringsQuant>
 	</individuals>
 	<!--Cell size in percents from stage size-->
-	<cellSize>0.5</cellSize>
+	<cellSize>1</cellSize>
 	<!-- initPosition of individual can be left-top, left-bottom,  right-top, right-bottom, center and random -->
 	<initPosition>random</initPosition>
-	<statRefreshTime>35</statRefreshTime>
+	<statRefreshTime>80</statRefreshTime>
+	<fieldRefreshTime>10</fieldRefreshTime>
 	<stepLength>1</stepLength>
 	<pluginsList>plugins/cover.swf;plugins/activity.swf;plugins/morisitaCounter.swf</pluginsList>
 	<arePluginsActiveOnLoading>false</arePluginsActiveOnLoading>
@@ -58,7 +59,6 @@
 		<debugLevel>1</debugLevel>
 		<color>0xf4e17f</color>
 		<behaviour_model>MomentalDeath</behaviour_model>
-		<!--behaviour_frequency individual will change it's behaviour in each second cell-->
 		<behaviour_frequency>20</behaviour_frequency>
 		<switchingEvent>calendar_data</switchingEvent>
 		<data>
@@ -107,10 +107,10 @@
 				<day>19.08.11</day>
 			</observation>
 			<observation>
-				<day>09.10.11</day>
+				<day>01.10.11</day>
 			</observation>
 			<observation>
-				<day>01.10.11</day>
+				<day>09.10.11</day>
 			</observation>
 			<observation>
 				<day>01.11.11</day>
@@ -144,6 +144,9 @@
 			</observation>
 			<observation>
 				<day>01.10.11</day>
+			</observation>
+			<observation>
+				<day>09.10.11</day>
 			</observation>
 			<observation>
 				<day>01.04.12</day>
@@ -197,6 +200,9 @@
 				<day>01.10.11</day>
 			</observation>
 			<observation>
+				<day>09.10.11</day>
+			</observation>
+			<observation>
 				<day>01.04.12</day>
 			</observation>
 		</data>
@@ -245,6 +251,9 @@
 			</observation>
 			<observation>
 				<day>01.10.11</day>
+			</observation>
+			<observation>
+				<day>09.10.11</day>
 			</observation>
 			<observation>
 				<day>01.04.12</day>
@@ -296,6 +305,9 @@
 			</observation>
 			<observation>
 				<day>01.10.11</day>
+			</observation>
+			<observation>
+				<day>09.10.11</day>
 			</observation>
 			<observation>
 				<day>01.04.12</day>

@@ -208,7 +208,7 @@ public class Plugin extends Sprite{
 			newStatisticMsg = e.target.message.split(':');
 			
 			for(var i:int = 0; i < tLength; i++){
-				
+				//trace(task[i].name + ': ' + task[i].currentDay)
 				if(task[i].switchingEvent == 'calendar_data' && task[i].currentDay == newStatisticMsg[1]){
 					currentTask = task[i];
 					msgString = 'Plugin get new calendar data '+ e.target.message;
