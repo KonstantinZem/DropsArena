@@ -169,7 +169,8 @@ public class activitySwitcher extends Plugin{
 	private function setNewObservingPosition(currentTask:ActivityTask):void{
 		var newDayPath:String = optionPath + 'data.observation.day';
 		
-		if(currentTask.currentActivityPosition > currentTask.numberOfObservingsInConfig){//Если мы дошли до конца списка и Configuration container вернул ошибку int(Error) - 0
+		if(currentTask.currentActivityPosition == currentTask.numberOfObservingsInConfig -1){//Если мы дошли до конца списка и Configuration container вернул ошибку int(Error) - 0
+			
 			currentTask.currentActivityPosition = 0;//Возвращаемся в начало списка наблюдений чтобы начать переключение заново
 			currentTask.cycleCounter++;
 			

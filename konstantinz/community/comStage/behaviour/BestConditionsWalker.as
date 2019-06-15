@@ -3,6 +3,8 @@ package konstantinz.community.comStage.behaviour{
 public class BestConditionsWalker extends BaseMotionBehaviour{
 	
 	private var viewDistance:int = 5;//Растояние в клетках на на котором особь будет искать зону с лучшими условиями
+	private var stepsToTarget:int = 0;
+	private var indDirection:int = 0;
 	
 	public function BestConditionsWalker(){
 	
@@ -14,11 +16,10 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 			newPosition.x = currentX;
 			newPosition.y = currentY;
 			
-			var indDirection:int = 0;
-			
 			try{
-				indDirection = Math.round(Math.random()*8);
-				
+				if(stepsToTarget <= 0){
+					indDirection = Math.round(Math.random()*8);
+					}
 			
 			switch(indDirection){
 				case 0: //Стоим наместе
@@ -29,7 +30,8 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 				if(currentX > populationArea.length-2){
 					
 					if((currentX - viewDistance) > 0 && populationArea[currentX - viewDistance][currentY].speedDeleyA > currentPlaceQuality){
-						newPosition.x = currentX - viewDistance;
+						numberOfStepsToTarget()
+						newPosition.x = currentX - stepLength;
 						}else{
 							newPosition.x = currentX - stepLength;
 							}
@@ -37,7 +39,8 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 					}
 					else{
 						if((currentX + viewDistance) < (populationArea.length -2) && populationArea[currentX + viewDistance][currentY].speedDeleyA > currentPlaceQuality){
-							newPosition.x = currentX + viewDistance;
+							numberOfStepsToTarget()
+							newPosition.x = currentX + stepLength;
 							}else{
 								newPosition.x = newPosition.x + stepLength;
 								}
@@ -49,7 +52,8 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 					}
 					else{
 						if((currentX - viewDistance) > 0 && populationArea[currentX - viewDistance][currentY].speedDeleyA > currentPlaceQuality){
-						newPosition.x = currentX - viewDistance;
+						numberOfStepsToTarget()
+						newPosition.x = currentX - stepLength;
 						}else{
 							newPosition.x = currentX - stepLength;
 							}
@@ -59,14 +63,16 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 				
 				if(currentY > super.populationArea[0].length-2){
 					if((currentY - viewDistance) > 0 && populationArea[currentX][currentY - viewDistance].speedDeleyA > currentPlaceQuality){
-						newPosition.y = currentY - viewDistance;
+						numberOfStepsToTarget()
+						newPosition.y = currentY - stepLength;
 						}else{
 							newPosition.y = newPosition.y - stepLength;
 							}
 					}
 					else{
 						if((currentY + viewDistance)< (populationArea[0].length - 2) && populationArea[currentX][currentY + viewDistance].speedDeleyA > currentPlaceQuality){
-						newPosition.y = currentY + viewDistance;
+						numberOfStepsToTarget()
+						newPosition.y = currentY + stepLength;
 						}else{
 							newPosition.y = newPosition.y + stepLength;
 							}
@@ -78,7 +84,8 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 					}
 					else{
 						if((currentY - viewDistance) > 0 && populationArea[currentX][currentY - viewDistance].speedDeleyA > currentPlaceQuality){
-						newPosition.y = currentY - viewDistance;
+						numberOfStepsToTarget()
+						newPosition.y = currentY - stepLength;
 						}else{
 							newPosition.y = newPosition.y - stepLength;
 							}
@@ -98,9 +105,21 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 			return newPosition;
 			}
 		
+		private function numberOfStepsToTarget():void{
+
+			if(stepsToTarget > 0){
+				stepsToTarget--;
+				}else{
+					stepsToTarget = viewDistance;
+					}
+		};
+		
 		public function setViewDistance(newViewDistance:int):void{
 			viewDistance = newViewDistance;
 			}
+		public function reset():void{
+			stepsToTarget = 0;
+		};
 
 	}
 }

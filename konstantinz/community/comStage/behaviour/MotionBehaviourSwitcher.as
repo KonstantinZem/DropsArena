@@ -56,6 +56,7 @@ public class MotionBehaviourSwitcher{
 					
 					case 'BestConditionsWalker':
 						newBehaviour = bestConditionsWalker;
+						bestConditionsWalker.reset();//Если поведение переключилось когда остались шаги, их предварительно надо сбросить
 					break;
 					
 					case 'MomentalDeath':

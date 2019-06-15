@@ -46,7 +46,7 @@
 			</condition>
 			<behavior>RandomWalker</behavior>
 		</rule>
-		<viewDistance>3</viewDistance>
+		<viewDistance>4</viewDistance>
 	</behaviourSwitching>
 </main>
 <plugins>
