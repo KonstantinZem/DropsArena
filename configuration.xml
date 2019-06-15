@@ -6,11 +6,11 @@
 	<individuals>
 		<group>
 			<!--thy will become adult from five month-->
-			<number>6</number>
+			<number>320</number>
 			<age>10404</age>
 		</group>
 		<group>
-			<number>6</number>
+			<number>320</number>
 			<age>4824</age>
 		</group>
 		<lifeTime>42320</lifeTime>
@@ -20,11 +20,11 @@
 		<offspringsQuant>5</offspringsQuant>
 	</individuals>
 	<!--Cell size in percents from stage size-->
-	<cellSize>1</cellSize>
+	<cellSize>0.5</cellSize>
 	<!-- initPosition of individual can be left-top, left-bottom,  right-top, right-bottom, center and random -->
 	<initPosition>random</initPosition>
-	<statRefreshTime>80</statRefreshTime>
-	<fieldRefreshTime>10</fieldRefreshTime>
+	<statRefreshTime>10</statRefreshTime>
+	<fieldRefreshTime>20</fieldRefreshTime>
 	<stepLength>1</stepLength>
 	<pluginsList>plugins/cover.swf;plugins/activity.swf;plugins/morisitaCounter.swf</pluginsList>
 	<arePluginsActiveOnLoading>false</arePluginsActiveOnLoading>
