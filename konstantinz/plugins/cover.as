@@ -146,6 +146,9 @@ public class cover extends Plugin{
 						xPos = currentTask.coverShema[i][j].controllX;
 						yPos = currentTask.coverShema[i][j].controllY;
 						communityStage.chessDesk[xPos][yPos].coverName = pluginName;
+						communityStage.chessDesk[xPos][yPos].speedDeleyA = currentTask.aDeley//Переопределяем скорость взрослых
+						communityStage.chessDesk[xPos][yPos].speedDeleyY = currentTask.yDeley//И молодых особей
+						communityStage.chessDesk[xPos][yPos].lifeQuant = lifequant;//Переопределяем время жизни особи за ход
 						communityStage.chessDesk[xPos][yPos].picture.transform.colorTransform = currentTask.background;
 						communityStage.chessDesk[xPos][yPos].behaviourModel = currentTask.coverShema[i][j].behaviourModel;
 						}

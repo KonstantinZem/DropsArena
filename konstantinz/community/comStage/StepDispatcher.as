@@ -9,6 +9,12 @@ package konstantinz.community.comStage{
 	public class StepDispatcher extends EventDispatcher{
 		
 		private const IMMORTAL_SIGHN:int = -2;
+		private const MOVING_SIGHT:String = 'moving';
+		private const SUSPEND_SIGHT:String = 'suspend';
+		private const STOP_SIGHT:String = 'stop';
+		private const DEAD_SIGHT:String = 'dead';
+		private const COLLISION_SIGHT:String = 'collision';
+		
 		private var indState:String;
 		private var lifeTime:int;
 		private var pauseTime:int;
@@ -19,41 +25,49 @@ package konstantinz.community.comStage{
 		public static const DO_STEP:String = 'do_step';//Событие посылается особи, внутри которой находится экземпляр этого класса
 		public static const STEP_DONE:String = 'step_done';
 		public static const SUSPEND:String = 'suspend';
+		public static const COLLISION:String = 'collision';
 		
 		public var indNumber:int//Номер особи, посылающей событие
+		public var message:String;
 		
 		function StepDispatcher(dbgl:String ='3'){
 			debugLevel = dbgl;
-			indState = 'moving';
+			indState = MOVING_SIGHT;
 			indNumber = 0;
 			lifeTime = IMMORTAL_SIGHN;
 			messenger = new Messenger(debugLevel);
 			messenger.setMessageMark('Step dispatcher');
-			messenger.message('Step dispatcher ' + indNumber  + ' has been created');
+			
+			ARENA::DEBUG{
+				messenger.message('Step dispatcher ' + indNumber  + ' has been created');
+				}
 			}
 			
 		public function statement(NewState:String = 'nothing', statementTime:int = 0):String{//Через эту функцию можно влиять на состояние особи
-			if(indState != 'stop'){
+			if(indState != STOP_SIGHT){
 			switch(NewState){
 				case 'moving':
-					indState = 'moving';
+					indState = MOVING_SIGHT;
 				break;
 				case 'suspend':
-					indState = 'suspend';
+					indState = SUSPEND_SIGHT;
+					message = indState;
 					pauseTime = statementTime;
 					dispatchEvent(new Event(StepDispatcher.SUSPEND));
 				break;
 				case 'stop':
-					indState = 'stop';
+					indState = STOP_SIGHT;
 					pauseTime = statementTime;
 				break;
 				case 'dead':
-					indState = 'dead';
+					indState = DEAD_SIGHT;
 				break;
 				
 				case 'collision':
-					indState = 'collision';
-					collisionTime = 5
+					indState = COLLISION_SIGHT;
+					message = indState;
+					collisionTime = 2;//Нужно чтобы изменение цвета особи можно было заметить
+					dispatchEvent(new Event(StepDispatcher.COLLISION));
 				break;
 				case 'nothing':
 					indState = indState;
@@ -67,27 +81,28 @@ package konstantinz.community.comStage{
 			}
 		
 		public function doStep():void{//Сигнал приходит от предыдущей особи
-			if(indState != 'suspend' && indState != 'suspend' && pauseTime < 0){//Если уже можно передвигаться
+			if(indState != STOP_SIGHT && indState != SUSPEND_SIGHT && pauseTime < 0){//Если уже можно передвигаться
 			  if(lifeTime != IMMORTAL_SIGHN){//Если особь не бессмертная
 				lifeTime --;
-				if(lifeTime < -1 && indState != 'dead' && indState != 'suspend' && indState != 'stop'){//Если жизнь особи уже истекла, но пометки о ее смерти еще нет
+				if(lifeTime < -1 && indState != DEAD_SIGHT && indState != SUSPEND_SIGHT && indState != STOP_SIGHT){//Если жизнь особи уже истекла, но пометки о ее смерти еще нет
 					killIndividual();
 					}
 				}
+				message = indState;
 				dispatchEvent(new Event(StepDispatcher.DO_STEP));
 			}else{
 				pauseTime--;
 			
-				if(pauseTime < 0){//особь сама меняет статум по истечении паузы
+				if(pauseTime < 0){//особь сама меняет статус по истечении паузы
 					pauseTime = -1;
-					indState = 'moving';
+					indState = MOVING_SIGHT;
 					}
 				}
-				if(indState == 'collision'){
+				if(indState == COLLISION_SIGHT){
 					collisionTime --;
 					}
 				if(collisionTime < 0){
-					indState = 'moving';
+					indState = MOVING_SIGHT;
 					collisionTime = 0;
 					}
 			}
@@ -96,7 +111,7 @@ package konstantinz.community.comStage{
 			
 			}
 		public function killIndividual():void{
-			indState = 'dead';
+			indState = DEAD_SIGHT;
 			}
 		public function setLifeTime(newLifeTime:int):void{
 			lifeTime = newLifeTime;
@@ -104,5 +119,8 @@ package konstantinz.community.comStage{
 		public function setIndividualNumber(newIndNumber:int):void{
 			indNumber = newIndNumber;
 			}
+		public function getStepsNumber():int{
+			return lifeTime;
+		}
 	}
 }

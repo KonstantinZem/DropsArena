@@ -35,9 +35,9 @@ package konstantinz.community.auxilarity{
 					trace('[' + messageMark + ' Error!]: ' + messageString + ';' + '\n');
 					msg = '';
 					}else{
-				trace('[' + messageMark + ']: ' + messageString + ';' + '\n');
-			}
-			}
+						trace('[' + messageMark + ']: ' + messageString + ';' + '\n');
+						}
+					}
 			}
 		
 		public function setMessageMark(mark:String):void{

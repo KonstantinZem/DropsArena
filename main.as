@@ -10,7 +10,7 @@
 // GNU General Public License for more details.
 
 package{
-    
+  
     import flash.display.Sprite;
 	import flash.events.Event; 
 	import flash.events.TimerEvent; 
@@ -25,7 +25,7 @@ package{
 		private const CURRENT_VERSION:String = '0.98';
 		private const CURRENT_BUILD:String = '190614';
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
-		private const MIN_INDIVIDUAL_CRITICAL_NUMBER:int = 5;//Минимально подходящие для отслеживания статистики количество особей
+		private const MIN_INDIVIDUAL_CRITICAL_NUMBER:int = 0;//Минимально подходящие для отслеживания статистики количество особей
 		private const MAX_INDIVIDUAL_CRITICAL_NUMBER:int = 3000;
 		private const PAUSE_AFTER_CYCLE:int = 2;//Время паузы между циклами передвижения особей
 		private const DEAD_INDIVIDUALS_REMOVING_INTERVAL:int = 100;
@@ -290,8 +290,9 @@ package{
 				addChild(startStopButton);
 				addChild(reloadButton);
 				}
-					
-			messenger.message(msgString, modelEvent.INFO_MARK);
+				ARENA::DEBUG{
+					messenger.message(msgString, modelEvent.INFO_MARK);
+					}
 				
 			}
 			
@@ -502,9 +503,10 @@ package{
 				for(i = 0; i< counter; i++){
 					individuals[i].name(i);//После ужимания массива делаем так, чтобы имя особи совпадало с ее позицией
 				}
-			
-				msgString = 'Now number of individuals is ' + individuals.length;
-				messenger.message(msgString, modelEvent.INFO_MARK);
+				ARENA::DEBUG{
+					msgString = 'Now number of individuals is ' + individuals.length;
+					messenger.message(msgString, modelEvent.INFO_MARK);
+					}
 				msgString = IND_NUMB + individuals.length;
 				messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
 			}catch(e:Error){
@@ -537,9 +539,10 @@ package{
 			for(var i:int = 0; i< counter; i++){
 				individuals[i].statement('moving');
 				}
-			
-			msgString = 'Individuals begin to move';
-			messenger.message(msgString, modelEvent.INFO_MARK);
+			ARENA::DEBUG{
+				msgString = 'Individuals begin to move';
+				messenger.message(msgString, modelEvent.INFO_MARK);
+				}
 			Accumulator.instance.startRefresh();
 			stepTimer.start();
 			}
@@ -551,8 +554,10 @@ package{
 			for(var i:int = 0; i< counter; i++){
 				individuals[i].statement('suspend');
 				}
-			msgString = 'Individuals has stoped';
-			messenger.message(msgString, modelEvent.INFO_MARK);
+				ARENA::DEBUG{
+					msgString = 'Individuals has stoped';
+					messenger.message(msgString, modelEvent.INFO_MARK);
+					}
 			
 			showMessageWindow();//Показываем статистику в окне
 			Accumulator.instance.stopRefresh();//Останавливаем сбор статистики
@@ -610,8 +615,10 @@ package{
 					stepTimer.stop();
 					showMessageWindow();
 					Accumulator.instance.stopRefresh();
-					msgString = 'Emulation has finished. Number of individuals is ' + individuals.length;
-					messenger.message(msgString, modelEvent.INFO_MARK);
+					ARENA::DEBUG{
+						msgString = 'Emulation has finished. Number of individuals is ' + individuals.length;
+						messenger.message(msgString, modelEvent.INFO_MARK);
+						}
 					}
 			
 			if(numberOfCycles > DEAD_INDIVIDUALS_REMOVING_INTERVAL){//Выждав нужное количество шагов

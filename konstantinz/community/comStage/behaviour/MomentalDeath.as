@@ -6,7 +6,8 @@ public class MomentalDeath extends BaseMotionBehaviour{
 	
 	private var indSuspender:StepDispatcher;
 	
-	function MomentalDeath():void{
+	function MomentalDeath(dbgLevel:String):void{
+		debugLevel = dbgLevel;
 		
 		}
 		

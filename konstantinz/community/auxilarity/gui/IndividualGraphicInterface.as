@@ -1,8 +1,9 @@
 ﻿//Цель этого класса - вынести из класса Individual все платформозависимые функции графики
-package konstantinz.community.comStage{
+package konstantinz.community.auxilarity.gui{
 	
 import flash.display.Sprite;
 import flash.geom.ColorTransform;
+import flash.events.MouseEvent;
 import konstantinz.community.auxilarity.*
 
 public class IndividualGraphicInterface extends Sprite{
@@ -25,10 +26,12 @@ public class IndividualGraphicInterface extends Sprite{
 	private var messenger:Messenger;
 	private var modelEvent:ModelEvent;
 	private var individualMoveVector:Sprite;
+	private var individualMigrationMark:Sprite;
 	private var individualPoint:Sprite;
-	private var hybernateIndividualPoint:Sprite
+	private var hybernateIndividualPoint:Sprite;
 	private var previousStepDistance:int;
 	private var currentScale:Number;
+	private var currentState:Array;
 	
 	public var individualBody:Sprite;
 	
@@ -54,6 +57,7 @@ public class IndividualGraphicInterface extends Sprite{
 		//Функция напрямую завязана на графике
 		individualBody = new Sprite();
 		individualPoint = new Sprite();
+		individualBody.addEventListener(MouseEvent.CLICK, onMouseClick);
 		hybernateIndividualPoint = new Sprite();
 		
 		individualPoint.graphics.lineStyle(1,BORDERCOLOR);
@@ -66,10 +70,14 @@ public class IndividualGraphicInterface extends Sprite{
 		individualBody.addChild(individualPoint);
 		individualBody.addChild(hybernateIndividualPoint);
 		drawVectorArror();
-		
+		drawMigrationMark();
+		//drawControlPoint(individualBody);
+		//drawControlPoint(individualMigrationMark);
 		}
 	
 	public function dotStep(currenteIndividualState:Array):void{
+			
+		currentState = currenteIndividualState;
 		individualMoveVector.graphics.lineStyle(1, VECTOR_COLOR);
 		indAge = currenteIndividualState.age;
 		individualBody.x = currenteIndividualState.currentX;
@@ -88,7 +96,7 @@ public class IndividualGraphicInterface extends Sprite{
 		showAdditionMarks(currenteIndividualState);
 		
 		}
-	
+		
 	public function age(newAge:int):void{
 		
 		try{
@@ -167,10 +175,11 @@ public class IndividualGraphicInterface extends Sprite{
 	
 			if(individualBody){//А то вдруг функцию вызовут до появления individualBody
 				individualBody.addChild(individualMoveVector);
+				individualBody.setChildIndex(individualMoveVector, 0);
 				individualMoveVector.x = individualBody.height/2;
 				individualMoveVector.y = individualBody.width/2;
 				}else{
-					throw new Error('individualBody not exist')
+					throw new Error('individualBody not exist');
 					}
 			individualMoveVector.graphics.lineStyle(1, VECTOR_COLOR);
 			individualMoveVector.graphics.lineTo(lineX, lineY);
@@ -185,61 +194,110 @@ public class IndividualGraphicInterface extends Sprite{
 			individualBody = new Sprite();
 			}
 		}
+	private function drawMigrationMark():void{
+		var lineX:int = 0;
+		var lineY:int = 0;
+		try{
+			individualMigrationMark = new Sprite();
+	
+			if(individualBody){//А то вдруг функцию вызовут до появления individualBody
+				individualBody.addChild(individualMigrationMark);
+				individualMigrationMark.x = individualBody.height/2;
+				individualMigrationMark.y = individualBody.width/2;
+				}else{
+					throw new Error('individualBody not exist')
+					}
+			individualMigrationMark.graphics.beginFill(0xffffff); 
+			individualMigrationMark.graphics.lineTo (lineX, lineY);
+			individualMigrationMark.graphics.lineTo (lineX - (0.2*VECTOR_LENGTH), lineY + (0.2*VECTOR_LENGTH));
+			individualMigrationMark.graphics.lineTo (lineX - (0.2*VECTOR_LENGTH), lineY - (0.2*VECTOR_LENGTH));
+			
+		}catch(e:Error){
+			msgString = e.message;
+			messenger.message(msgString, modelEvent.ERROR_MARK);
+			individualBody = new Sprite();
+			}
+		}
+	
+	private function drawControlPoint(figure:Sprite):void{
+		var controlPoint:Sprite = new Sprite();
+		figure.addChild(controlPoint);
+		controlPoint.graphics.beginFill(0xffffff);
+		controlPoint.graphics.drawCircle(figure.x, figure.y, .8);
+		};
 	
 	private function showAdditionMarks(currenteIndividualState:Array):void{
-		if(currenteIndividualState.statement == 'moving' && currenteIndividualState.behaviour == "BestConditionsWalker" && stepDistanceHasChanged(currenteIndividualState) == 'true'){//Стрека показывается только у живой особи когда она сделала длинный шаг согласно модели поведения BestConditionWalker
-			showVector(currenteIndividualState);
-			}else{
-				hideVector();
+		try{
+			hideMark(individualMigrationMark);
+			hideMark(individualMoveVector);
+			
+			if(currenteIndividualState.statement == 'moving'){
+				switch(currenteIndividualState.behaviour){
+					case "BestConditionsWalker":
+						showMark(individualMoveVector, currenteIndividualState);
+					break;
+					case "MigrationBehaviour":
+						showMark(individualMigrationMark, currenteIndividualState);
+					break;
+					case 'RandomWalker':
+						//hideMark(individualMigrationMark);
+						//hideMark(individualMoveVector);
+					break;
+					default:
+						hideMark(individualMigrationMark);
+						hideMark(individualMoveVector);
+						throw new Error('Uncnow individual behaviour name');
+					break;
+					}
+				}
+			}catch(e:Error){
+				trace(e.message + ': ' + currenteIndividualState.behaviour)
 				}
 		}
-	private function hideVector():void{
-		if(individualMoveVector.scaleX > 0){
-			individualMoveVector.scaleX = 0;
-			individualMoveVector.scaleY = 0;
-			}
-			}
 	
-	private function showVector(currenteIndividualState:Array):void{
-		individualMoveVector.scaleX = individualPoint.scaleX/3;
-		individualMoveVector.scaleY = individualPoint.scaleY/3;
+	private function showMark(individualMark:Sprite, currenteIndividualState:Array):void{
+		hideMark(individualMark);
+		individualMark.scaleX = individualPoint.scaleX/2.5;
+		individualMark.scaleY = individualPoint.scaleY/2.5;
+		individualMark.x = individualPoint.x;
+		individualMark.y = individualPoint.y;
 		//Изначально вектор смотрит вправо
 		
 		if(currenteIndividualState.currentY != currenteIndividualState.previousY){//Если сделали шаг по вертекали
 			if(currenteIndividualState.currentY < currenteIndividualState.previousY){//Если сделали вверх
-				individualMoveVector.rotation = -90;
+				individualMark.rotation = -90;
+				individualMark.x = individualPoint.x + individualPoint.width/2 -2;
+				individualMark.y = individualPoint.y - individualPoint.height/2;
 				}else{
-					individualMoveVector.rotation = 90;
+					individualMark.rotation = 90;
+					individualMark.x = individualPoint.x + individualPoint.width/2 -2;
+					individualMark.y = individualPoint.y + individualPoint.height;
 					}
 			}
 
 		if(currenteIndividualState.currentX != currenteIndividualState.previousX){//Если сделали шаг по горизонтали
 			if(currenteIndividualState.currentX < currenteIndividualState.previousX){//Если это шаг влево
-				individualMoveVector.rotation = 180;
+				individualMark.rotation = 180;
+				individualMark.y = individualPoint.y + individualPoint.height/2 -2;
+				individualMark.x = individualPoint.x - individualPoint.width/2;
 				}else{
-					individualMoveVector.rotation = 0;
+					individualMark.rotation = 0;
+					individualMark.y = individualPoint.y + individualPoint.height/2 -2;
+					individualMark.x = individualPoint.x + individualPoint.width;
 					}
-			}
-		
-		if((currenteIndividualState.currentX - individualMoveVector.width) < 0 || (currenteIndividualState.currentY - individualMoveVector.height) < 0){//Чтобы линии вектров не вылазели за пределы chessDesk
-			individualMoveVector.scaleX = 0;
-			individualMoveVector.scaleY = 0;
+			}else{
+				hideMark(individualMark)
 			}
 		}
 	
-	private function stepDistanceHasChanged(currenteIndividualState:Array):String{
-		var result:String = 'false'
-		if(previousStepDistance != Math.abs(currenteIndividualState.currentY) - Math.abs(currenteIndividualState.previousY)){
-			previousStepDistance = Math.abs(currenteIndividualState.currentY) - Math.abs(currenteIndividualState.previousY);
-			result = 'true';
-			}
-		if(previousStepDistance != Math.abs(currenteIndividualState.currentX) - Math.abs(currenteIndividualState.previousX)){
-			previousStepDistance = Math.abs(currenteIndividualState.currentX) - Math.abs(currenteIndividualState.previousX);
-			result = 'true';
-			}
-		return result;
+	private function hideMark(individualMark:Sprite):void{
+		individualMark.scaleX = 0;
+		individualMark.scaleY = 0;
 		}
+	
+	private function onMouseClick(event:MouseEvent):void{
 		
+	};
 	
 	}
 }

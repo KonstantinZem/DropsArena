@@ -65,7 +65,6 @@ package konstantinz.community.comStage{
 			errorType = new ModelErrors();
 			
 			try{
-		
 				indConfiguration = configuration;
 				debugLevel = indConfiguration.getOption('main.debugLevel');
 				messenger = new Messenger(debugLevel);
@@ -76,13 +75,16 @@ package konstantinz.community.comStage{
 				stepDispatcher = new StepDispatcher(debugLevel);
 				
 				stepDispatcher.addEventListener(StepDispatcher.DO_STEP, step);
+				
 				lifeTime = int(indConfiguration.getOption('main.individuals.lifeTime'));
 				stepDispatcher.setLifeTime(lifeTime);
 				
 				if(args[0]==undefined){
 					indNumber = Math.round(Math.random()*1000);
-					msgString = 'Individual ' + errorType.idUndefined + ' There were set random name ' + indNumber;
-					messenger.message(msgString, modelEvent.INFO_MARK);
+					ARENA::DEBUG{
+						msgString = 'Individual ' + errorType.idUndefined + ' There were set random name ' + indNumber;
+						messenger.message(msgString, modelEvent.INFO_MARK);
+						}
 					}
 				
 				stepDispatcher.setIndividualNumber (indNumber);
@@ -108,12 +110,11 @@ package konstantinz.community.comStage{
 				indPlacement.previousX = 0;
 				indPlacement.previousY = 0;
 			
-				motionBehaviour = new MotionBehaviourSwitcher(chessDesk);
-				motionBehaviour.setViewDistance(int(indConfiguration.getOption('main.behaviourSwitching.viewDistance')));
-
+				motionBehaviour = new MotionBehaviourSwitcher(chessDesk, indConfiguration, debugLevel);
+				stepDispatcher.addEventListener(StepDispatcher.COLLISION, motionBehaviour.onIndividualStateChange);
+				stepDispatcher.addEventListener(StepDispatcher.STEP_DONE, motionBehaviour.onNextStep);
+				
 				myBehaviour = motionBehaviour.newBehaviour;
-				myBehaviour.setIndividualNumber(indNumber);
-				myBehaviour.setStepLength(stepLength);
 				motionBehaviour.setSuspender(stepDispatcher);
 			
 				if(args[1]==undefined||args[2]==undefined){
@@ -131,8 +132,10 @@ package konstantinz.community.comStage{
 				
 				lifeStart = new Date();
 				
-				msgString = 'Individual ' + indNumber + ' has created. \n It current position is '+ currentChessDeskI+ ':' + currentChessDeskJ;
-				messenger.message(msgString, modelEvent.INIT_MSG_MARK);
+				ARENA::DEBUG{
+					msgString = 'Individual ' + indNumber + ' has created. \n It current position is '+ currentChessDeskI+ ':' + currentChessDeskJ;
+					messenger.message(msgString, modelEvent.INIT_MSG_MARK);
+					}
 				
 				indStatus = 'active';
 				indAgeState = 'young';
@@ -154,9 +157,11 @@ package konstantinz.community.comStage{
 				else{
 					if(adultAge==0){//После этого adultAge станет меньше нуля и сообщение появлятся не должно
 						adultAge--;
-						msgString= 'Individual ' + indNumber + ' now adult';
-						messenger.message(msgString, modelEvent.INFO_MARK);
-					}
+						ARENA::DEBUG{
+							msgString= 'Individual ' + indNumber + ' now adult';
+							messenger.message(msgString, modelEvent.INFO_MARK);
+							}
+						}
 					return true;
 				}
 			}
@@ -222,8 +227,11 @@ package konstantinz.community.comStage{
 				IndividualEvent.currentChessDeskJ = currentChessDeskJ;
 				IndividualEvent.maturing();
 				
-				msgString = 'Maturing in '+ currentChessDeskI+ ':'+ currentChessDeskJ;
-				messenger.message(msgString, modelEvent.DEBUG_MARK);
+				ARENA::DEBUG{
+					msgString = 'Maturing in '+ currentChessDeskI+ ':'+ currentChessDeskJ;
+					messenger.message(msgString, modelEvent.DEBUG_MARK);
+					}
+				
 				maturingDeley = int(indConfiguration.getOption('main.individuals.maturingDeley'));
 			
 			}
@@ -283,7 +291,7 @@ package konstantinz.community.comStage{
 				indPlacement.y = chessDesk[currentChessDeskI][currentChessDeskJ].sqrY + 1;
 				}
 			  
-			  if(chessDesk[currentChessDeskI][currentChessDeskJ].behaviourModel != ''){//Если в новом квадарте указанно поведение, которое особь должна начать проявлять
+			  if(chessDesk[currentChessDeskI][currentChessDeskJ].behaviourModel != '' && chessDesk[currentChessDeskI][currentChessDeskJ].behaviourModel != 'empty'){//Если в новом квадарте указанно поведение, которое особь должна начать проявлять
 				motionBehaviour.switchBehaviour(chessDesk[currentChessDeskI][currentChessDeskJ].behaviourModel);//Включаем этот тип
 				}
 			  
@@ -305,8 +313,10 @@ package konstantinz.community.comStage{
 			
 			individualCounter('remove', indAgeState, currentChessDeskI, currentChessDeskJ);//Освобождаем ячейку от следов своего присутсвия
 			
-			msgString = 'Individual ' + indNumber + ' is dead. R.I.P. \n' + 'It lived ' + Math.round((deltaTime)*0.00006) + ' min';
-			messenger.message(msgString, modelEvent.INFO_MARK);
+			ARENA::DEBUG{
+				msgString = 'Individual ' + indNumber + ' is dead. R.I.P. \n' + 'It lived ' + Math.round((deltaTime)*0.00006) + ' min';
+				messenger.message(msgString, modelEvent.INFO_MARK);
+				}
 			}
 			
 			private function step(e:Event):void{//Вызывается из indDispatcher каждй раз, когда из него приходит событие StepDispatcher.DO_STEP
@@ -320,8 +330,11 @@ package konstantinz.community.comStage{
 		
 		public function externalTimer():void{ //Возможность управлять особью при помощью внешнего таймера
 			timerForIndividuals.stop();
-			msgString = 'Individual number '+ indNumber + ': ' + 'Internal timer has stoped';
-			messenger.message(msgString, modelEvent.DEBUG_MARK);
+			
+			ARENA::DEBUG{
+				msgString = 'Individual number '+ indNumber + ': ' + 'Internal timer has stoped';
+				messenger.message(msgString, modelEvent.DEBUG_MARK);
+				}
 			}
 			
 		public function doStep():void{//Заставляем особь двигаться по внешнему таймеру
@@ -334,8 +347,11 @@ package konstantinz.community.comStage{
 				indNumber = newNumber;
 				myBehaviour.setIndividualNumber(newNumber);
 				stepDispatcher.setIndividualNumber (newNumber);
-				msgString = 'Individual has change it number from ' + oldNumber + ' to ' + newNumber;
-				messenger.message(msgString, modelEvent.DEBUG_MARK);
+				
+				ARENA::DEBUG{
+					msgString = 'Individual has change it number from ' + oldNumber + ' to ' + newNumber;
+					messenger.message(msgString, modelEvent.DEBUG_MARK);
+					}
 				}
 			return indNumber;
 		}
@@ -344,13 +360,21 @@ package konstantinz.community.comStage{
 			if(stepDispatcher.statement() != 'dead' && stepDispatcher.statement() != 'stop'){//Особь поменяет свое состояние только если она жива и не находится в гибернации
 				switch(statementName){
 					case 'suspend':
-						msgString = 'Individual number '+ indNumber + ' has been suspended';
-						messenger.message(msgString, modelEvent.DEBUG_MARK);
+						
+						ARENA::DEBUG{
+							msgString = 'Individual number '+ indNumber + ' has been suspended';
+							messenger.message(msgString, modelEvent.DEBUG_MARK);
+							}
+						
 						stepDispatcher.statement('suspend', statementLength);
 					break;
 					case 'stop':
-						msgString = 'Individual number '+ indNumber + ' has been stoped';
-						messenger.message(msgString, modelEvent.DEBUG_MARK);
+						
+						ARENA::DEBUG{
+							msgString = 'Individual number '+ indNumber + ' has been stoped';
+							messenger.message(msgString, modelEvent.DEBUG_MARK);
+							}
+						
 						stepDispatcher.statement('stop', statementLength);
 						individualCounter('remove', indAgeState, currentChessDeskI, currentChessDeskJ);
 					break;
@@ -361,8 +385,12 @@ package konstantinz.community.comStage{
 					break;
 					case 'dead':
 						if(stepDispatcher.statement() != 'dead'){//Если особь уже не мертва
-							msgString = 'Individual ' + indNumber + 'has killed';
-							messenger.message(msgString, modelEvent.INFO_MARK);
+							
+							ARENA::DEBUG{
+								msgString = 'Individual ' + indNumber + 'has killed';
+								messenger.message(msgString, modelEvent.INFO_MARK);
+								}
+							
 							killIndividual();
 							}
 					break;
@@ -375,8 +403,11 @@ package konstantinz.community.comStage{
 					break;
 					}
 				}else{
-					msgString = 'Individual get '+ statementName + ' but it can not switching cause has status ' + stepDispatcher.statement();
-					messenger.message(msgString, modelEvent.DEBUG_MARK);//Применять только при малом числе особей
+					
+					ARENA::DEBUG{
+						msgString = 'Individual get '+ statementName + ' but it can not switching cause has status ' + stepDispatcher.statement();
+						messenger.message(msgString, modelEvent.DEBUG_MARK);//Применять только при малом числе особей
+						}
 					}
 				return stepDispatcher.statement();
 			}
@@ -399,11 +430,11 @@ package konstantinz.community.comStage{
 				if(motionBehaviour != null){
 					if(newBehaviour == 'empty'){
 						currentBehaviourName = motionBehaviour.getCurrentBehaviour();//Если функцию вызвали без параметров, это значит, что она должна просто вывести название текущей модели поведения
-					}else{
-						motionBehaviour.switchBehaviour(newBehaviour);
-						myBehaviour = motionBehaviour.newBehaviour;
+						}else{
+							motionBehaviour.switchBehaviour(newBehaviour);
+							myBehaviour = motionBehaviour.newBehaviour;
+							}
 						}
-					}
 				return currentBehaviourName;
 			}
 			
