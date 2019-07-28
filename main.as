@@ -23,9 +23,9 @@ package{
     public class main extends Sprite{
 		
 		private const CURRENT_VERSION:String = '0.98';
-		private const CURRENT_BUILD:String = '190614';
+		private const CURRENT_BUILD:String = '190728';
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
-		private const MIN_INDIVIDUAL_CRITICAL_NUMBER:int = 0;//Минимально подходящие для отслеживания статистики количество особей
+		private const MIN_INDIVIDUAL_CRITICAL_NUMBER:int = 5;//Минимально подходящие для отслеживания статистики количество особей
 		private const MAX_INDIVIDUAL_CRITICAL_NUMBER:int = 3000;
 		private const PAUSE_AFTER_CYCLE:int = 2;//Время паузы между циклами передвижения особей
 		private const DEAD_INDIVIDUALS_REMOVING_INTERVAL:int = 100;
@@ -43,7 +43,7 @@ package{
 		private var behaviourChoicer:BehaviourChoicer;
 		private var eventsForPlugins:Object;
 		private var eventsForPluginsList:Array;
-		private var individualCurrentState:Array;
+		private var individualCurrentState:IndividualState;
 		private var individualsAgeGroups:Array;
 		private var modelEvent:ModelEvent;
 		private var stepTimer:Timer;
@@ -167,14 +167,7 @@ package{
 			individualsAgeGroups = new Array();
 			individualsAgeGroups = getIndividualAgeGroups('main.individuals');
 			
-			individualCurrentState = new Array();
-			individualCurrentState['currentX'] = 0;
-			individualCurrentState['currentY'] = 0;
-			individualCurrentState['previousX'] = 0;
-			individualCurrentState['previousY'] = 0;
-			individualCurrentState['behaviour'] = '';
-			individualCurrentState['statement'] = '';
-			individualCurrentState['age'] = '';
+			individualCurrentState = new IndividualState();
 			
 			individuals = new Vector.<Individual>();
 			individualPictures = new Vector.<IndividualGraphicInterface>();
@@ -640,11 +633,10 @@ package{
 			for(var i:int = 0; i < counter; i++){
 				individualCurrentState.currentX = individuals[i].placement().x;
 				individualCurrentState.currentY = individuals[i].placement().y;
-				individualCurrentState.previousX = individuals[i].placement().previousX;
-				individualCurrentState.previousY = individuals[i].placement().previousY;
 				individualCurrentState.behaviour = individuals[i].behaviour();
 				individualCurrentState.statement = individuals[i].statement();
 				individualCurrentState.age = individuals[i].age();
+				individualCurrentState.direction = individuals[i].direction();
 				
 				individualPictures[i].dotStep(individualCurrentState);//Передаем координаты, куда особи надо переместится на следующем шаге
 			}

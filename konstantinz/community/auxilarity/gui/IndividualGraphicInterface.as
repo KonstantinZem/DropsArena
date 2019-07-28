@@ -4,6 +4,7 @@ package konstantinz.community.auxilarity.gui{
 import flash.display.Sprite;
 import flash.geom.ColorTransform;
 import flash.events.MouseEvent;
+import konstantinz.community.comStage.*;
 import konstantinz.community.auxilarity.*
 
 public class IndividualGraphicInterface extends Sprite{
@@ -31,7 +32,7 @@ public class IndividualGraphicInterface extends Sprite{
 	private var hybernateIndividualPoint:Sprite;
 	private var previousStepDistance:int;
 	private var currentScale:Number;
-	private var currentState:Array;
+	private var currentState:IndividualState;
 	
 	public var individualBody:Sprite;
 	
@@ -75,7 +76,7 @@ public class IndividualGraphicInterface extends Sprite{
 		//drawControlPoint(individualMigrationMark);
 		}
 	
-	public function dotStep(currenteIndividualState:Array):void{
+	public function dotStep(currenteIndividualState:IndividualState):void{
 			
 		currentState = currenteIndividualState;
 		individualMoveVector.graphics.lineStyle(1, VECTOR_COLOR);
@@ -90,10 +91,10 @@ public class IndividualGraphicInterface extends Sprite{
 				individualPoint.scaleX = currentScale;
 				individualPoint.scaleY = currentScale;
 				}
+			
+			markIndividual(currenteIndividualState.statement);
+			showAdditionMarks(currenteIndividualState);
 			}
-		
-		markIndividual(currenteIndividualState.statement);
-		showAdditionMarks(currenteIndividualState);
 		
 		}
 		
@@ -205,7 +206,7 @@ public class IndividualGraphicInterface extends Sprite{
 				individualMigrationMark.x = individualBody.height/2;
 				individualMigrationMark.y = individualBody.width/2;
 				}else{
-					throw new Error('individualBody not exist')
+					throw new Error('individualBody not exist');
 					}
 			individualMigrationMark.graphics.beginFill(0xffffff); 
 			individualMigrationMark.graphics.lineTo (lineX, lineY);
@@ -226,11 +227,9 @@ public class IndividualGraphicInterface extends Sprite{
 		controlPoint.graphics.drawCircle(figure.x, figure.y, .8);
 		};
 	
-	private function showAdditionMarks(currenteIndividualState:Array):void{
+	private function showAdditionMarks(currenteIndividualState:IndividualState):void{
 		try{
-			hideMark(individualMigrationMark);
-			hideMark(individualMoveVector);
-			
+		
 			if(currenteIndividualState.statement == 'moving'){
 				switch(currenteIndividualState.behaviour){
 					case "BestConditionsWalker":
@@ -240,8 +239,8 @@ public class IndividualGraphicInterface extends Sprite{
 						showMark(individualMigrationMark, currenteIndividualState);
 					break;
 					case 'RandomWalker':
-						//hideMark(individualMigrationMark);
-						//hideMark(individualMoveVector);
+						hideMark(individualMigrationMark);
+						hideMark(individualMoveVector);
 					break;
 					default:
 						hideMark(individualMigrationMark);
@@ -249,45 +248,49 @@ public class IndividualGraphicInterface extends Sprite{
 						throw new Error('Uncnow individual behaviour name');
 					break;
 					}
+				}else{
+					hideMark(individualMigrationMark);
+					hideMark(individualMoveVector);
 				}
 			}catch(e:Error){
 				trace(e.message + ': ' + currenteIndividualState.behaviour)
 				}
 		}
 	
-	private function showMark(individualMark:Sprite, currenteIndividualState:Array):void{
-		hideMark(individualMark);
+	private function showMark(individualMark:Sprite, currenteIndividualState:IndividualState):void{
+		
 		individualMark.scaleX = individualPoint.scaleX/2.5;
 		individualMark.scaleY = individualPoint.scaleY/2.5;
 		individualMark.x = individualPoint.x;
 		individualMark.y = individualPoint.y;
 		//Изначально вектор смотрит вправо
 		
-		if(currenteIndividualState.currentY != currenteIndividualState.previousY){//Если сделали шаг по вертекали
-			if(currenteIndividualState.currentY < currenteIndividualState.previousY){//Если сделали вверх
-				individualMark.rotation = -90;
-				individualMark.x = individualPoint.x + individualPoint.width/2 -2;
-				individualMark.y = individualPoint.y - individualPoint.height/2;
-				}else{
-					individualMark.rotation = 90;
-					individualMark.x = individualPoint.x + individualPoint.width/2 -2;
-					individualMark.y = individualPoint.y + individualPoint.height;
-					}
-			}
-
-		if(currenteIndividualState.currentX != currenteIndividualState.previousX){//Если сделали шаг по горизонтали
-			if(currenteIndividualState.currentX < currenteIndividualState.previousX){//Если это шаг влево
+		switch(currenteIndividualState.direction){
+			case 0: //Стоим наместе
+				hideMark(individualMark);
+			break;
+			case 3://Направо
+				individualMark.rotation = 0;
+				individualMark.y = individualPoint.y + individualPoint.height/2 -2;
+				individualMark.x = individualPoint.x + individualPoint.width;
+			break;
+			case 4://Налево
 				individualMark.rotation = 180;
 				individualMark.y = individualPoint.y + individualPoint.height/2 -2;
 				individualMark.x = individualPoint.x - individualPoint.width/2;
-				}else{
-					individualMark.rotation = 0;
-					individualMark.y = individualPoint.y + individualPoint.height/2 -2;
-					individualMark.x = individualPoint.x + individualPoint.width;
-					}
-			}else{
-				hideMark(individualMark)
+			break;
+			case 1: //Вниз
+				individualMark.rotation = 90;
+				individualMark.x = individualPoint.x + individualPoint.width/2 -2;
+				individualMark.y = individualPoint.y + individualPoint.height;
+			break;
+			case 2://Вверх
+				individualMark.rotation = -90;
+				individualMark.x = individualPoint.x + individualPoint.width/2 -2;
+				individualMark.y = individualPoint.y - individualPoint.height/2;
+			break;
 			}
+
 		}
 	
 	private function hideMark(individualMark:Sprite):void{
@@ -296,7 +299,7 @@ public class IndividualGraphicInterface extends Sprite{
 		}
 	
 	private function onMouseClick(event:MouseEvent):void{
-		
+		trace('x=' + individualBody.x + ';' + 'y=' + individualBody.y)
 	};
 	
 	}

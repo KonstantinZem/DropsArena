@@ -219,7 +219,7 @@ package konstantinz.community.comStage{
 				}
 
 		
-		private function maturing():void{
+		private function maturing():void{//Особь начнет размножаться не сразу
 			//функция полностью платформонезависимая
 			if(maturingDeley <= 0){
 				
@@ -424,6 +424,9 @@ package konstantinz.community.comStage{
 				}
 			return indAgeState;
 			}
+		public function direction():int{
+			return myBehaviour.getDirection();
+			};
 		
 		public function behaviour(newBehaviour:String = 'empty'):String{
 			var currentBehaviourName:String = 'undefined';

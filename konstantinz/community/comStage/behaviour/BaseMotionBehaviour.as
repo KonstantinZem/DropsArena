@@ -19,6 +19,7 @@ package konstantinz.community.comStage.behaviour{
 		protected var modelEvent:ModelEvent;
 		protected var behaviourName:String;
 		protected var state:String;
+		protected var directionAlreadyChoised:Boolean;
 		
 		protected var newPosition:Array = new Array();
 		protected var individualName:int;
@@ -28,6 +29,7 @@ package konstantinz.community.comStage.behaviour{
 		
 		function BaseMotionBehaviour(dbgLevel:String='3'){
 			behaviourName = 'RandomWalker';
+			directionAlreadyChoised = false;
 			state = CONSTANT_STATE;//Модель поведения не имеет условия начала и окончания
 			debugLevel = dbgLevel;
 			messenger = new Messenger();
@@ -45,7 +47,7 @@ package konstantinz.community.comStage.behaviour{
 			
 				if(area.length == 0){
 					throw new Error('Population area array is empty');
-				}
+					}
 				populationArea = area;
 			}catch(err:Error){
 				msgString = err.message;
@@ -57,7 +59,7 @@ package konstantinz.community.comStage.behaviour{
 			return populationArea[currentX][currentY].speedDeleyA;
 			}
 		
-		public function getMovieDirection():int{
+		protected function getMovieDirection():int{
 			return Math.round(Math.random()*5);//Пускай лучше этот код будет прописан в одном месте
 			};
 	
@@ -66,10 +68,13 @@ package konstantinz.community.comStage.behaviour{
 			onBeginChoisingPosition(currentX, currentY);
 			
 			try{
-				if(state != HOLD_STATE){//Если выбранное направление не нужно удерживать в течении нескольких ходов
-					indDirection = getMovieDirection();//Вычисляем новое направление движения особи
-					if(state != CONSTANT_STATE){ //Если линия поведение имеет начало и конец
-						state = HOLD_STATE;//Делаем пометку о начале данной линии поведения, чтобы удерживать направление до конца 
+				
+				if(directionAlreadyChoised == false){//Направление передвижения может выбираться и в другом месте. Флаг подымается, чтобы небыло повторов
+					if(state != HOLD_STATE){//Если выбранное направление не нужно удерживать в течении нескольких ходов
+						indDirection = getMovieDirection();//Вычисляем новое направление движения особи
+						if(state != CONSTANT_STATE){ //Если линия поведение имеет начало и конец
+							state = HOLD_STATE;//Делаем пометку о начале данной линии поведения, чтобы удерживать направление до конца 
+							}
 						}
 					}
 					
@@ -95,7 +100,7 @@ package konstantinz.community.comStage.behaviour{
 					//throw new Error('Wrong direction code');
 				break;
 				}
-			
+		
 			onEndChoisingPosition();
 			
 			}catch(err:Error){
@@ -115,6 +120,10 @@ package konstantinz.community.comStage.behaviour{
 			return behaviourName;
 			};
 		
+		public function getDirection():int{
+			return indDirection;
+			};
+		
 		public function setIndividualNumber(newNumber:int):void{
 			individualName = newNumber;
 			}
@@ -125,15 +134,15 @@ package konstantinz.community.comStage.behaviour{
 		
 		protected function onStepUp(currentX:int, currentY:int):void{
 			if (currentY > 0){
-				newPosition.y = newPosition.y - stepLength;
+				newPosition.y = currentY - stepLength;
 				}
 			}
 		
 		protected function onStepDown(currentX:int, currentY:int):void{
 			if(currentY > populationArea[0].length-2){
-				newPosition.y = newPosition.y - stepLength;
+				newPosition.y = currentY - stepLength;
 				}else{
-					newPosition.y = newPosition.y + stepLength;
+					newPosition.y = currentY + stepLength;
 					}
 			}
 		
@@ -141,13 +150,15 @@ package konstantinz.community.comStage.behaviour{
 			if(currentX > populationArea.length-2){//Если особь дошла до правого края сцены
 				newPosition.x = currentX - stepLength;//Делаем шаг назад
 				}else{
-					newPosition.x = newPosition.x + stepLength;
+					newPosition.x = currentX + stepLength;
 					}
 		}
 		
 		protected function onStepLeft(currentX:int, currentY:int):void{
-			if(currentX > 0){
-				newPosition.x = newPosition.x - stepLength;
+			if(currentX > stepLength){
+				newPosition.x = currentX - stepLength;
+				}else{
+					newPosition.x = currentX + stepLength;
 				}
 		}
 		

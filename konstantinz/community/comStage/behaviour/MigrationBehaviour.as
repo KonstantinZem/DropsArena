@@ -48,16 +48,18 @@ public class MigrationBehaviour extends BaseMotionBehaviour{
 
 		if(collisionCounter > collisionsThreshold){//Если набралось достаточно встерч
 			state = HOLD_STATE;
+			
 			behaviourName = 'MigrationBehaviour';//Говорим, что нужно включать миграцию
 			resetAllCounters();
 			indDirection = getMovieDirection();
+			directionAlreadyChoised = true;
 			
 			ARENA::DEBUG{
 				msgString = 'Individual ' + individualName + ' begins to migrate';
 				messenger.message(msgString, modelEvent.INFO_MARK);
 				}
 				}else{
-					state == RESET_STATE
+					state = RESET_STATE;
 					}
 			}
 		};
@@ -86,52 +88,65 @@ public class MigrationBehaviour extends BaseMotionBehaviour{
 			};
 		
 		private function resetAllCounters():void{
-			currentStepsNumber = 0;
-			previosStepsNumber = 0;
+			previosStepsNumber = currentStepsNumber;
+			currentStepsNumber = stepDispetcher.getStepsNumber();
 			collisionCounter = 0;
+			directionAlreadyChoised = false;
 			}
 		
-		override protected function onStepUp(currentX:int, currentY:int):void{
-			if (currentY > 0){
-				newPosition.y = newPosition.y - stepLength;
+		override protected function onStepUp(currentX:int, currentY:int):void{//Идем вверх
+			if (currentY < 1){//Если выходим за верхнюю границу поля
+				newPosition.y = newPosition.y + stepLength;
+				resetAllCounters();
+				state = CONSTANT_STATE;//Чтобы функция суперкласса getNewPosition вычислила новое направление
+				}else{
+					newPosition.y = newPosition.y - stepLength;
 				}
 			}
 		
-		override protected function onStepDown(currentX:int, currentY:int):void{
-			if(currentY > populationArea[0].length-2){
-				newPosition.y = newPosition.y - stepLength;
-				state = RESET_STATE;
+		override protected function onStepDown(currentX:int, currentY:int):void{//Идем вниз
+			if(currentY > populationArea[0].length-2){//Если вышли за пределы сцены, сбраываем поведение
+				newPosition.y = currentY - stepLength;
+				resetAllCounters();
+				state = CONSTANT_STATE;//Чтобы функция суперкласса getNewPosition вычислила новое направление
 				}else{
-					newPosition.y = newPosition.y + stepLength;
+					newPosition.y = currentY + stepLength;
 					}
 			}
 		
 		override protected function onStepRight(currentX:int, currentY:int):void{
 			if(currentX > populationArea.length-2){//Если особь дошла до правого края сцены
 				newPosition.x = currentX - stepLength;//Делаем шаг назад
-				state = RESET_STATE;
+				resetAllCounters();
+				state = CONSTANT_STATE;//Чтобы функция суперкласса getNewPosition вычислила новое направление
 				}else{
-					newPosition.x = newPosition.x + stepLength;
+					newPosition.x = currentX + stepLength;
 					}
 		}
 		
-		override protected function onStepLeft(currentX:int, currentY:int):void{
-			if(currentX > 0){
-				newPosition.x = newPosition.x - stepLength;
-				}
-		}
+		override protected function onStepLeft(currentX:int, currentY:int):void{//Идем влево
+			if(currentX <= stepLength){//Если можем выйти за пределы поля
+				newPosition.x = currentX + stepLength;//Делаем шаг вперед
+				resetAllCounters();
+				state = CONSTANT_STATE;//Чтобы функция суперкласса getNewPosition вычислила новое направление
+				}else{
+					newPosition.x = currentX - stepLength;
+					}
+			}
 		
 		override protected function onStay(currentX:int, currentY:int):void{
 			newPosition.x = currentX;
 			newPosition.y = currentY;
+			resetAllCounters();
+			state = CONSTANT_STATE;//Чтобы функция суперкласса getNewPosition вычислила новое направление
 			};
 		
 		override protected function onEndChoisingPosition():void{
 			previosStepsNumber++;
 				
 			if(deltaSteps() == migrationDistance){//Если мы прошли заданное количество шагов
-				state = RESET_STATE;
-					
+				state = CONSTANT_STATE;//Чтобы функция суперкласса getNewPosition вычислила новое направление
+				
 				ARENA::DEBUG{
 					msgString = 'Individual ' + individualName + ' end to migrate after ' + deltaSteps() + ' steps';
 					messenger.message(msgString, modelEvent.INFO_MARK);

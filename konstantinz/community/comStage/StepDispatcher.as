@@ -121,6 +121,6 @@ package konstantinz.community.comStage{
 			}
 		public function getStepsNumber():int{
 			return lifeTime;
-		}
+			}
 	}
 }

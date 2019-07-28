@@ -34,7 +34,7 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 			};
 		
 		override protected function onStepUp(currentX:int, currentY:int):void{//Идем вверх
-			if (currentY - viewDistance < 0){//Если особь дошла до верхнего края сцены
+			if (currentY - viewDistance < stepLength){//Если особь дошла до верхнего края сцены
 				newPosition.y = currentY + stepLength;
 				stepsToTarget = leftOfStepsToTarget(0, viewDistance);
 				}else{
@@ -64,7 +64,7 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 			}
 		
 		override protected function onStepLeft(currentX:int, currentY:int):void{//Идем влево
-			if(currentX - viewDistance < 0){//Если особь дошла до левого края сцены
+			if(currentX - viewDistance < stepLength){//Если особь дошла до левого края сцены
 				newPosition.x = currentX + stepLength;//Делаем шаг вправо
 				stepsToTarget = leftOfStepsToTarget(0, viewDistance);//Сбрасываем линию поведению
 				}else{

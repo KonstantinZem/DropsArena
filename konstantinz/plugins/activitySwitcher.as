@@ -80,8 +80,11 @@ public class activitySwitcher extends Plugin{
 				
 		if(currentTask.selectionType != 'percents' && currentTask.selectionType != 'items'){//Если в настройках способ выборки особей поставлен неправильно или отсутствует
 		   currentTask.selectionType = 'percents';//Выбираем значение по умолчанию
-		   msgString = errorType.varIsIncorrect + '. ' + errorType.defaultValue + ': percents';
-		   messenger.message(msgString, modelEvent.ERROR_MARK);
+		   
+		   ARENA::DEBUG{
+			 msgString = errorType.varIsIncorrect + '. ' + errorType.defaultValue + ': percents';
+			 messenger.message(msgString, modelEvent.ERROR_MARK);
+		   }
 		  }
 		 
 		 currentTask.statMessageHead = setMsgHead(currentTask.signalType);
@@ -153,15 +156,19 @@ public class activitySwitcher extends Plugin{
 			}
 			
 		}catch(e:Error){
-			msgString = e.message;
-			messenger.message(msgString, modelEvent.ERROR_MARK);
+			ARENA::DEBUG{
+				msgString = e.message;
+				messenger.message(msgString, modelEvent.ERROR_MARK);
+				}
 			}
 		
 		currentTask.activityObservationPosition[4] = 0;//Корректируем
 		numberOfObservingsInConfig--;//Корректируем
 		
-		msgString = 'Number of observations is ' + numberOfObservingsInConfig;
-		messenger.message(msgString, modelEvent.DEBUG_MARK);
+		ARENA::DEBUG{
+			msgString = 'Number of observations is ' + numberOfObservingsInConfig;
+			messenger.message(msgString, modelEvent.DEBUG_MARK);
+			}
 		
 		return numberOfObservingsInConfig;
 		}
@@ -191,12 +198,17 @@ public class activitySwitcher extends Plugin{
 					currentTask.currentActivityPosition = 0
 					currentTask.activityObservationPosition[4] = currentTask.currentActivityPosition;//Обнуляем счетчик. А то плагин будет стоять и ждать дату Error
 					currentTask.currentDay = configuration.getOption(newDayPath, currentTask.activityObservationPosition);//Берем из конфига дату наблюдения
-					msgString = 'Plugin has begun new cycle';
-					messenger.message(msgString, modelEvent.DEBUG_MARK);
+					
+					ARENA::DEBUG{
+						msgString = 'Plugin has begun new cycle';
+						messenger.message(msgString, modelEvent.DEBUG_MARK);
+						}
 					}
 				
-				msgString = 'Next observation data is ' + currentTask.currentDay + ' (position ' + currentTask.activityObservationPosition[4] + ')';
-				messenger.message(msgString, modelEvent.DEBUG_MARK);
+				ARENA::DEBUG{
+					msgString = 'Next observation data is ' + currentTask.currentDay + ' (position ' + currentTask.activityObservationPosition[4] + ')';
+					messenger.message(msgString, modelEvent.DEBUG_MARK);
+					}
 		}
 	
 	private function setDuration(currentTask:ActivityTask):void{
@@ -204,8 +216,12 @@ public class activitySwitcher extends Plugin{
 		
 		if(currentTask.currentDuration > 0){//Если время паузы прописано в конфиге
 			setNewSwitchingInterval(currentTask.currentDuration);
-			msgString = 'Pause duration is set to ' + currentTask.currentDuration;
-			messenger.message(msgString, modelEvent.DEBUG_MARK);
+			
+			ARENA::DEBUG{
+				msgString = 'Pause duration is set to ' + currentTask.currentDuration;
+				messenger.message(msgString, modelEvent.DEBUG_MARK);
+				}
+			
 			}else if(currentTask.switchingIntervalHasChanged == 'true'){
 				setNewSwitchingInterval(0);//0 - значит вернуть предыдущий интервал
 				}
@@ -219,9 +235,11 @@ public class activitySwitcher extends Plugin{
 
 			currentActiveIndividualsNumber = int(configuration.getOption(currentTask.activeIndividualsNumberPosition, currentTask.activityObservationPosition));			
 			stopOnly(currentTask, currentActiveIndividualsNumber, currentTask.selectionType);
-
-			msgString = 'Current stoped individuals part is ' +  currentTask.currentDay + '(position ' + currentTask.currentActivityPosition + '): '+ currentActiveIndividualsNumber;
-			messenger.message(msgString, modelEvent.DEBUG_MARK);
+			
+			ARENA::DEBUG{
+				msgString = 'Current stoped individuals part is ' +  currentTask.currentDay + '(position ' + currentTask.currentActivityPosition + '): '+ currentActiveIndividualsNumber;
+				messenger.message(msgString, modelEvent.DEBUG_MARK);
+				}
 				
 			if(currentTask.activeIndividualsNumberPosition != 'Error'){
 				msgString = currentTask.statMessageHead + ':' + currentActiveIndividualsNumber;

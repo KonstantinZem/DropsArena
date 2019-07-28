@@ -95,7 +95,6 @@ public class MotionBehaviourSwitcher{
 						break;
 						
 						case 'MigrationBehaviour':
-							//migrationBehaviour.reset();
 							newBehaviour = migrationBehaviour;
 						break;
 					

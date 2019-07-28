@@ -69,14 +69,20 @@ public class cover extends Plugin{
 		
 		if(currentTask.behaviourFrequency == 0 || currentTask.behaviourFrequency < 0){//Если в конфигурационном файле нет такой опции
 			currentTask.behaviourFrequency = 100;
-			msgString = 'Behaviour frequency: ' + modelError.varIsIncorrect;
-			messenger.message(msgString, modelEvent.ERROR_MARK);
+			
+			ARENA::DEBUG{
+				msgString = 'Behaviour frequency: ' + modelError.varIsIncorrect;
+				messenger.message(msgString, modelEvent.ERROR_MARK);
+				}
 			}
 		
 		if(currentTask.behaviourFrequency > 100){
 			currentTask.behaviourFrequency = 100;
-			msgString = 'Behaviour frequency: ' + modelError.varIsIncorrect + ' It can not be greater then 100';
-			messenger.message(msgString, modelEvent.ERROR_MARK);
+			
+			ARENA::DEBUG{
+				msgString = 'Behaviour frequency: ' + modelError.varIsIncorrect + ' It can not be greater then 100';
+				messenger.message(msgString, modelEvent.ERROR_MARK);
+				}
 			}
 		
 		currentTask.imageName = configuration.getOption(optionPath + 'picture', currentTask.observationPosition);
@@ -96,8 +102,12 @@ public class cover extends Plugin{
 	};
 
 	private function onIOError(error:IOErrorEvent):void{
-		msgString = "Unable to load picture: " + error.text; 
-		messenger.message(msgString, modelEvent.ERROR_MARK);
+		
+		ARENA::DEBUG{
+			msgString = "Unable to load picture: " + error.text; 
+			messenger.message(msgString, modelEvent.ERROR_MARK);
+			}
+			
 		currentTask.loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onIOError);
 		pluginEvent.ready();//Сообщаем о том, что все уже сделано, ведь другие плагины тоже хотят загрузится
 		}
@@ -156,8 +166,11 @@ public class cover extends Plugin{
 					}
 				}
 			}catch(e:Error){
-				msgString = e.message;
-				messenger.message(msgString, modelEvent.ERROR_MARK);
+				
+				ARENA::DEBUG{
+					msgString = e.message;
+					messenger.message(msgString, modelEvent.ERROR_MARK);
+				}
 			}
 		}
 	
@@ -203,10 +216,12 @@ public class cover extends Plugin{
 		bmd.dispose(); //Небольшая оптимизация, чтобы уменьшить занимаемую память
 		bmd = null;
 		
-		msgString = 'Individuals speed now is ' + communityStage.chessDesk[controllX][controllY].speedDeleyA;
-		messenger.message(msgString, modelEvent.INFO_MARK);
-	    msgString = 'Individuals life decriasing now is ' + communityStage.chessDesk[controllX][controllY].lifeQuant + ' points after step';
-	    messenger.message(msgString, modelEvent.INFO_MARK);
+		ARENA::DEBUG{
+			msgString = 'Individuals speed now is ' + communityStage.chessDesk[controllX][controllY].speedDeleyA;
+			messenger.message(msgString, modelEvent.INFO_MARK);
+			msgString = 'Individuals life decriasing now is ' + communityStage.chessDesk[controllX][controllY].lifeQuant + ' points after step';
+			messenger.message(msgString, modelEvent.INFO_MARK);
+			}
 		}
 		
 	private function initBehaviourShema(currentTask:CoverTask):void{
