@@ -11,7 +11,7 @@
 
 package konstantinz.plugins{
 	
-	import flash.events.Event
+	import flash.events.Event;
 	import flash.errors.IOError;
 	import flash.events.IOErrorEvent;
 	import flash.net.URLRequest;
@@ -27,9 +27,9 @@ package konstantinz.plugins{
 public class cover extends Plugin{
 	
 	private var lifequant:int = 1; //Убыль жизни за ход. Должна быть включена в интерфейс этого типа плагинов
+	private var numberOfInitilizedTasks:int;
 	private var image:Object; //Должна быть включена в интерфейс этого типа плагинов
 	private var modelError:ModelErrors;
-	private var numberOfInitilizedTasks:int
 	
 	function cover(){
 		modelError = new ModelErrors();
@@ -49,13 +49,14 @@ public class cover extends Plugin{
 		
 		currentTask.loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
 		currentTask.loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
-		currentTask.loader.load(new URLRequest(currentTask.imageName));
+		currentTask.loader.load(new URLRequest(currentTask.imageName));//Загружаем картинку с паттерном напочвенного покрова
 		}
 	
 	private function initCurrentTaskData(currentTask:CoverTask, taskName:String, taskNumber:int):void{
+		var calendarData:String;
 		
 		currentTask.dataPath = 'plugins.' + pluginName + '.task.data.observation';
-		var calendarData:String = currentTask.dataPath + '.day';
+		calendarData = currentTask.dataPath + '.day';
 			
 		currentTask.name = taskName;
 		currentTask.number = taskNumber;
@@ -67,8 +68,8 @@ public class cover extends Plugin{
 		currentTask.currentDay = configuration.getOption(calendarData, currentTask.currentDayPosition);//Берем из аттрибутов дату наблюдения
 		currentTask.behaviourFrequency = int(configuration.getOption(optionPath + 'behaviour_frequency', currentTask.observationPosition));
 		
-		if(currentTask.behaviourFrequency == 0 || currentTask.behaviourFrequency < 0){//Если в конфигурационном файле нет такой опции
-			currentTask.behaviourFrequency = 100;
+		if(currentTask.behaviourFrequency == 0 || currentTask.behaviourFrequency < 0){//Если в конфигурационном файле не указана частота срабатывания на данном участки какой либо линии поведения
+			currentTask.behaviourFrequency = 100;//Данная линия поведения будет транслироватья на весь участок
 			
 			ARENA::DEBUG{
 				msgString = 'Behaviour frequency: ' + modelError.varIsIncorrect;
@@ -174,23 +175,26 @@ public class cover extends Plugin{
 			}
 		}
 	
-	private function initCoverShema(currentTask:CoverTask):void{
+	private function initCoverShema(currentTask:CoverTask):void{//Создаем в памяти массив куда заносим положение только закрашенных участков
 		var controllX:int;
 		var controllY:int;
 		var bmd:BitmapData = image.bitmapData;
 		var counterI:int;
 		var counterJ:int;
+		var tableRoot:Array;
+		var coverLength:int
 	
 		image.x = communityStage.x;
 		image.y = communityStage.y;
 		image.height = communityStage.height;
 		image.width = communityStage.width;
 				
-		var tableRoot:Array = communityStage.chessDesk;
+		tableRoot = communityStage.chessDesk;
 		counterI = tableRoot.length;
 	
 		for(var i:int = 0; i< counterI; i++){//Проходимся по пикселам прикрепленной картинки
 				var pixelValue:String;
+				
 				counterJ = tableRoot[i].length;
 				currentTask.coverShema[i] = new Array();
 				
@@ -210,6 +214,7 @@ public class cover extends Plugin{
 						aux['controllY'] = controllY;
 						aux['behaviourModel'] = '';
 						currentTask.coverShema[i].push(aux);
+						coverLength++
 					}
 				}	
 		}
@@ -225,29 +230,39 @@ public class cover extends Plugin{
 		}
 		
 	private function initBehaviourShema(currentTask:CoverTask):void{
-		var aux:Array = new Array(0,1,2,3,4,5,6,7,8,9);//Этот массив нужен для присвоения модели поведения случайным клеткам из десяти
-		var counterI:int = currentTask.coverShema.length;
-		var counterD:int = 0;
-		var initedCellsNumber:int = currentTask.behaviourFrequency/10;
+		var tenCells:Array = new Array(0,1,2,3,4,5,6,7,8,9);//Этот массив нужен для присвоения модели поведения случайным клеткам из десяти
+		var rowsNumber:int = currentTask.coverShema.length;
+		var columnsNumber:int = 0;
+		var numberOfCellsChoising:int = currentTask.behaviourFrequency/10;//какое количество из десяти ячеек нужно выбрать
 		var cellNumber:int;
+		var behaviourChangedCells:int = 0;//Нужно для подсчета клеток с ненулевым поведением
+		var allCellsNumber:int = 0;//Для статистика
 		
-		for(var i:int = 0; i < counterI; i++){
+		for(var row:int = 0; row < rowsNumber; row++){
+			columnsNumber = currentTask.coverShema[row].length;
+			allCellsNumber += columnsNumber;
 			
-			for(var j:int = 0; j< currentTask.coverShema[i].length; j = j + 10){
-				counterD = j + initedCellsNumber;
+			for(var column:int = 0; column < columnsNumber; column += 10){//Проходимся по клеткам, перепрыгивая через каждые 10
 				
-				for(var d:int = j; d < counterD; d++){
-					cellNumber = Math.round(Math.random() * (aux.length));//Выбираем случайную ячейку вспомогатеьного массива
+				for(var currentChoise:int = 0; currentChoise < numberOfCellsChoising; currentChoise++){
+					cellNumber = Math.round(Math.random() * tenCells.length);//Выбираем случайную ячейку вспомогатеьного массива
 					
-					if(currentTask.coverShema[i][aux[cellNumber] + j] != undefined){
-						currentTask.coverShema[i][aux[cellNumber] + j]['behaviourModel'] = currentTask.behaviourModelName;
+					if(currentTask.coverShema[row][tenCells[cellNumber] + column] != undefined){//И если такая ячейка есть
+						currentTask.coverShema[row][tenCells[cellNumber] + column].behaviourModel = currentTask.behaviourModelName;//Записываем модель поведения в клетку на сцене
+						behaviourChangedCells++;
 						}
-					aux.splice(cellNumber,1);
+					
+					tenCells.splice(cellNumber,1);//Убираем номер ранее выбранной ячейки из вспомогательного массива
 					
 					}
-					aux = new Array(0,1,2,3,4,5,6,7,8,9);
+					tenCells = new Array(0,1,2,3,4,5,6,7,8,9);//Перезаполняем вспомогательный массив
 				}
 			}
+			
+			ARENA::DEBUG{
+				msgString = 'Task ' + currentTask.name + '. ' + 'Nuber of cells: ' + allCellsNumber + '. Cells with behaviour: ' + behaviourChangedCells + '. Part of behaviour: ' + (behaviourChangedCells/allCellsNumber)*100;
+				messenger.message(msgString, modelEvent.DEBUG_MARK);
+				}
 		}
 	
 	override public function startPluginJobe():void{

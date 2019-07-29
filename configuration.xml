@@ -59,7 +59,7 @@
 		<description>Zone of decading mowing</description>
 		<picture>pictures/park/mowing.png</picture>
 		<stepDeley>0</stepDeley>
-		<debugLevel>1</debugLevel>
+		<debugLevel>3</debugLevel>
 		<color>0xf4e17f</color>
 		<behaviour_model>MomentalDeath</behaviour_model>
 		<behaviour_frequency>20</behaviour_frequency>
