@@ -16,8 +16,10 @@ package konstantinz.plugins{
 		public var imageName:String;
 		//Color shema
 		public var background:ColorTransform;
+		public var useColorBackground:String = 'true';
 		public var coverShema:Array;//Схема напочвенного покрова может загружаться в процессе работы программы несколько раз. Чтобы не загружать битмап каждый раз, надо заранее создать схему
 		public var color:Number; //Определяет цвет участка с данными характеристиками
+		public var previosBackground:ColorTransform;//Какой цвет имела ячейка перед изменением (сохраняем на всякий случай)
 		
 		function CoverTask(){
 			

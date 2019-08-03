@@ -23,10 +23,10 @@ package{
     public class main extends Sprite{
 		
 		private const CURRENT_VERSION:String = '0.98';
-		private const CURRENT_BUILD:String = '190728';
+		private const CURRENT_BUILD:String = '190803';
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
 		private const MIN_INDIVIDUAL_CRITICAL_NUMBER:int = 5;//Минимально подходящие для отслеживания статистики количество особей
-		private const MAX_INDIVIDUAL_CRITICAL_NUMBER:int = 3000;
+		private const MAX_INDIVIDUAL_CRITICAL_NUMBER:int = 5000;
 		private const PAUSE_AFTER_CYCLE:int = 2;//Время паузы между циклами передвижения особей
 		private const DEAD_INDIVIDUALS_REMOVING_INTERVAL:int = 100;
 		
@@ -455,7 +455,8 @@ package{
 					
 					individualPictures[i].drawIndividual();
 					commStage.addChild(individualPictures[i].individualBody);
-				
+					
+					individuals[i].age(1);
 					individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
 					individuals[i].externalTimer();
 				}

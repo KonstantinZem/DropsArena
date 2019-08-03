@@ -5,7 +5,7 @@ import flash.display.Sprite;
 import flash.geom.ColorTransform;
 import flash.events.MouseEvent;
 import konstantinz.community.comStage.*;
-import konstantinz.community.auxilarity.*
+import konstantinz.community.auxilarity.*;
 
 public class IndividualGraphicInterface extends Sprite{
 	
@@ -91,10 +91,10 @@ public class IndividualGraphicInterface extends Sprite{
 				individualPoint.scaleX = currentScale;
 				individualPoint.scaleY = currentScale;
 				}
-			
-			markIndividual(currenteIndividualState.statement);
-			showAdditionMarks(currenteIndividualState);
 			}
+		
+		markIndividual(currenteIndividualState.statement);
+		showAdditionMarks(currenteIndividualState);
 		
 		}
 		
@@ -206,7 +206,7 @@ public class IndividualGraphicInterface extends Sprite{
 				individualMigrationMark.x = individualBody.height/2;
 				individualMigrationMark.y = individualBody.width/2;
 				}else{
-					throw new Error('individualBody not exist');
+					throw new Error('individualBody not exist')
 					}
 			individualMigrationMark.graphics.beginFill(0xffffff); 
 			individualMigrationMark.graphics.lineTo (lineX, lineY);
@@ -229,7 +229,9 @@ public class IndividualGraphicInterface extends Sprite{
 	
 	private function showAdditionMarks(currenteIndividualState:IndividualState):void{
 		try{
-		
+			hideMark(individualMigrationMark);
+			hideMark(individualMoveVector);
+			
 			if(currenteIndividualState.statement == 'moving'){
 				switch(currenteIndividualState.behaviour){
 					case "BestConditionsWalker":
@@ -239,8 +241,8 @@ public class IndividualGraphicInterface extends Sprite{
 						showMark(individualMigrationMark, currenteIndividualState);
 					break;
 					case 'RandomWalker':
-						hideMark(individualMigrationMark);
-						hideMark(individualMoveVector);
+						//hideMark(individualMigrationMark);
+						//hideMark(individualMoveVector);
 					break;
 					default:
 						hideMark(individualMigrationMark);
@@ -248,17 +250,14 @@ public class IndividualGraphicInterface extends Sprite{
 						throw new Error('Uncnow individual behaviour name');
 					break;
 					}
-				}else{
-					hideMark(individualMigrationMark);
-					hideMark(individualMoveVector);
 				}
+					
 			}catch(e:Error){
 				trace(e.message + ': ' + currenteIndividualState.behaviour)
 				}
 		}
 	
 	private function showMark(individualMark:Sprite, currenteIndividualState:IndividualState):void{
-		
 		individualMark.scaleX = individualPoint.scaleX/2.5;
 		individualMark.scaleY = individualPoint.scaleY/2.5;
 		individualMark.x = individualPoint.x;
@@ -290,7 +289,6 @@ public class IndividualGraphicInterface extends Sprite{
 				individualMark.y = individualPoint.y - individualPoint.height/2;
 			break;
 			}
-
 		}
 	
 	private function hideMark(individualMark:Sprite):void{
@@ -299,7 +297,7 @@ public class IndividualGraphicInterface extends Sprite{
 		}
 	
 	private function onMouseClick(event:MouseEvent):void{
-		trace('x=' + individualBody.x + ';' + 'y=' + individualBody.y)
+		
 	};
 	
 	}

@@ -37,7 +37,7 @@ public class cover extends Plugin{
 	
 	override public function initSpecial(task:Array, taskName:String, taskNumber:int):void{
 		var currentTask:CoverTask
-		
+
 		task[taskNumber]= new CoverTask();
 		
 		currentTask = task[taskNumber];
@@ -65,6 +65,13 @@ public class cover extends Plugin{
 
 		currentTask.coverShema = new Array();
 		currentTask.color = configuration.getOption(optionPath + 'color', currentTask.observationPosition);
+		
+		if(isNaN(currentTask.color)){
+			currentTask.useColorBackground = 'false';//Цвет ячеек можети не изменятся. Это нужно чтобы с помощью этого плагина создавать на сцене зоны с определенным поведением особей
+			currentTask.color = '0xffffff';
+			currentTask.previosBackground = new ColorTransform();
+			}
+	
 		currentTask.currentDay = configuration.getOption(calendarData, currentTask.currentDayPosition);//Берем из аттрибутов дату наблюдения
 		currentTask.behaviourFrequency = int(configuration.getOption(optionPath + 'behaviour_frequency', currentTask.observationPosition));
 		
@@ -160,7 +167,14 @@ public class cover extends Plugin{
 						communityStage.chessDesk[xPos][yPos].speedDeleyA = currentTask.aDeley//Переопределяем скорость взрослых
 						communityStage.chessDesk[xPos][yPos].speedDeleyY = currentTask.yDeley//И молодых особей
 						communityStage.chessDesk[xPos][yPos].lifeQuant = lifequant;//Переопределяем время жизни особи за ход
-						communityStage.chessDesk[xPos][yPos].picture.transform.colorTransform = currentTask.background;
+						
+						if(currentTask.useColorBackground == 'true'){
+							communityStage.chessDesk[xPos][yPos].picture.transform.colorTransform = currentTask.background;//Надо передать именно экземпляр. Иначе цвет не изменится
+							}else{	//Если нем не нужно изменять цвет ячейки. 
+								currentTask.previosBackground.color = communityStage.chessDesk[xPos][yPos].picture.transform.colorTransform.color;
+								communityStage.chessDesk[xPos][yPos].picture.transform.colorTransform = currentTask.previosBackground;
+								}
+							
 						communityStage.chessDesk[xPos][yPos].behaviourModel = currentTask.coverShema[i][j].behaviourModel;
 						}
 					
@@ -191,7 +205,7 @@ public class cover extends Plugin{
 				
 		tableRoot = communityStage.chessDesk;
 		counterI = tableRoot.length;
-	
+		
 		for(var i:int = 0; i< counterI; i++){//Проходимся по пикселам прикрепленной картинки
 				var pixelValue:String;
 				
@@ -203,6 +217,7 @@ public class cover extends Plugin{
 					pixelValue = bmd.getPixel(tableRoot[i][j].sqrX /1.7, tableRoot[i][j].sqrY /1.7).toString(16);
 		
 					if(pixelValue != 'ffffff'){//Если участок картинки не белый
+					
 						communityStage.chessDesk[i][j].picture.transform.colorTransform = currentTask.background;
 						communityStage.chessDesk[i][j].speedDeleyA = currentTask.aDeley//Переопределяем скорость взрослых
 						communityStage.chessDesk[i][j].speedDeleyY = currentTask.yDeley//И молодых особей
@@ -214,7 +229,7 @@ public class cover extends Plugin{
 						aux['controllY'] = controllY;
 						aux['behaviourModel'] = '';
 						currentTask.coverShema[i].push(aux);
-						coverLength++
+						coverLength++;
 					}
 				}	
 		}

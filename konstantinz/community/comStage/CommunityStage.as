@@ -19,6 +19,7 @@ package konstantinz.community.comStage{
 		private var msgString:String
 		private var messenger:Messenger;
 		private var modelEvent:ModelEvent;
+		private var cellSize:String;
 		
 		public var chessDesk:Array;
 		
@@ -37,8 +38,16 @@ package konstantinz.community.comStage{
 						throw new Error(errorType.paramError);
 						}
 					}
-				squSize = (stgw*Number(extOptions.getOption('main.cellSize')))/100;
-				if(squSize<CRITICAL_LEVEL){//Если мы рискуем получить слишком много слишком мелких квадратов
+					
+				cellSize = extOptions.getOption('main.cellSize');
+				
+				if(cellSize == 'Error'|| cellSize == null){//Если мы забыли внести в конфиг размер ячейки
+					cellSize = '1';//Даем ей значение по умолчанию
+					}
+				
+				squSize = (stgw*Number(cellSize))/100;
+				
+				if(squSize < CRITICAL_LEVEL){//Если мы рискуем получить слишком много слишком мелких квадратов
 					throw new Error(errorType.tooSmall + ' ' + errorType.unstableWarning);//Лучше сразу выбросить ошибку, чтобы не повесить комп
 					}
 				

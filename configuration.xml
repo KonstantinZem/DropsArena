@@ -15,12 +15,12 @@
 		</group>
 		<lifeTime>42320</lifeTime>
 		<lifeQuant>1</lifeQuant>
-		<adultAge>12864</adultAge>
+		<adultAge>10864</adultAge>
 		<maturingDeley>1600</maturingDeley>
-		<offspringsQuant>5</offspringsQuant>
+		<offspringsQuant>15</offspringsQuant>
 	</individuals>
 	<!--Cell size in percents from stage size-->
-	<cellSize>1</cellSize>
+     <cellSize>1</cellSize>
 	<!-- initPosition of individual can be left-top, left-bottom,  right-top, right-bottom, center and random -->
 	<initPosition>random</initPosition>
 	<statRefreshTime>10</statRefreshTime>
@@ -30,8 +30,8 @@
 	<arePluginsActiveOnLoading>false</arePluginsActiveOnLoading>
 	<behaviourSwitching>
 		<enable>true</enable>
-		<viewDistance>10</viewDistance>
-		<migrationDistance>30</migrationDistance>
+		<viewDistance>8</viewDistance>
+		<migrationDistance>40</migrationDistance>
 		<collisionsThreshold>6</collisionsThreshold>
 		<collisionsExpectionLimit>50</collisionsExpectionLimit>
 		<rule>
@@ -54,6 +54,7 @@
 </main>
 <plugins>
 	<cover>
+    <description>Plugin emulate ground cover with different environment conditions</description>
 	<task>
 		<name>mowing</name>
 		<description>Zone of decading mowing</description>
@@ -392,6 +393,55 @@
 		</data>
 	</task>
 	<task>
+		<name>migration</name>
+		<description>This emulate migration of individuals behinde scene borders</description>
+		<picture>pictures/park/borders.png</picture>
+		<stepDeley>1</stepDeley>
+		<debugLevel>1</debugLevel>
+		<!-- If color not set, cell will not chande it's color. Only beheviour will be written -->
+		<behaviour_model>MomentalDeath</behaviour_model>
+		<behaviour_frequency>50</behaviour_frequency>
+		<switchingEvent>calendar_data</switchingEvent>
+		<data>
+			<observation>
+				<day>08.09.10</day>
+			</observation>
+			<observation>
+				<day>02.11.10</day>
+			</observation>
+			<observation>
+				<day>03.04.11</day>
+			</observation>
+			<observation>
+				<day>14.05.11</day>
+			</observation>
+			<observation>
+				<day>14.06.11</day>
+			</observation>
+			<observation>
+				<day>19.08.11</day>
+			</observation>
+			<observation>
+				<day>01.10.11</day>
+			</observation>
+			<observation>
+				<day>09.10.11</day>
+			</observation>
+			<observation>
+				<day>01.11.11</day>
+			</observation>
+			<observation>
+				<day>01.04.12</day>
+			</observation>
+			<observation>
+				<day>11.06.12</day>
+			</observation>
+			<observation>
+				<day>24.06.12</day>
+			</observation>
+		</data>
+	</task> 
+	<task>
 		<name>poa_5</name>
 		<picture>pictures/park/5_poa.png</picture>
 		<description url='https://ru.wikipedia.org/wiki/%D0%9C%D1%8F%D1%82%D0%BB%D0%B8%D0%BA_%D0%BE%D0%B4%D0%BD%D0%BE%D0%BB%D0%B5%D1%82%D0%BD%D0%B8%D0%B9'>[Poa] grass cover zones</description>
@@ -417,9 +467,10 @@
 			</observation>
 		</data>
 	</task>
-        
+       
 	</cover>
 	<activity>
+            <description>Plugin controll activity of individuals acording of field observation data</description>
 		<task>
 		<name>activity_observations</name>
 		<description>Changing activity of individuals on a stage according field observation data</description>
@@ -1818,9 +1869,9 @@
         </task>
        </activity>
 	<morisitaCounter>
+        <description url='https://en.wikipedia.org/wiki/Morisita%27s_overlap_index'>Count [Morisita index]</description>
 		<task>
 			<name>morisita</name>
-			<description url='https://en.wikipedia.org/wiki/Morisita%27s_overlap_index'>Count [Morisita index]</description>
 			<icon></icon>
 			<debugLevel>1</debugLevel>
 			<switchingInterval>160</switchingInterval>

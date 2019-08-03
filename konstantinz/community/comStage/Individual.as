@@ -20,19 +20,21 @@ package konstantinz.community.comStage{
 
 	public class Individual{
 		//Класс, описывающий поведение отдельного организма в сообществе
-		private const YSIGN:String = 'Y';//Young
-		private const ASIGN:String = 'A';//Adult
+		
+		private const YOUNG_SIGHT:String = 'young';
+		private const ADULT_SIGHT:String = 'adult';
+		private const COLLISION_SIGHT:String = 'collision';
+		private const STOP_SIGHT:String = 'stop';
+		private const SUSPEND_SIGHT:String = 'suspend';
+		private const MOVING_SIGHT:String = 'moving';
+		private const DEAD_SIGHT:String = 'dead';
 		
 		private var tickInterval:int = 20;//Интервал между тиками таймера
 		private var lifeStart:Date;
 		private var lifeEnd:Date;
 		private var date:Date;
 		private var indNumber:int;
-		private var maturingDeley:int;//Промежуток между размножениями
 		private var adultAge:int;//Время взросления. Передается из настроек
-		private var amIAdult:Boolean;
-		private var amIAlong:Boolean;
-		private var offspringsQuant:int;
 		private var currentChessDeskI:int;//Номер строки текущего квадрата
 		private var currentChessDeskJ:int;//Номер столбца текущего квадрата
 		private var lifeTime:int;
@@ -51,6 +53,7 @@ package konstantinz.community.comStage{
 		
 		private var myBehaviour:BaseMotionBehaviour;
 		private var motionBehaviour:MotionBehaviourSwitcher;
+		private var maturingBehaviour:MaturingBehaviour;
 		private var stepDispatcher:StepDispatcher;
 		
 		private var modelEvent:ModelEvent;//А если это все брать из MotionBehaviour
@@ -81,6 +84,7 @@ package konstantinz.community.comStage{
 				
 				if(args[0]==undefined){
 					indNumber = Math.round(Math.random()*1000);
+					
 					ARENA::DEBUG{
 						msgString = 'Individual ' + errorType.idUndefined + ' There were set random name ' + indNumber;
 						messenger.message(msgString, modelEvent.INFO_MARK);
@@ -93,13 +97,12 @@ package konstantinz.community.comStage{
 				
 				if(stepLength <= 0){
 					stepLength = 1;
-					msgString = 'Step length: ' + errorType.varIsIncorrect;
-					messenger.message(msgString, modelEvent.ERROR_MARK);
+					
+					ARENA::DEBUG{
+						msgString = 'Step length: ' + errorType.varIsIncorrect;
+						messenger.message(msgString, modelEvent.ERROR_MARK);
+						}
 					}
-				
-				adultAge = int(indConfiguration.getOption('main.individuals.adultAge'));
-				offspringsQuant = int(indConfiguration.getOption('main.individuals.offspringsQuant'))//Количество оставленных потомков
-				maturingDeley = 0;
 				
 				chessDesk = stage;
 				
@@ -116,14 +119,18 @@ package konstantinz.community.comStage{
 				
 				myBehaviour = motionBehaviour.newBehaviour;
 				motionBehaviour.setSuspender(stepDispatcher);
+				
+				adultAge = int(indConfiguration.getOption('main.individuals.adultAge'));
+				maturingBehaviour = new MaturingBehaviour();
+				maturingBehaviour.setDeley(int(indConfiguration.getOption('main.individuals.maturingDeley')));
 			
 				if(args[1]==undefined||args[2]==undefined){
 					currentChessDeskI = 0;//Если не указано начальное положение особи, начинаем двигаться с верхнего левого угла (первый квадрат)
 					currentChessDeskJ = 0;
-				}else{
-					currentChessDeskI = args[1];
-					currentChessDeskJ = args[2];
-					}
+					}else{
+						currentChessDeskI = args[1];
+						currentChessDeskJ = args[2];
+						}
 			
 				deleySteps = 1;
 				timerForIndividuals = new Timer(tickInterval); 
@@ -138,7 +145,7 @@ package konstantinz.community.comStage{
 					}
 				
 				indStatus = 'active';
-				indAgeState = 'young';
+				indAgeState = YOUNG_SIGHT;
 			
 			}catch(error:ArgumentError){
 				msgString = error.message;
@@ -147,26 +154,7 @@ package konstantinz.community.comStage{
 			}
 /////////////////////////Private//////////////////////////////////////////////////////////////////////
 		
-		private function isIndividualAdult():Boolean{
-			//функция полностью платформонезависимая
-			//Определяет повзрослела ли особь
-			if(adultAge > 0){//Если время повзрослеть еще не насталло
-				adultAge--;//Приближаем совершеннолетие еще на шаг
-				return false;
-				}
-				else{
-					if(adultAge==0){//После этого adultAge станет меньше нуля и сообщение появлятся не должно
-						adultAge--;
-						ARENA::DEBUG{
-							msgString= 'Individual ' + indNumber + ' now adult';
-							messenger.message(msgString, modelEvent.INFO_MARK);
-							}
-						}
-					return true;
-				}
-			}
-		
-		private function isIndividualAlong():Boolean{//Есть ли в заданном квадрате кто либо еще
+		private function individualAlong():Boolean{//Есть ли в заданном квадрате кто либо еще
 			
 			if(individualCounter('count', 'individuals', currentChessDeskI, currentChessDeskJ) > 1 && chessDesk[currentChessDeskI][currentChessDeskJ].individualName != indNumber){//Если встретились две особи
 				return false;
@@ -206,39 +194,34 @@ package konstantinz.community.comStage{
 							indNumber = chessDesk[xpos][ypos].numberOfIndividuals.adult;
 						break;
 						default:
-							msgString = 'Wrong symbol';
-							messenger.message(msgString, modelEvent.ERROR_MARK);
+							ARENA::DEBUG{
+								msgString = 'Wrong symbol';
+								messenger.message(msgString, modelEvent.ERROR_MARK);
+								}
 						break;
 						}
 					}catch(e:Error){
-						msgString = e.message;
-						messenger.message(msgString, modelEvent.ERROR_MARK);
+						ARENA::DEBUG{
+							msgString = e.message;
+							messenger.message(msgString, modelEvent.ERROR_MARK);
+							}
 						}
 					
 					return indNumber;
 				}
 
 		
-		private function maturing():void{//Особь начнет размножаться не сразу
-			//функция полностью платформонезависимая
-			if(maturingDeley <= 0){
+		private function maturing():void{
+			IndividualEvent.currentChessDeskI = currentChessDeskI;
+			IndividualEvent.currentChessDeskJ = currentChessDeskJ;
+			IndividualEvent.maturing();
 				
-				IndividualEvent.currentChessDeskI = currentChessDeskI;
-				IndividualEvent.currentChessDeskJ = currentChessDeskJ;
-				IndividualEvent.maturing();
-				
-				ARENA::DEBUG{
-					msgString = 'Maturing in '+ currentChessDeskI+ ':'+ currentChessDeskJ;
-					messenger.message(msgString, modelEvent.DEBUG_MARK);
-					}
-				
-				maturingDeley = int(indConfiguration.getOption('main.individuals.maturingDeley'));
-			
-			}
-			else{
-				maturingDeley--;
+			ARENA::DEBUG{
+				msgString = 'Maturing in '+ currentChessDeskI+ ':'+ currentChessDeskJ;
+				messenger.message(msgString, modelEvent.DEBUG_MARK);
 				}
 			}
+		
 		private function internalMoveImpuls(event:TimerEvent):void{//Заставляем особь двигаться по собственному таймеру
 			nextStep();
 			stepDispatcher.stepDone();
@@ -248,32 +231,30 @@ package konstantinz.community.comStage{
 		private function nextStep():void{
 			
 			//функция платформонезавмсимая, при условии, что кто то будет читать переменную individual.x и individual.y и на изменять сведения о положении особи
+			var numberOfIndividualsinCell:int;
+			
 			if(deleySteps > 0){
 				deleySteps--;//Уменьшаем количество пропущеных ходов
 				}
 			
-			if(indAgeState == 'young'){//Если особь уже выросла, зачем это проверять лишний раз
-				amIAdult = isIndividualAdult();//Стоит здесь, так как взрослеть особь должна в не зависимости от того, стоит она на месте или движется
-				}
-			
-			if(stepDispatcher.statement() == 'moving' && deleySteps==0){//И если отстояли на месте положенное количество тиков таймера, двигаемся дальше
+			if(stepDispatcher.statement() == MOVING_SIGHT && deleySteps==0){//И если отстояли на месте положенное количество тиков таймера, двигаемся дальше
 				
 				deleySteps = myBehaviour.getPlaceQuality(currentChessDeskI,currentChessDeskJ);//Смотрим на новой клетке число ходов
+				numberOfIndividualsinCell = individualCounter('count', ADULT_SIGHT, currentChessDeskI, currentChessDeskJ)
 			
-				amIAlong = isIndividualAlong();
+				maturingBehaviour.onIndividualStep();
+				indAgeState = maturingBehaviour.getState();
 	
-					if(!amIAlong){
-					  stepDispatcher.statement('collision');
-					  
-					  if(amIAdult){
-					    indAgeState = 'adult';
-					   
-						if(individualCounter('count', 'adult', currentChessDeskI, currentChessDeskJ) > 2){//Если встретились две взрослые
-						   maturing();
-					       }
-						}
+				if(!individualAlong()){
+					stepDispatcher.statement(COLLISION_SIGHT);
+					numberOfIndividualsinCell = individualCounter('count', ADULT_SIGHT, currentChessDeskI, currentChessDeskJ);
+					
+					if(maturingBehaviour.timeToMaturing() == true && numberOfIndividualsinCell > 1){//Если встретились две взрослые, то идет обычное двуполое размножение
+						maturing();//Начнется размножение. Позже надо предусмотреть возможность партеногенеза. Вызывая функцию maturing() с помощью события генерируемого внутри maturingBehaviour
+					    }
+				
 					}else{
-						 stepDispatcher.statement('moving');
+						stepDispatcher.statement(MOVING_SIGHT);
 						}
 				
 				individualCounter('remove', indAgeState, currentChessDeskI, currentChessDeskJ);
@@ -295,15 +276,15 @@ package konstantinz.community.comStage{
 				motionBehaviour.switchBehaviour(chessDesk[currentChessDeskI][currentChessDeskJ].behaviourModel);//Включаем этот тип
 				}
 			  
-			  if(stepDispatcher.statement() == 'dead'){
+			  if(stepDispatcher.statement() == DEAD_SIGHT){
 				  killIndividual();
 				  }
 		}
 			
 		private function killIndividual():void{//Убирает особь со сцены
 			var deltaTime:int;
-			//функция относительно платформонезависимая, так как таймеры и слушатели событий есть и в других языках
-			stepDispatcher.statement('dead');//Теперь, если кто то попытается обратится к особи, он будет по крайне мере знать, что она присмерти
+			
+			stepDispatcher.statement(DEAD_SIGHT);//Теперь, если кто то попытается обратится к особи, он будет по крайне мере знать, что она присмерти
 				
 			lifeEnd = new Date();
 			timerForIndividuals.stop();//Выключаем таймер
@@ -320,7 +301,7 @@ package konstantinz.community.comStage{
 			}
 			
 			private function step(e:Event):void{//Вызывается из indDispatcher каждй раз, когда из него приходит событие StepDispatcher.DO_STEP
-				if(stepDispatcher.statement() != 'dead'){
+				if(stepDispatcher.statement() != DEAD_SIGHT){
 					nextStep();
 					}
 				stepDispatcher.stepDone();
@@ -357,34 +338,34 @@ package konstantinz.community.comStage{
 		}
 
 		public function statement(statementName:String = 'empty', statementLength:int = 0):String{
-			if(stepDispatcher.statement() != 'dead' && stepDispatcher.statement() != 'stop'){//Особь поменяет свое состояние только если она жива и не находится в гибернации
+			if(stepDispatcher.statement() != DEAD_SIGHT && stepDispatcher.statement() != 'stop'){//Особь поменяет свое состояние только если она жива и не находится в гибернации
 				switch(statementName){
-					case 'suspend':
+					case SUSPEND_SIGHT:
 						
 						ARENA::DEBUG{
 							msgString = 'Individual number '+ indNumber + ' has been suspended';
 							messenger.message(msgString, modelEvent.DEBUG_MARK);
 							}
 						
-						stepDispatcher.statement('suspend', statementLength);
+						stepDispatcher.statement(SUSPEND_SIGHT, statementLength);
 					break;
-					case 'stop':
+					case STOP_SIGHT:
 						
 						ARENA::DEBUG{
 							msgString = 'Individual number '+ indNumber + ' has been stoped';
 							messenger.message(msgString, modelEvent.DEBUG_MARK);
 							}
 						
-						stepDispatcher.statement('stop', statementLength);
+						stepDispatcher.statement(STOP_SIGHT, statementLength);
 						individualCounter('remove', indAgeState, currentChessDeskI, currentChessDeskJ);
 					break;
-					case 'moving':
-						if(stepDispatcher.statement() != 'stop'){
-							stepDispatcher.statement('moving');
+					case MOVING_SIGHT:
+						if(stepDispatcher.statement() != STOP_SIGHT){
+							stepDispatcher.statement(MOVING_SIGHT);
 							}
 					break;
-					case 'dead':
-						if(stepDispatcher.statement() != 'dead'){//Если особь уже не мертва
+					case DEAD_SIGHT:
+						if(stepDispatcher.statement() != DEAD_SIGHT){//Если особь уже не мертва
 							
 							ARENA::DEBUG{
 								msgString = 'Individual ' + indNumber + 'has killed';
@@ -419,7 +400,7 @@ package konstantinz.community.comStage{
 		public function age(newAge:int = 0):String{
 			if(newAge > 0){
 				lifeTime = lifeTime - newAge;
-				adultAge = adultAge - newAge;
+				maturingBehaviour.setAdultAge(adultAge - newAge);
 				stepDispatcher.setLifeTime(lifeTime);
 				}
 			return indAgeState;
