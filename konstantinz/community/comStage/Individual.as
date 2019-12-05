@@ -31,13 +31,8 @@ package konstantinz.community.comStage{
 		
 		private var tickInterval:int = 20;//Интервал между тиками таймера
 		private var lifeStart:Date;
-		private var lifeEnd:Date;
-		private var date:Date;
-		private var indNumber:int;
-		private var adultAge:int;//Время взросления. Передается из настроек
 		private var currentChessDeskI:int;//Номер строки текущего квадрата
 		private var currentChessDeskJ:int;//Номер столбца текущего квадрата
-		private var lifeTime:int;
 		private var stepLength:int;//Длинна шага особи
 		private var deleySteps:int;//количество ходов, которые надо пропустить для замедления движения
 		private var chessDesk:Array; //Ссылка на внешний массив с координатами и условиями среды
@@ -63,7 +58,9 @@ package konstantinz.community.comStage{
 		public var IndividualEvent:DispatchEvent;
 		
 		function Individual(stage:Array, configuration:ConfigurationContainer, ...args){
-
+			var indNumber:int;
+			var lifeTime:int;
+			
 			IndividualEvent = new DispatchEvent();
 			errorType = new ModelErrors();
 			
@@ -91,7 +88,7 @@ package konstantinz.community.comStage{
 						}
 					}
 				
-				stepDispatcher.setIndividualNumber (indNumber);
+				stepDispatcher.setIndividualNumber(indNumber);
 				
 				stepLength = int(indConfiguration.getOption('main.stepLength'));
 				
@@ -120,7 +117,7 @@ package konstantinz.community.comStage{
 				myBehaviour = motionBehaviour.newBehaviour;
 				motionBehaviour.setSuspender(stepDispatcher);
 				
-				adultAge = int(indConfiguration.getOption('main.individuals.adultAge'));
+				//adultAge = int(indConfiguration.getOption('main.individuals.adultAge'));
 				maturingBehaviour = new MaturingBehaviour();
 				maturingBehaviour.setDeley(int(indConfiguration.getOption('main.individuals.maturingDeley')));
 			
@@ -155,8 +152,8 @@ package konstantinz.community.comStage{
 /////////////////////////Private//////////////////////////////////////////////////////////////////////
 		
 		private function individualAlong():Boolean{//Есть ли в заданном квадрате кто либо еще
-			
-			if(individualCounter('count', 'individuals', currentChessDeskI, currentChessDeskJ) > 1 && chessDesk[currentChessDeskI][currentChessDeskJ].individualName != indNumber){//Если встретились две особи
+						
+			if(individualCounter('count', 'individuals', currentChessDeskI, currentChessDeskJ) > 1 && chessDesk[currentChessDeskI][currentChessDeskJ].individualName != stepDispatcher.getIndividualNumber()){//Если встретились две особи
 				return false;
 				
 				}else{
@@ -165,7 +162,7 @@ package konstantinz.community.comStage{
 			}
 			
 		private function individualCounter(todo:String, age:String, xpos:int, ypos:int):int{
-				var indNumber:int = 0;
+				var individualsInCell:int = 0;
 				var symbolPos:int = 0;
 				var inquiry:String = todo + '_' + age;
 				
@@ -188,10 +185,10 @@ package konstantinz.community.comStage{
 								}
 						break;
 						case 'count_individuals':
-							indNumber = chessDesk[xpos][ypos].numberOfIndividuals.young + chessDesk[xpos][ypos].numberOfIndividuals.adult;
+							individualsInCell = chessDesk[xpos][ypos].numberOfIndividuals.young + chessDesk[xpos][ypos].numberOfIndividuals.adult;
 						break;
 						case 'count_adult':
-							indNumber = chessDesk[xpos][ypos].numberOfIndividuals.adult;
+							individualsInCell = chessDesk[xpos][ypos].numberOfIndividuals.adult;
 						break;
 						default:
 							ARENA::DEBUG{
@@ -207,7 +204,7 @@ package konstantinz.community.comStage{
 							}
 						}
 					
-					return indNumber;
+					return individualsInCell;
 				}
 
 		
@@ -264,7 +261,7 @@ package konstantinz.community.comStage{
 						
 				currentChessDeskI = myBehaviour.getNewPosition(currentChessDeskI,currentChessDeskJ).x;
 				currentChessDeskJ = myBehaviour.getNewPosition(currentChessDeskI,currentChessDeskJ).y;
-				chessDesk[currentChessDeskI][currentChessDeskJ].individualName = indNumber;
+				chessDesk[currentChessDeskI][currentChessDeskJ].individualName = stepDispatcher.getIndividualNumber();
 				
 				individualCounter('add', indAgeState, currentChessDeskI, currentChessDeskJ);
 				
@@ -282,6 +279,7 @@ package konstantinz.community.comStage{
 		}
 			
 		private function killIndividual():void{//Убирает особь со сцены
+			var lifeEnd:Date;
 			var deltaTime:int;
 			
 			stepDispatcher.statement(DEAD_SIGHT);//Теперь, если кто то попытается обратится к особи, он будет по крайне мере знать, что она присмерти
@@ -295,17 +293,17 @@ package konstantinz.community.comStage{
 			individualCounter('remove', indAgeState, currentChessDeskI, currentChessDeskJ);//Освобождаем ячейку от следов своего присутсвия
 			
 			ARENA::DEBUG{
-				msgString = 'Individual ' + indNumber + ' is dead. R.I.P. \n' + 'It lived ' + Math.round((deltaTime)*0.00006) + ' min';
+				msgString = 'Individual ' + stepDispatcher.getIndividualNumber() + ' is dead. R.I.P. \n' + 'It lived ' + Math.round((deltaTime)*0.00006) + ' min';
 				messenger.message(msgString, modelEvent.INFO_MARK);
 				}
 			}
 			
-			private function step(e:Event):void{//Вызывается из indDispatcher каждй раз, когда из него приходит событие StepDispatcher.DO_STEP
-				if(stepDispatcher.statement() != DEAD_SIGHT){
-					nextStep();
-					}
-				stepDispatcher.stepDone();
+		private function step(e:Event):void{//Вызывается из indDispatcher каждй раз, когда из него приходит событие StepDispatcher.DO_STEP
+			if(stepDispatcher.statement() != DEAD_SIGHT){
+				nextStep();
 				}
+			stepDispatcher.stepDone();
+			}
 			
 ////////////////////////////Public////////////////////////////////////////////////////
 		
@@ -313,7 +311,7 @@ package konstantinz.community.comStage{
 			timerForIndividuals.stop();
 			
 			ARENA::DEBUG{
-				msgString = 'Individual number '+ indNumber + ': ' + 'Internal timer has stoped';
+				msgString = 'Individual number '+ stepDispatcher.getIndividualNumber() + ': ' + 'Internal timer has stoped';
 				messenger.message(msgString, modelEvent.DEBUG_MARK);
 				}
 			}
@@ -324,20 +322,22 @@ package konstantinz.community.comStage{
 
 		public function name(newNumber:int = -1):int{
 			if(newNumber > 0){
-				var oldNumber:int = indNumber;
-				indNumber = newNumber;
+				var oldNumber:int = stepDispatcher.getIndividualNumber();
+				
 				myBehaviour.setIndividualNumber(newNumber);
-				stepDispatcher.setIndividualNumber (newNumber);
+				stepDispatcher.setIndividualNumber(newNumber);
 				
 				ARENA::DEBUG{
 					msgString = 'Individual has change it number from ' + oldNumber + ' to ' + newNumber;
 					messenger.message(msgString, modelEvent.DEBUG_MARK);
 					}
 				}
-			return indNumber;
+			return stepDispatcher.getIndividualNumber();
 		}
 
 		public function statement(statementName:String = 'empty', statementLength:int = 0):String{
+			var indNumber:int = stepDispatcher.getIndividualNumber();
+			
 			if(stepDispatcher.statement() != DEAD_SIGHT && stepDispatcher.statement() != 'stop'){//Особь поменяет свое состояние только если она жива и не находится в гибернации
 				switch(statementName){
 					case SUSPEND_SIGHT:
@@ -398,6 +398,9 @@ package konstantinz.community.comStage{
 			}
 		
 		public function age(newAge:int = 0):String{
+			var lifeTime:int = stepDispatcher.getLifeTime();
+			var adultAge:int = int(indConfiguration.getOption('main.individuals.adultAge'));//Время взросления. Передается из настроек
+			
 			if(newAge > 0){
 				lifeTime = lifeTime - newAge;
 				maturingBehaviour.setAdultAge(adultAge - newAge);

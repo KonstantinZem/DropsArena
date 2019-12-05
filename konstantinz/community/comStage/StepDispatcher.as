@@ -106,6 +106,7 @@ package konstantinz.community.comStage{
 					collisionTime = 0;
 					}
 			}
+		
 		public function stepDone():void{
 			dispatchEvent(new Event(StepDispatcher.STEP_DONE));
 			
@@ -116,9 +117,19 @@ package konstantinz.community.comStage{
 		public function setLifeTime(newLifeTime:int):void{
 			lifeTime = newLifeTime;
 			}
+			
+		public function getLifeTime():int{
+			return lifeTime;
+			}
+			
 		public function setIndividualNumber(newIndNumber:int):void{
 			indNumber = newIndNumber;
 			}
+			
+		public function getIndividualNumber():int{
+			return indNumber;
+			}
+		
 		public function getStepsNumber():int{
 			return lifeTime;
 			}
