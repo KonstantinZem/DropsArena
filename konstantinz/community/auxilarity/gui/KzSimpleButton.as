@@ -42,8 +42,11 @@ public class KzSimpleButton extends Sprite{
 	public function KzSimpleButton(dbgLevel:String = '1'){
 		debugLevel = dbgLevel;
 		buttonEvent = new DispatchEvent();
-		messanger = new Messenger(debugLevel);
-		messanger.setMessageMark('Button');
+		
+		ARENA::DEBUG{
+			messanger = new Messenger(debugLevel);
+			messanger.setMessageMark('Button');
+			}
 		currentState = 'first_click';
 	}
 	
@@ -131,7 +134,9 @@ public class KzSimpleButton extends Sprite{
 			}
 		
 		createClickableArea();
-		messanger.message(msgString, 2);
+		ARENA::DEBUG{
+			messanger.message(msgString, 2);
+			}
 		}
 		
 	private function createClickableArea():void{
@@ -256,7 +261,9 @@ public class KzSimpleButton extends Sprite{
 			}
 		messanger.message(currentState, 3);//Говорим, в каком сотоянии находится кнопка
 		}catch(e:Error){
-			messanger.message(e.message, 0);
+			ARENA::DEBUG{
+				messanger.message(e.message, 0);
+				}
 			}
 		}
 		
@@ -268,7 +275,9 @@ public class KzSimpleButton extends Sprite{
 					throw new Error('Imposible to click becuase EventDispatcher not exist');
 					}
 			}catch(e:Error){
-				messanger.message(e.message, 0);
+				ARENA::DEBUG{
+					messanger.message(e.message, 0);
+					}
 				}
 		}
 	private function btnMouseUp(e:MouseEvent):void{

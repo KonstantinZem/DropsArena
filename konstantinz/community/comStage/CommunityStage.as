@@ -14,7 +14,7 @@ package konstantinz.community.comStage{
 		private var sqrQantH:int; //Количество квадратов в столбце
 		private var sqrQantW:int; //Количество квадратов в ряду
 		private var lifeQuant:int//Убыль жизни за ход
-		private var errorType:Object;//Контейнер для ошибок
+		private var errorType:ModelErrors;//Контейнер для ошибок
 		private var debugLevel:String;
 		private var msgString:String
 		private var messenger:Messenger;
@@ -29,8 +29,11 @@ package konstantinz.community.comStage{
 			
 			try{
 				debugLevel = extOptions.getOption('main.debugLevel');
-				messenger = new Messenger(debugLevel);
-				messenger.setMessageMark('Community stage');
+				
+				ARENA::DEBUG{
+					messenger = new Messenger(debugLevel);
+					messenger.setMessageMark('Community stage');
+					}
 				modelEvent = new ModelEvent();//Будем брать основные константы от сюда
 				
 				for(var i:int = 0; i<arguments.length; i++){
@@ -58,13 +61,17 @@ package konstantinz.community.comStage{
 				sqrQantW = stgWidth/squSize;//Количество квадратов по ширине
 				lifeQuant = int(extOptions.getOption('main.lifeQuant'));
 				buildNet();
-					
-				msgString = 'The stage ' + chessDesk.length + 'X' + chessDesk[0].length + ' has bulded succesfully';
-				messenger.message(msgString, modelEvent.INIT_MSG_MARK);
+				
+				ARENA::DEBUG{	
+					msgString = 'The stage ' + chessDesk.length + 'X' + chessDesk[0].length + ' has bulded succesfully';
+					messenger.message(msgString, modelEvent.INIT_MSG_MARK);
+					}
 				}
 			catch(error:ArgumentError){
-				msgString = error.message;
-				messenger.message(msgString, modelEvent.ERROR_MARK);
+				ARENA::DEBUG{
+					msgString = error.message;
+					messenger.message(msgString, modelEvent.ERROR_MARK);
+					}
 				}
 				}
 				
@@ -86,8 +93,10 @@ package konstantinz.community.comStage{
 						break;
 					}
 				}catch(error:ArgumentError){
-					msgString = error.message;
-					messenger.message(msgString, modelEvent.ERROR_MARK);
+					ARENA::DEBUG{
+						msgString = error.message;
+						messenger.message(msgString, modelEvent.ERROR_MARK);
+						}
 				}
 				return result;
 				};

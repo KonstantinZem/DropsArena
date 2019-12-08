@@ -39,8 +39,12 @@ public class IndividualGraphicInterface extends Sprite{
 	
 	public function IndividualGraphicInterface(minSize:int, maxSize:int=0, stepsQantaty:int=1, debugLevel:String = '3'){
 		modelEvent = new ModelEvent();//Будем брать основные константы от сюда
-		messenger = new Messenger(debugLevel);
-		messenger.setMessageMark('Individual GUI');
+		
+		ARENA::DEBUG{
+			messenger = new Messenger(debugLevel);
+			messenger.setMessageMark('Individual GUI');
+			}
+		
 		growthRange = 0;
 		indSize = 5;
 		remaningSteps = stepsQantaty/SCALE_COEFFICIENT;
@@ -112,8 +116,10 @@ public class IndividualGraphicInterface extends Sprite{
 				throw new Error('New individual age is less or equial zerro');
 				}
 			}catch(e:Error){
-				msgString = e.message;
-				messenger.message(msgString, modelEvent.ERROR_MARK);
+				ARENA::DEBUG{
+					msgString = e.message;
+					messenger.message(msgString, modelEvent.ERROR_MARK);
+					}
 				}
 		}
 	
@@ -156,8 +162,11 @@ public class IndividualGraphicInterface extends Sprite{
 			default: 
 				ct.color = INDCOLOR;
 				individualPoint.transform.colorTransform = ct;
-				msgString = 'Wrong statement code';
-				messenger.message(msgString, modelEvent.ERROR_MARK);
+				
+				ARENA::DEBUG{
+					msgString = 'Wrong statement code';
+					messenger.message(msgString, modelEvent.ERROR_MARK);
+					}
 			break;
 				}
 		}
@@ -190,8 +199,11 @@ public class IndividualGraphicInterface extends Sprite{
 			individualMoveVector.graphics.lineTo(lineX - (0.2*VECTOR_LENGTH), lineY - (0.2*VECTOR_LENGTH));
 			
 		}catch(e:Error){
-			msgString = e.message;
-			messenger.message(msgString, modelEvent.ERROR_MARK);
+			
+			ARENA::DEBUG{
+				msgString = e.message;
+				messenger.message(msgString, modelEvent.ERROR_MARK);
+				}
 			individualBody = new Sprite();
 			}
 		}
@@ -214,8 +226,10 @@ public class IndividualGraphicInterface extends Sprite{
 			individualMigrationMark.graphics.lineTo (lineX - (0.2*VECTOR_LENGTH), lineY - (0.2*VECTOR_LENGTH));
 			
 		}catch(e:Error){
-			msgString = e.message;
-			messenger.message(msgString, modelEvent.ERROR_MARK);
+			ARENA::DEBUG{
+				msgString = e.message;
+				messenger.message(msgString, modelEvent.ERROR_MARK);
+				}
 			individualBody = new Sprite();
 			}
 		}

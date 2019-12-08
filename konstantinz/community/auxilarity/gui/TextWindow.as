@@ -42,12 +42,14 @@
 		public function TextWindow(winh:int=100, winw:int=100, msg:String='message text'){
 			
 			debugeLevel = '3';
-			windowErrors = new ModelErrors();
+			//windowErrors = new ModelErrors();
 			msgString = msg;
 			
-			if(msgString==null){
-				msgString = 'There is no message text';
-				messenger.message(msgString, 0);
+			ARENA::DEBUG{
+				if(msgString==null){
+					msgString = 'There is no message text';
+					messenger.message(msgString, 0);
+					}
 				}
 			
 			windowHeight = winh;
@@ -61,9 +63,11 @@
 			
 			windowEvent = new DispatchEvent();
 			
-			messenger = new Messenger(debugeLevel);
-			messenger.setMessageMark('Text Window');
-			messenger.message('Text Window has loaded', 2);
+			ARENA::DEBUG{
+				messenger = new Messenger(debugeLevel);
+				messenger.setMessageMark('Text Window');
+				messenger.message('Text Window has loaded', 2);
+				}
 			
 			}
 		
@@ -135,7 +139,9 @@
 				removeChild(scroller);
 				windowEvent.done();//Посылаем главной программе 
 				}catch(e:Error){
-					messenger.message(e.message, 0)
+					ARENA::DEBUG{
+						messenger.message(e.message, 0);
+						}
 					}
 			}
 		

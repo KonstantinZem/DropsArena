@@ -41,11 +41,14 @@ public class Plugin extends Sprite{
 		currentTaskNumber = 0
 		
 		modelEvent = new ModelEvent();//Будем брать основные константы от сюда
-		errorType = new ModelErrors();
+		
+		ARENA::DEBUG{
+			errorType = new ModelErrors();
+			}
 		messenger = new Messenger(debugeLevel);
 		pluginEvent = new DispatchEvent();
 		newStatisticMsg = new Array('','');
-		errorType = new ModelErrors();
+		//errorType = new ModelErrors();
 		}
 	
 	public function initPlugin(e:ModelEvent):void{//Функция запускается сообщением PLUGIN_LOADED из pluginLoader
@@ -167,8 +170,11 @@ public class Plugin extends Sprite{
 		
 		if(newSwitchingEvent != 'steps' && newSwitchingEvent != 'calendar_data'){//Если в конфиге тип переключения не указан или указан неправильно
 			newSwitchingEvent = 'steps';//даем переменной значение по умолчанию steps
-			msgString = errorType.varIsIncorrect + '. ' + errorType.defaultValue + '- steps';
-			messenger.message(msgString, modelEvent.INFO_MARK);
+			
+			ARENA::DEBUG{
+				msgString = errorType.varIsIncorrect + '. ' + errorType.defaultValue + '- steps';
+				messenger.message(msgString, modelEvent.INFO_MARK);
+				}
 			}
 			return newSwitchingEvent;
 	};

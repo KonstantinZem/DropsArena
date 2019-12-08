@@ -40,7 +40,6 @@ package konstantinz.community.comStage{
 		private var msgString:String;
 		private var debugLevel:String;
 		private var indAgeState:String;
-		private var indStatus:String;//Так как особи могут подаваться внешние команды, надо всегда знать может ли особь эти команды выполнить
 		private var currentBehaviourName:String;//Переключаться поведение будет только если название поведения из пришедшего сообщения будет отличаться от записанного сюда
 		
 		private var indConfiguration:ConfigurationContainer;
@@ -62,7 +61,10 @@ package konstantinz.community.comStage{
 			var lifeTime:int;
 			
 			IndividualEvent = new DispatchEvent();
-			errorType = new ModelErrors();
+			
+			ARENA::DEBUG{
+				errorType = new ModelErrors();
+				}
 			
 			try{
 				indConfiguration = configuration;
@@ -117,7 +119,6 @@ package konstantinz.community.comStage{
 				myBehaviour = motionBehaviour.newBehaviour;
 				motionBehaviour.setSuspender(stepDispatcher);
 				
-				//adultAge = int(indConfiguration.getOption('main.individuals.adultAge'));
 				maturingBehaviour = new MaturingBehaviour();
 				maturingBehaviour.setDeley(int(indConfiguration.getOption('main.individuals.maturingDeley')));
 			
@@ -141,7 +142,6 @@ package konstantinz.community.comStage{
 					messenger.message(msgString, modelEvent.INIT_MSG_MARK);
 					}
 				
-				indStatus = 'active';
 				indAgeState = YOUNG_SIGHT;
 			
 			}catch(error:ArgumentError){
@@ -206,7 +206,6 @@ package konstantinz.community.comStage{
 					
 					return individualsInCell;
 				}
-
 		
 		private function maturing():void{
 			IndividualEvent.currentChessDeskI = currentChessDeskI;
@@ -298,7 +297,7 @@ package konstantinz.community.comStage{
 				}
 			}
 			
-		private function step(e:Event):void{//Вызывается из indDispatcher каждй раз, когда из него приходит событие StepDispatcher.DO_STEP
+		private function step(e:Event):void{//Вызывается из StepDispatcher каждй раз, когда из него приходит событие StepDispatcher.DO_STEP
 			if(stepDispatcher.statement() != DEAD_SIGHT){
 				nextStep();
 				}

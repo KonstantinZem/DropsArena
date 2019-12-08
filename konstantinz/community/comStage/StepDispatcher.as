@@ -23,7 +23,7 @@ package konstantinz.community.comStage{
 		private var debugLevel:String;
 		
 		public static const DO_STEP:String = 'do_step';//Событие посылается особи, внутри которой находится экземпляр этого класса
-		public static const STEP_DONE:String = 'step_done';
+		public static const STEP_DONE:String = 'step_done'; //Посылается объекту MotionBehavior, его функции onNextStep
 		public static const SUSPEND:String = 'suspend';
 		public static const COLLISION:String = 'collision';
 		

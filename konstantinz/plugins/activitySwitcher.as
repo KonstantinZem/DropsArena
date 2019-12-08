@@ -71,7 +71,9 @@ public class activitySwitcher extends Plugin{
 		   currentTask.killStoped = configuration.getOption(optionPath + 'killStoped', currentTask.observationPosition);//Узнаем, должны ли мы убивать всех подряд или только активных осоей
 				
 			if(currentTask.killStoped !='true' && currentTask.killStoped !='false'){//Если опция killStoped напсиана неправильно
-			   messenger.message('killStoped: ' + currentTask.killStoped + '. ' + errorType.varIsIncorrect, 0);
+				ARENA::DEBUG{
+					messenger.message('killStoped: ' + currentTask.killStoped + '. ' + errorType.varIsIncorrect, 0);
+				}
 			   currentTask.killStoped = 'false';//Заменяем неправильное значение на значение по умолчанию 
 			   }
 			}
@@ -134,11 +136,11 @@ public class activitySwitcher extends Plugin{
 		try{
 			
 			if(currentTask == null){
-				throw new Error(functName + '. CurrentTask: ' + errorType.varIsNull);
+				throw new Error(functName + '. CurrentTask: Variable is null');
 				}
 			
 			if(currentTask.activeIndividualsNumberPosition == null){
-				throw new Error(functName + '. ActiveIndividualsNumberPosition: ' + errorType.varIsNull);
+				throw new Error(functName + '. ActiveIndividualsNumberPosition: Variable is null');
 			}
 			
 			while(optionValue != 'Error'){//Пока не вышли за пределы списка наблюдений
@@ -327,7 +329,7 @@ public class activitySwitcher extends Plugin{
 		var counter:int;
 		try{
 			if((individuals.length - 1) < CRITIAL_IND_NUMBER){
-				throw new IllegalOperationError(errorType.tooSmall + '. Number of individals less then critical');
+				throw new IllegalOperationError('Number of individals less then critical');
 				}
 			
 			for(var i:int = 0; i< currentTask.stopedIndividuals.length; i++){//Пробигаемся по списку особей, которых надо остановить

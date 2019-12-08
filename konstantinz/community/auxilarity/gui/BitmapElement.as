@@ -27,9 +27,13 @@
 	
 	public function BitmapElement(imageName:String,elH:Number,elW:Number):void{
 		loadedImageName = imageName
-		BitmampErrors = new ModelErrors();
 		debugeLevel = '3';
-		messenger = new Messenger(debugeLevel);
+		
+		ARENA::DEBUG{
+			BitmampErrors = new ModelErrors();
+			messenger = new Messenger(debugeLevel);
+			}
+		
 		elementHeight = elH;
 		elementWidth = elW;
 		imageLoader = new Loader();
@@ -49,8 +53,11 @@
 	private function onError(e:IOErrorEvent):void{//Если картинка не скачалась, рисуем кнопку в виде простого квадрата
 		this.graphics.lineStyle(0.1,BUTTON_BORDER_COLOR);
 		this.graphics.drawRect(0,0,elementHeight,elementWidth);
-		msgString = 'Picture: ' + loadedImageName + '. ' + BitmampErrors.fileNotFound;
-		messenger.message(msgString, 0);
+		
+		ARENA::DEBUG{
+			msgString = 'Picture: ' + loadedImageName + '. ' + BitmampErrors.fileNotFound;
+			messenger.message(msgString, 0);
+			}
 		}
 	
 	}

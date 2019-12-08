@@ -27,7 +27,10 @@
 		function PluginLoader(opt:ConfigurationContainer){
 			var pluginString:String;
 			
-			errorType = new ModelErrors();
+			ARENA::DEBUG{
+				errorType = new ModelErrors();
+				}
+			
 			pluginsEventsList = new Array();
 			loaderEvent = new DispatchEvent();
 			modelEvent = new ModelEvent();//Будем брать основные константы от сюда
@@ -37,8 +40,11 @@
 				debugLevel = options.getOption('main.debugLevel');
 				arePluginsActiveOnLoading = options.getOption('main.arePluginsActiveOnLoading');
 				plugins = new Array();
-				messenger = new Messenger(debugLevel);
-				messenger.setMessageMark('Plugins loader');
+				
+				ARENA::DEBUG{
+					messenger = new Messenger(debugLevel);
+					messenger.setMessageMark('Plugins loader');
+					}
 				
 				currentPlNumber = 0;
 				pluginString = options.getOption('main.pluginsList');
@@ -53,7 +59,10 @@
 			}catch(error:ArgumentError){
 				loaderEvent.pluginName = 'last';//Если в списке плагинов есть ошибки, посылаем сообщение что мы уже ничего не загружаем
 				loaderEvent.pluginLoaded();
-				messenger.message(error.message, modelEvent.ERROR_MARK);
+				
+				ARENA::DEBUG{
+					messenger.message(error.message, modelEvent.ERROR_MARK);
+					}
 				}
 			}
 		public function startLoading():void{
@@ -71,21 +80,29 @@
 				}catch(error:Error){
 					loaderEvent.pluginName = 'last';//Если в списке плагинов есть ошибки, посылаем сообщение что мы уже ничего не загружаем
 					loaderEvent.pluginLoaded();
-					messenger.message(error.message, modelEvent.ERROR_MARK);
+					
+					ARENA::DEBUG{
+						messenger.message(error.message, modelEvent.ERROR_MARK);
+						}
 					}
 			}
 		private function loadPlugins(pluginNumber:int):void{//Начинаем загрузку файлов плагинов в корневой ролик
 			
 			if(pluginNumber > pluginsList.length -1){//Когда список плагинов закончился, прерываемся
 				loaderEvent.pluginLoaded();
-				messenger.message(msgString, modelEvent.INIT_MSG_MARK);
+				
+				ARENA::DEBUG{
+					messenger.message(msgString, modelEvent.INIT_MSG_MARK);
+					 }
 				}
            else{
 				plugins[pluginNumber].contentLoaderInfo.addEventListener(Event.COMPLETE, onPluginFileDownloading);//Это событие должно придти от URLRequest 
 				plugins[pluginNumber].load(new URLRequest(pluginsList[pluginNumber]));
 				currentPlugName = pluginsList[pluginNumber];//Берем полное имя плагина из списка плагинов, заданного в конфигурационном файле
-				msgString = 'Load plugin ' + pluginNumber + ' '+ currentPlugName;
-				messenger.message(msgString, modelEvent.DEBUG_MARK);
+				ARENA::DEBUG{
+					msgString = 'Load plugin ' + pluginNumber + ' '+ currentPlugName;
+					messenger.message(msgString, modelEvent.DEBUG_MARK);
+					}
 				}
 			}
 			
@@ -121,8 +138,10 @@
 						plugins[currentPlNumber].content.plEntry.activeOnLoad = 'false';
 					break
 					default:
+					ARENA::DEBUG{
 						msgString='Wrong option item';
 						messenger.message(msgString, modelEvent.ERROR_MARK);
+						}
 					break
 					}
 				}
@@ -131,8 +150,10 @@
 					plugins[currentPlNumber].content.plEntry.pluginName = currentPlugName;//Загруженный плагин не знает своего имени. Передать его должен загрузчик
 					}
 					else{
-						msgString = 'Plugin ' + currentPlugName + ' has no property pluginName';
-						messenger.message(msgString, modelEvent.ERROR_MARK);
+						ARENA::DEBUG{
+							msgString = 'Plugin ' + currentPlugName + ' has no property pluginName';
+							messenger.message(msgString, modelEvent.ERROR_MARK);
+							}
 						}
 				
 				
@@ -141,16 +162,21 @@
 					}
 					else{//Если плагин не содержит такого события, то просто загружаем следующий не дожидаясь окончания работы предыдущего
 						loadPlugins(currentPlNumber);
-						msgString = 'Plugin ' + currentPlugName + ' has no property pluginEvent';
-						messenger.message(msgString, modelEvent.ERROR_MARK);
+						
+						ARENA::DEBUG{
+							msgString = 'Plugin ' + currentPlugName + ' has no property pluginEvent';
+							messenger.message(msgString, modelEvent.ERROR_MARK);
+							}
 						}
 				loaderEvent.addEventListener(ModelEvent.PLUGIN_LOADED, plugins[currentPlNumber].content.plEntry['initPlugin']);	
 				linkRootAndPlugisByEvents(currentPlNumber);
 				
 				loaderEvent.pluginLoaded();//Сообщаем плагину о том, что он загружен
 				
-				msgString = 'Plugin '+ currentPlNumber +': ' + className + ' has loaded';
-				messenger.message(msgString, modelEvent.INIT_MSG_MARK);
+				ARENA::DEBUG{
+					msgString = 'Plugin '+ currentPlNumber +': ' + className + ' has loaded';
+					messenger.message(msgString, modelEvent.INIT_MSG_MARK);
+					}
 				
 				plugins[currentPlNumber].removeEventListener(Event.COMPLETE, onPluginFileDownloading);
 					
@@ -159,8 +185,10 @@
 			}catch(e:Error){
 				loaderEvent.pluginName = 'last';//Если в списке плагинов есть ошибки, посылаем сообщение что мы уже ничего не загружаем
 				loaderEvent.pluginLoaded();
-				msgString = e.message;
-				messenger.message(msgString, modelEvent.ERROR_MARK);
+				ARENA::DEBUG{
+					msgString = e.message;
+					messenger.message(msgString, modelEvent.ERROR_MARK);
+					}
 				}
 				
 			}
@@ -172,11 +200,15 @@
 					if(pluginsEventsList[i].sendToRootObject != undefined){//Если есть событие которое надо отослать в главную программу
 						if(plugins[pluginNumber].content.plEntry.hasOwnProperty(pluginsEventsList[i].sendFromPluginObject)){//Проверяем, есть ли вообще в загружаемом плагине компонент Messenger
 							if(plugins[pluginNumber].content.plEntry[pluginsEventsList[i].sendFromPluginObject]==null){
-								msgString ='Plugin '+ currentPlNumber+ '.' + pluginsEventsList[i].sendFromPluginObject + 'component exist but not initilazed yet';
-								messenger.message(msgString, modelEvent.INIT_MSG_MARK);
+									msgString ='Plugin '+ currentPlNumber+ '.' + pluginsEventsList[i].sendFromPluginObject + 'component exist but not initilazed yet';
+									ARENA::DEBUG{
+									messenger.message(msgString, modelEvent.INIT_MSG_MARK);
+									}
 								}else{
-									msgString = 'Try to set listener to ' + plugins[pluginNumber].content.plEntry[pluginsEventsList[i].sendFromPluginObject]
-									messenger.message(msgString, modelEvent.DEBUG_MARK);
+									ARENA::DEBUG{
+										msgString = 'Try to set listener to ' + plugins[pluginNumber].content.plEntry[pluginsEventsList[i].sendFromPluginObject]
+										messenger.message(msgString, modelEvent.DEBUG_MARK);
+										}
 									plugins[pluginNumber].content.plEntry[pluginsEventsList[i].sendFromPluginObject].addEventListener(pluginsEventsList[i].pluginEventHandler, root[pluginsEventsList[i].sendToRootObject]);//Соединям плагин с определенной функцией в главной программе
 									}
 								}
@@ -184,21 +216,27 @@
 						if(pluginsEventsList[i].sendFromRootObject != undefined){//Если есть что отослать плагину из главной программы
 	
 							if(root.hasOwnProperty(pluginsEventsList[i].sendFromRootObject) && plugins[pluginNumber].content.plEntry.hasOwnProperty(pluginsEventsList[i].sendToPluginObject)){//Проверяем, есть ли вообще в главной программе нужное нам свойство
-								msgString = 'Try to set listener to ' + root[pluginsEventsList[i].sendFromRootObject];
-								messenger.message(msgString, modelEvent.INFO_MARK);
+								ARENA::DEBUG{
+									msgString = 'Try to set listener to ' + root[pluginsEventsList[i].sendFromRootObject];
+									messenger.message(msgString, modelEvent.INFO_MARK);
+									}
 								root[pluginsEventsList[i].sendFromRootObject].addEventListener(pluginsEventsList[i].rootEventHandler, plugins[pluginNumber].content.plEntry[pluginsEventsList[i].sendToPluginObject]);//Если это так, то ждем от плагина сообщения что он отработал и загружаем следующий только потом
 								}
 							}
 						}
 					}
 				}catch(e:Error){
-					messenger.message(e.message, modelEvent.ERROR_MARK)
+					ARENA::DEBUG{
+						messenger.message(e.message, modelEvent.ERROR_MARK);
+						}
 					}
 				}
 			
 			private function onError(e:ModelEvent):void{
-				msgString = 'Plugin has not loaded. ' + errorType.fileNotFound;
-				messenger.message(msgString, modelEvent.ERROR_MARK);
+				ARENA::DEBUG{
+					msgString = 'Plugin has not loaded. ' + errorType.fileNotFound;
+					messenger.message(msgString, modelEvent.ERROR_MARK);
+					}
 				}
 			
 			private function onPluginsJobeFinish(e:ModelEvent):void{//Функция вызывается когда загруженный плагин посылает сообщение ready()
@@ -211,12 +249,16 @@
 						}else{
 							loaderEvent.pluginName = 'last';//Это сообщение принимается в main
 							loaderEvent.pluginLoaded();
-							msgString = 'All plugins has loaded';
-							messenger.message(msgString, modelEvent.INIT_MSG_MARK);
+							ARENA::DEBUG{
+								msgString = 'All plugins has loaded';
+								messenger.message(msgString, modelEvent.INIT_MSG_MARK);
+								}
 							}
 				}catch(e:Error){
-					msgString = e.message;
-					messenger.message(msgString, modelEvent.ERROR_MARK);
+					ARENA::DEBUG{
+						msgString = e.message;
+						messenger.message(msgString, modelEvent.ERROR_MARK);
+						}
 					}
 				
 				}
