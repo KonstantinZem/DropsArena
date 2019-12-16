@@ -8,6 +8,8 @@ import konstantinz.community.auxilarity.*;
 
 public class Accumulator{
 	
+	private const SPACER_MARK:String = '\u0020'
+	
 	private var debugLevel:String;
 	private var msgString:String;
 	private var paramNamebuffer:Array//Здесь хранится информация для формирования таблицы статистики
@@ -144,6 +146,10 @@ public class Accumulator{
 				paramPosition = 0;
 		}
 		
+		public function getSpacer():String{
+			return SPACER_MARK;
+		}
+		
 		public function getStatistic():String{
 			var statText:String
 			try{
@@ -223,7 +229,7 @@ public class Accumulator{
 		counter = statTable[0].length;
          statusBarText = '';
          for(var i:int = 1; i< counter; i++){
-            statusBarText = statusBarText + (statTable[0][i] + ': ' + statTable[statTable.length - 1][i] + '    ');
+            statusBarText = statusBarText + (statTable[0][i] + ':' + statTable[statTable.length - 1][i] + '    ');
 			}
       }
 

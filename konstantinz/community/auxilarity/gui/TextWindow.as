@@ -42,7 +42,6 @@
 		public function TextWindow(winh:int=100, winw:int=100, msg:String='message text'){
 			
 			debugeLevel = '3';
-			//windowErrors = new ModelErrors();
 			msgString = msg;
 			
 			ARENA::DEBUG{

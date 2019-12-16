@@ -69,8 +69,12 @@ package konstantinz.community.comStage{
 			try{
 				indConfiguration = configuration;
 				debugLevel = indConfiguration.getOption('main.debugLevel');
-				messenger = new Messenger(debugLevel);
-				messenger.setMessageMark('Individual');
+				
+				ARENA::DEBUG{
+					messenger = new Messenger(debugLevel);
+					messenger.setMessageMark('Individual');
+					}
+				
 				modelEvent = new ModelEvent();//Будем брать основные константы от сюда
 				indNumber = args[0];
 				
@@ -145,8 +149,10 @@ package konstantinz.community.comStage{
 				indAgeState = YOUNG_SIGHT;
 			
 			}catch(error:ArgumentError){
-				msgString = error.message;
-				messenger.message(msgString, modelEvent.ERROR_MARK);
+				ARENA::DEBUG{
+					msgString = error.message;
+					messenger.message(msgString, modelEvent.ERROR_MARK);
+					}
 				}
 			}
 /////////////////////////Private//////////////////////////////////////////////////////////////////////
@@ -378,8 +384,10 @@ package konstantinz.community.comStage{
 						
 					break;
 					default:
-						msgString = 'Wrong statement name ' + statementName;
-						messenger.message(msgString, modelEvent.ERROR_MARK);
+						ARENA::DEBUG{
+							msgString = 'Wrong statement name ' + statementName;
+							messenger.message(msgString, modelEvent.ERROR_MARK);
+							}
 					break;
 					}
 				}else{

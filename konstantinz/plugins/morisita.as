@@ -12,33 +12,27 @@ package konstantinz.plugins{
 		private const BORDERCOLOR:Number = 0x000000;
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
 	
-		private var plotSize:int;//Количество пробных площадок
-		private var plotsXQuantaty:int;//Колиство квадратов в ряду
-		private var plotsYQuantaty:int;//Колиство квадратов в столбце
-		private var plotsPosition:Array;//Координаты площадок (чтобы не высчитывать их каждый раз заново)
-		private var plotsCells:Array;
-		private var cellSize:int;
-	
 		public function morisita (){
 			activeOnLoad = 'true';
 			messenger.setMessageMark('Morisita counter');
 			}	
 	
 		public override function initSpecial(task:Array, taskName:String, taskNumber:int):void{
-			task[taskNumber] = new Task();
+			var investigatedAreaPositionString:String
+			task[taskNumber] = new MorisitaTask();
 			currentTask = task[taskNumber];
 			initCurrentTaskData(currentTask, taskName,  taskNumber);
 			
+			investigatedAreaPositionString = configuration.getOption('plugins.morisitaCounter.task.plotPosition');
 			debugeLevel = configuration.getOption('plugins.morisitaCounter.task.debugLevel');
-			plotSize = int(configuration.getOption('plugins.morisitaCounter.task.plotSize'));
+			currentTask.releveSize = int(configuration.getOption('plugins.morisitaCounter.task.releveSize'));
+			
+			parsePositiongString(investigatedAreaPositionString, currentTask);
 	
-			cellSize = int(configuration.getOption('main.dropSize'));
-			plotsCells = new Array;
-			plotsPosition = new Array;
+			currentTask.plotsCells = new Array;
+			currentTask.plotsPosition = new Array;
 			messenger.setDebugLevel (debugeLevel);
 				
-			plotsXQuantaty = communityStage.chessDesk[0].length/plotSize;
-			plotsYQuantaty = communityStage.chessDesk.length/plotSize;
 			drawMorisitaPlot();
 			
 			setTimeout(pluginEvent.ready, 50);//Сообщение о том что плагин полностью готов к работе принимается функцией onPluginsJobeFinish в pluginLoader
@@ -52,25 +46,89 @@ package konstantinz.plugins{
 			currentTask.switchingInterval = setSwitchingInterval(currentTask);
 			}
 		
-		private function drawMorisitaPlot():void{	//Разлинеивает игровое поле в квадратики для большей наглядности
-			var xpos:int = 10; //Позиция квадрата на поле
-			var ypos:int = 10;
+		private function parsePositiongString(posString:String, task:MorisitaTask):void{
+			try{
+				task.investigatedAreaPosition = new Array;
+				
+				if(posString == 'Error'){//Если координаты области для расчета не заданы
+					throw new ArgumentError('Plot position not set');
+					}
+				var positionFromConfig:Array = posString.split(';');
+				
+				if(positionFromConfig.length < 4){//Если не хватает координат
+					throw new ArgumentError('Plot position is wrong');
+					}
+				
+				task.investigatedAreaPosition.upX = int(positionFromConfig[0]);
+				task.investigatedAreaPosition.upY = int(positionFromConfig[1]);
+				task.investigatedAreaPosition.dwnX = int(positionFromConfig[2]);
+				task.investigatedAreaPosition.dwnY = int(positionFromConfig[3]);
+				
+				if(task.investigatedAreaPosition.upX > task.investigatedAreaPosition.dwnX
+					||
+					task.investigatedAreaPosition.upY > task.investigatedAreaPosition.dwnY
+				){
+					throw new ArgumentError('Up coordinates les then down');
+					}
 
-			var morisitaPlotSize:int = communityStage.width/plotsXQuantaty;
-
-				for(var i:int = 0; i<plotsXQuantaty;i++){
-					plotsCells[i]  = new Array;
+				if(//Если заданные координаты выходят за границы сцены
+					task.investigatedAreaPosition.dwnX >= communityStage.chessDesk[0].length //width is out
+					||
+					task.investigatedAreaPosition.dwnY >= communityStage.chessDesk.length //height is out
+					){
+					msgString = 'Bottom rigth coner coordinates are: Y=' + communityStage.chessDesk[0].length + ', X=' +  communityStage.chessDesk.length;
+					messenger.message(msgString, modelEvent.ERROR_MARK);
+					throw new ArgumentError('Coordinates out from borders');
+					}
+				
+				}
+				catch(e:ArgumentError){
+					msgString = e.message
+					messenger.message(msgString, modelEvent.ERROR_MARK);
 					
-					for(var j:int = 0; j<plotsYQuantaty;j++){
-						plotsCells[i][j] = new Sprite();
-						plotsCells[i][j].graphics.lineStyle(1,BORDERCOLOR);
-						plotsCells[i][j].graphics.drawRect(ypos,xpos,morisitaPlotSize,morisitaPlotSize);
-						communityStage.addChild(plotsCells[i][j]);
-						xpos = xpos + morisitaPlotSize;
+					task.investigatedAreaPosition.upX = 0;
+					task.investigatedAreaPosition.upY = 0;
+					task.investigatedAreaPosition.dwnX = communityStage.chessDesk[0].length -1;//width
+					task.investigatedAreaPosition.dwnY = communityStage.chessDesk.length -1;//height
+				}
+			};
+		
+		private function drawMorisitaPlot():void{	//Разлинеивает игровое поле в квадратики для большей наглядности
+	
+			var cellUpX:int = currentTask.investigatedAreaPosition.upX; //Позиция квадрата на поле 0
+			var cellUpY:int = currentTask.investigatedAreaPosition.upY; 
+			var cellDwnX:int = currentTask.investigatedAreaPosition.dwnX; 
+			var cellDwnY:int = currentTask.investigatedAreaPosition.dwnY; 
+			
+			var xpos:int = communityStage.chessDesk[cellUpY][cellUpX].sqrX;
+			var ypos:int = communityStage.chessDesk[cellUpY][cellUpX].sqrY;
+			
+			var plotLength:int = communityStage.chessDesk[cellDwnY][cellDwnX].sqrX - communityStage.chessDesk[cellDwnY][cellUpX].sqrX;
+			var plotHeigth:int = communityStage.chessDesk[cellDwnY][cellUpX].sqrY - communityStage.chessDesk[cellUpY][cellUpX].sqrY; 
+			
+			var releveLength:int = communityStage.chessDesk[0][currentTask.releveSize].sqrX;
+			
+			msgString = 'Up corner X=' + cellUpX + ', Y=' + cellUpY + '. Down corner X=' + cellDwnX + ', Y=' + cellDwnY;
+			messenger.message(msgString, modelEvent.DEBUG_MARK);
+			
+			currentTask.plotsXQuantaty = plotLength/releveLength;
+			currentTask.plotsYQuantaty = plotHeigth/releveLength;
+			
+			var morisitaPlotSize:int = plotLength/currentTask.plotsXQuantaty;
+
+				for(var i:int = 0; i < currentTask.plotsYQuantaty;i++){
+					currentTask.plotsCells[i]  = new Array;
+					
+					for(var j:int = 0; j < currentTask.plotsXQuantaty;j++){
+						currentTask.plotsCells[i][j] = new Sprite();
+						currentTask.plotsCells[i][j].graphics.lineStyle(1,BORDERCOLOR);
+						currentTask.plotsCells[i][j].graphics.drawRect(xpos,ypos,morisitaPlotSize,morisitaPlotSize);
+						communityStage.addChild(currentTask.plotsCells[i][j]);
+						xpos += morisitaPlotSize;//Следующий квадрат рисуем сразу после предыдущего
 					}
 					
-					ypos = ypos+ morisitaPlotSize;
-	                xpos = 10;
+					ypos += morisitaPlotSize;
+	                xpos = communityStage.chessDesk[cellUpY][cellUpX].sqrX;
 				}
 			}
 			
@@ -84,7 +142,7 @@ package konstantinz.plugins{
 			messenger.message(msgString, modelEvent.DEBUG_MARK);
 			var morisita:Number;
 
-			if(plotsPosition.length == 0){//Если пречень координат  квадратов еще не составлялся
+			if(currentTask.plotsPosition.length == 0){//Если пречень координат  квадратов еще не составлялся
 				getPlotPosition();//Составляем его чтобы в дальнейшем не расчитывать позиции которые уже не изменятся а просто брать уже готовые координаты
 				}	
 				
@@ -103,26 +161,25 @@ package konstantinz.plugins{
 		
 		private function getPlotPosition():int{
 			
-			var newX:int = 0;
-			var newY:int = 0;
-			var counter:int = 0;
+			var newX:int = currentTask.investigatedAreaPosition.upX;//Верхний левый угол зоны подсчета
+			var newY:int = currentTask.investigatedAreaPosition.upY;
+			var counter:int = 0;//Подсчет зон участвующих в вычислении
+			
+			for(var i:int = 0; i < currentTask.plotsYQuantaty;i++){//Пробегаемся по квадратам и высчитываем количество особей в каждом из них
 
-			for(var i:int = 0; i<plotsXQuantaty;i++){//Пробегаемся по квадратам и высчитываем количество особей в каждом из них
-
-				for(var j:int = 0; j<plotsYQuantaty;j++){
-					plotsPosition[counter] = new Array;
-					plotsPosition[counter].push(newX);
-					plotsPosition[counter].push(newY);
-					newX += plotSize;
+				for(var j:int = 0; j < currentTask.plotsXQuantaty;j++){
+					currentTask.plotsPosition[counter] = new Array;
+					currentTask.plotsPosition[counter].push(newX);
+					currentTask.plotsPosition[counter].push(newY);
+					newX += currentTask.releveSize;
 					counter++;
 					}
-					
-				newX = 0;
-				newY += plotSize;
+			
+				newX = currentTask.investigatedAreaPosition.upX;
+				newY += currentTask.releveSize;
 			}
 		}
 		
-
 		private function morisitaIndex():Number{
 		
 			var mIndex:Number;
@@ -135,16 +192,15 @@ package konstantinz.plugins{
 			var newY:int = 0;
 			var counter:int;
 			
-			counter = plotsPosition.length;
+			counter = currentTask.plotsPosition.length;
 			
 			for (var i:int = 0; i< counter; i++){
-				newX = plotsPosition[i][0];//Берем заранее подсчитанные позиции квадратов
-				newY = plotsPosition[i][1];
-				ind = countIndividuals(newX,newY,plotSize);
+				newX = currentTask.plotsPosition[i][0];//Берем заранее подсчитанные позиции квадратов
+				newY = currentTask.plotsPosition[i][1];
+				ind = countIndividuals(newX,newY,currentTask.releveSize);
 				individualsInplot.push(ind);//Подсчитываем количество особей в каждом квадрате
 				}
 			//Вот здесь вставляем формулу подсчета другого варианта мориситы
-			
 			
 			allPlotsNumber = individualsInplot.length;
 				
@@ -171,8 +227,8 @@ package konstantinz.plugins{
 			for(var i:int = 0; i< plSize; i++){
 		
 				for(var j:int = 0; j< plSize; j++){
-					individualsNumber += communityStage.chessDesk[xcrd+i][ycrd+j].numberOfIndividuals.adult;
-					individualsNumber += communityStage.chessDesk[xcrd+i][ycrd+j].numberOfIndividuals.young;
+					individualsNumber += communityStage.chessDesk[ycrd+i][xcrd+j].numberOfIndividuals.adult;
+					individualsNumber += communityStage.chessDesk[ycrd+i][xcrd+j].numberOfIndividuals.young;
 					}
 				}
 			

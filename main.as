@@ -12,6 +12,7 @@
 package{
   
     import flash.display.Sprite;
+    import flash.display.Stage;
 	import flash.events.Event; 
 	import flash.events.TimerEvent; 
 	import flash.utils.Timer;
@@ -60,8 +61,10 @@ package{
 		public var commStage:CommunityStage;
 		public var startStopButtonEvent:DispatchEvent;
 		public var reloadButtonEvent:DispatchEvent;
+		public var fullScreenButtonEvent:DispatchEvent;
 		public var startStopButton:KzSimpleButton;
 		public var reloadButton:KzSimpleButton;
+		public var fullScreenButton:KzSimpleButton;
 		public var dumpCommStageButton:KzSimpleButton;
 		public var dumpCommStageButtonEvent:DispatchEvent;
 		public var stageEvent:DispatchEvent;
@@ -89,6 +92,7 @@ package{
 			startStopButtonEvent.removeEventListener(ModelEvent.FIRST_CLICK, onStartClick);
 			startStopButtonEvent.removeEventListener(ModelEvent.SECOND_CLICK, onStopClick);
 			reloadButtonEvent.removeEventListener(ModelEvent.CLICKING, onReloadClick);
+			fullScreenButtonEvent.removeEventListener(ModelEvent.CLICKING, onFullSreenClick);
 			
 			messenger.removeEventListener(Messenger.HAVE_EXT_DATA, getNewStatistics);
 			messenger = null;
@@ -103,6 +107,7 @@ package{
 			statusBar.clear();
 			startStopButton.clear();
 			reloadButton.clear();
+			fullScreenButton.clear();
 			model.removeChild(versionText);
 			model.removeChild(statusBar);
 			
@@ -111,6 +116,7 @@ package{
 			configuration = null;
 			commStage = null;
 			reloadButton = null;
+			fullScreenButton = null;
 			startStopButton = null;
 			plugins = null;
 			}
@@ -276,12 +282,14 @@ package{
 					messenger.message(msgString, modelEvent.ERROR_MARK);
 					addChild(startStopButton);//Просто добавляем кнопку пуск
 					addChild(reloadButton);
+					addChild(fullScreenButton);
 					}
 				
 			}else{
 				msgString = 'Plugins are disabled';
 				addChild(startStopButton);
 				addChild(reloadButton);
+				addChild(fullScreenButton);
 				}
 				ARENA::DEBUG{
 					messenger.message(msgString, modelEvent.INFO_MARK);
@@ -314,6 +322,15 @@ package{
 				reloadButton.height = 30;
 				reloadButton.width = 30;
 				
+				fullScreenButton = new KzSimpleButton();//Кнопка развертывания в полный экран
+				fullScreenButton.setButtonSkins('pictures/interface/fullScreen.png');
+				fullScreenButton.height = 30;
+				fullScreenButton.width = 30;
+				fullScreenButtonEvent = fullScreenButton.buttonEvent;
+				fullScreenButtonEvent.addEventListener(ModelEvent.CLICKING, onFullSreenClick);
+				fullScreenButton.x = commStage.width - 20;;
+				fullScreenButton.y = commStage.height + 30;;
+				
 				dumpCommStageButton = new KzSimpleButton();//Кнопка снятия дампа заначений ячеек commStage
 				dumpCommStageButton.setButtonSkins('pictures/interface/dump.png');
 				dumpCommStageButton.height = 20;
@@ -324,8 +341,9 @@ package{
 				dumpCommStageButton.y = 10;
 			
 				statusBar = new StatusBar();
+				statusBar.setSpacer(Accumulator.instance.getSpacer());
 				model.addChild(statusBar);
-				statusBar.setBarAt((70 + startStopButton.width + reloadButton.width), startStopButton.y);
+				statusBar.setBarAt((30 + startStopButton.width + reloadButton.width), startStopButton.y);
 				}catch(e:Error){
 					
 					}
@@ -515,6 +533,7 @@ package{
 			if(plugins.loaderEvent.pluginName =='last'){
 				addChild(startStopButton);//Когда плагины загрузились, показываем кнопку старта. Иначе могут случатся ошибки, когда плагин еще не загрузился а юзер уже пытается его остановить кнопкой
 				addChild(reloadButton);
+				addChild(fullScreenButton);
 				plugins.loaderEvent.removeEventListener(ModelEvent.PLUGIN_LOADED, onPluginsLoading);//Когда плагины загрузились, больше не нужно ждать сообщений об окончании загрузки
 			}
 		}
@@ -566,6 +585,17 @@ package{
 		private function onDumpClick(e:ModelEvent):void{
 			dumper.saveDumpFile();
 		    };
+		    
+		private function onFullSreenClick(e:ModelEvent):void{
+			
+			if(stage.displayState == "normal"){//если флеш-плеер в данный момент не находится в полноэкранном режиме
+				stage.displayState = "fullScreen";//переходим в полноэкранный режим
+				}else
+					{
+					stage.displayState = "normal";//выходим из полноэкранного режима
+				}
+				trace(stage.displayState);
+			}
 		    
 		private function onCloseWindowClick(e:ModelEvent):void{
 			msgWindow.windowEvent.removeEventListener(ModelEvent.DONE, onCloseWindowClick);

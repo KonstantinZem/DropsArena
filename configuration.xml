@@ -1873,9 +1873,11 @@
 		<task>
 			<name>morisita</name>
 			<icon></icon>
-			<debugLevel>1</debugLevel>
+			<debugLevel>3</debugLevel>
 			<switchingInterval>160</switchingInterval>
-			<plotSize>8</plotSize>
+			<releveSize>4</releveSize>
+			<!--Up Left coner X,Y Down right coner X,Y-->
+			<plotPosition>50;2;98;30</plotPosition>
 		</task>
 	</morisitaCounter>
 </plugins>
