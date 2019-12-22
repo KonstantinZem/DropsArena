@@ -10,7 +10,10 @@ package konstantinz.plugins{
 	
 	public class morisita extends Plugin{
 		private const BORDERCOLOR:Number = 0x000000;
-		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
+		private const IND_NUMB:String = 'ind_numb_m_plot:';//Пометка сообщения о количестве особей
+		private const IND_QUANT:String = 'ind_quant: '
+		private const MORISITA_INDEX:String = 'morisita_index: '
+		private const QUANT_STD:String = 'quant_std: ';
 	
 		public function morisita (){
 			activeOnLoad = 'true';
@@ -149,11 +152,11 @@ package konstantinz.plugins{
 			morisita = morisitaIndex();//Высчитываем индекс Мориситы
 			
 			if(isNaN(morisita)){//Проверяем, можем ли мы расчитать индекс
-				msgString = 'morisita_index:-';//И если индекс уже не может быть расчитан (особей слишком мало)
+				msgString = MORISITA_INDEX + 'can not been counted';//И если индекс уже не может быть расчитан (особей слишком мало)
 				messenger.message('Stoping to count Morisita index', modelEvent.INFO_MARK);
 				}
 				else{//Если индекс расчитан
-					msgString = 'morisita_index:' + morisita;//Посылаем результат для дальнейшей обработки сторонними компонентами
+					msgString = MORISITA_INDEX + morisita;//Посылаем результат для дальнейшей обработки сторонними компонентами
 					}
 			
 			messenger.message(msgString, modelEvent.STATISTIC_MARK);
@@ -183,6 +186,8 @@ package konstantinz.plugins{
 		private function morisitaIndex():Number{
 		
 			var mIndex:Number;
+			var averageQuant:Number;//Средняя численность особей
+			var standartDeviation:Number;
 			var allIndividuals:int = 0;
 			var allPlotsNumber:int = 0;
 			var individualsInplot:Array = new Array;//Количество особей в каждой из площадок
@@ -211,12 +216,19 @@ package konstantinz.plugins{
 			for(i = 0; i < allPlotsNumber; i++){
 				niSumm += individualsInplot[i]*(individualsInplot[i]-1);
 				}
+				
+			averageQuant = getIndAverageQuantaty(individualsInplot);
+			standartDeviation = getStandartDeviation(averageQuant, individualsInplot);
 			
 			mIndex = allPlotsNumber*(niSumm/(allIndividuals*(allIndividuals-1)));
 			msgString = 'source data: Idividuals '+ allIndividuals + ', plots ' + allPlotsNumber;
-			messenger.message(msgString, 3);//Возвращаем индекс Мориситы с точностью 3 знака после запятой
+			messenger.message(msgString, modelEvent.INFO_MARK);//Возвращаем индекс Мориситы с точностью 3 знака после запятой
 			msgString = IND_NUMB + allIndividuals;
 			messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
+			msgString = IND_QUANT + averageQuant.toFixed(2);
+			messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем плотность особей для статистики
+			msgString = QUANT_STD + standartDeviation.toFixed(2);
+			messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем плотность особей для статистики
 			
 			return mIndex.toFixed(3);
 		}
@@ -234,5 +246,38 @@ package konstantinz.plugins{
 			
 			return individualsNumber;
 		}
+		
+		private function getIndAverageQuantaty(plots:Array):Number{//Вычисляет среднюю особей численность 
+			
+			var allIndividuals:int;
+			var allPlots:int = plots.length;
+			try{
+				if(plots.length > 0){
+					for(var i:int; i < allPlots; i++)
+					allIndividuals += plots[i];
+				}
+				
+			}catch(e:ArgumentError){
+				
+			}
+			
+			return allIndividuals/allPlots;
+		};
+		
+		private function getStandartDeviation(average:Number, varSequence:Array):Number{
+			var aux:Number = 0;
+			var n:int = 0;
+			
+			if(average > 0 && varSequence.length > 0){
+				n = varSequence.length;
+				
+				for(var i:int = 0; i < n; i++){
+					aux += Math.abs(varSequence[i] - average);
+				}
+				
+			}
+			return aux/(n-1);
+			
+		};
 	}
 }
