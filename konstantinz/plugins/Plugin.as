@@ -18,11 +18,11 @@ public class Plugin extends Sprite{
 	protected var msgString:String;
 	protected var newStatisticMsg:Array;
 	
-	protected var task:Array;//Здесь каждый бывший плагин будет хранить свои данные
+	protected var task:Array;//Здесь каждый таск будет хранить свои данные
 	protected var taskList:Array;
 	protected var currentTask:Object;
 	protected var alreadyInited:String;
-	protected var currentTaskNumber:int;
+	protected var currentTaskNumber:int;//Счетчик загруженных плагинов. Для того, чтобы определить когда все плагины загрузятся
 	
 	protected var errorType:ModelErrors;
 	protected var modelEvent:ModelEvent
@@ -48,7 +48,6 @@ public class Plugin extends Sprite{
 		messenger = new Messenger(debugeLevel);
 		pluginEvent = new DispatchEvent();
 		newStatisticMsg = new Array('','');
-		//errorType = new ModelErrors();
 		}
 	
 	public function initPlugin(e:ModelEvent):void{//Функция запускается сообщением PLUGIN_LOADED из pluginLoader
@@ -94,11 +93,9 @@ public class Plugin extends Sprite{
 		
 		try{
 		
-		if(taskList == null){
-		   throw new Error('TaskList array not initilizing yet');
-		    }
-		
-		
+			if(taskList == null){
+				throw new Error('TaskList array not initilizing yet');
+				}
 		
 			while(optionValue != 'Error'){//Пока не вышли за пределы списка наблюдений
 				
@@ -214,7 +211,7 @@ public class Plugin extends Sprite{
 			newStatisticMsg = e.target.message.split(':');
 			
 			for(var i:int = 0; i < tLength; i++){
-				//trace(task[i].name + ': ' + task[i].currentDay)
+				
 				if(task[i].switchingEvent == 'calendar_data' && task[i].currentDay == newStatisticMsg[1]){
 					currentTask = task[i];
 					msgString = 'Plugin get new calendar data '+ e.target.message;

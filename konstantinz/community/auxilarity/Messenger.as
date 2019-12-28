@@ -15,6 +15,8 @@ package konstantinz.community.auxilarity{
 		
 		public static const HAVE_EXT_DATA:String = 'have_ext_data';
 		
+		public static const CRITICAL_ERROR:String = 'critical_error'
+		
 		public var msg:String;
 		
 		
@@ -30,6 +32,12 @@ package konstantinz.community.auxilarity{
 			
 				dispatchEvent(new Event(Messenger.HAVE_EXT_DATA));//Посылаем статистику в виде сообщения, ведь неизвестно, какой компонент и как ее будет обрабатывать
 			}
+			
+			if(messageLevel == modelEvent.IOERROR_MARK){
+				msg = messageString;
+				dispatchEvent(new Event(Messenger.CRITICAL_ERROR));//Посылаем статистику в виде сообщения, ведь неизвестно, какой компонент и как ее будет обрабатывать
+			}
+			
 			if(messageLevel <= int(debugeLevel)){
 				if(messageLevel == modelEvent.ERROR_MARK){//Если пришло сообщение об ошибке
 					trace('[' + messageMark + ' Error!]: ' + messageString + ';' + '\n');

@@ -36,7 +36,7 @@ public class cover extends Plugin{
 		}
 	
 	override public function initSpecial(task:Array, taskName:String, taskNumber:int):void{
-		var currentTask:CoverTask
+		var currentTask:CoverTask;
 
 		task[taskNumber]= new CoverTask();
 		
@@ -50,6 +50,21 @@ public class cover extends Plugin{
 		currentTask.loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onLoadComplete);
 		currentTask.loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
 		currentTask.loader.load(new URLRequest(currentTask.imageName));//Загружаем картинку с паттерном напочвенного покрова
+		}
+	
+	private function onIOError(e:IOErrorEvent):void{
+		
+		var wrongPict:String
+		for(var i:int = 0; i < task.length; i++){
+			if(task[i].loader.contentLoaderInfo.bytesTotal == 0){//У каждого лоудера смотрим размер загруженного им файла. У кого он равен нулю, в том ошибка и произошла
+				wrongPict = task[i].imageName;//Смотрим имя файла в том таске, к которому принадлежит лоудер
+				break;
+				}
+			}
+
+		msgString = '<font color="#FF0000">Error: Picture ' + wrongPict + ' not found'; 
+		messenger.message(msgString, modelEvent.IOERROR_MARK);//Эту ошибку должен увидеть пользователь, поэтому показываем ее в статусной строке
+		pluginEvent.ready();//Сообщаем о том, что все уже сделано, ведь другие плагины тоже хотят загрузится
 		}
 	
 	private function initCurrentTaskData(currentTask:CoverTask, taskName:String, taskNumber:int):void{
@@ -107,18 +122,7 @@ public class cover extends Plugin{
 		currentTask.loader = new Loader();
 		currentTask.background = new ColorTransform();
 		currentTask.background.color = currentTask.color;
-	};
-
-	private function onIOError(error:IOErrorEvent):void{
-		
-		ARENA::DEBUG{
-			msgString = "Unable to load picture: " + error.text; 
-			messenger.message(msgString, modelEvent.ERROR_MARK);
-			}
-			
-		currentTask.loader.contentLoaderInfo.removeEventListener(IOErrorEvent.IO_ERROR, onIOError);
-		pluginEvent.ready();//Сообщаем о том, что все уже сделано, ведь другие плагины тоже хотят загрузится
-		}
+		};
 
 	private function onLoadComplete(e:Event):void{//Функция запускается один раз сразу после старта плагина
 		

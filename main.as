@@ -16,6 +16,7 @@ package{
 	import flash.events.Event; 
 	import flash.events.TimerEvent; 
 	import flash.utils.Timer;
+	import flash.external.ExternalInterface;
 	import konstantinz.community.comStage.*;
 	import konstantinz.community.comStage.behaviour.BehaviourChoicer;
 	import konstantinz.community.auxilarity.*;
@@ -78,6 +79,11 @@ package{
         public function getNewStatistics(e:Event):void{//При получении информации, которую нужно сохранить для дальнейшего анализа
 				Accumulator.instance.pushToBuffer(e.target.msg);//Передаем ее в компонент, формирующий таблицу
 				statusBar.setTexSource(Accumulator.instance.statusBarText);//А затем выводим текущую статистическую информацию в статусную строку
+				
+				if (ExternalInterface.available){
+					ExternalInterface.call('getModelData', Accumulator.instance.statusBarText);//Отправляем данные статистики во внешний мир, чтобы их можно было обработатьс помощью javascript
+					}
+				
 				behaviourChoicer.getConditionsMeaning(e.target.msg);
 				stageEvent.message = e.target.msg
 				stageEvent.target = e.target.messageMark;
@@ -122,14 +128,38 @@ package{
 			}
         
         private function initConfig():void{
-			configuration = ConfigurationContainer.instance;
-			configuration.setConfigFileName('configuration.xml');
-			configuration.addEventListener(ConfigurationContainer.LOADED, init);//
-			configuration.addEventListener(ConfigurationContainer.LOADING_ERROR, init);//Если не найдем конфигурационного файла, все равно загружаем программу дальше
+			try{
+				messenger = new Messenger(debugLevel);
+				messenger.setMessageMark('Main');
+				messenger.addEventListener(Messenger.CRITICAL_ERROR, onCriticalError);
+				
+				var configName:String = loaderInfo.parameters.configName;//Берем название конфигурационного файла из html страницы
+				
+				if(configName == null){
+					configName = 'configuration.xml';
+					}
+				configuration = ConfigurationContainer.instance;
+				configuration.setConfigFileName(configName);
+				configuration.addEventListener(ConfigurationContainer.LOADED, init);//
+				configuration.addEventListener(ConfigurationContainer.LOADING_ERROR, onConfigNotFound);//Если не найдем конфигурационного файла, все равно загружаем программу дальше
 			
-			model = new Sprite();
-			addChild(model);
+				model = new Sprite();
+				addChild(model);
+				}catch(e:Error){
+				
+					}
 			}
+			
+		private function onConfigNotFound(e:Event):void{
+			statusBar = new StatusBar();
+			addChild(statusBar);
+			statusBar.setBarAt(60, 700);
+			statusBar.setTexSource("<font color='#FF0000'>Error: Config file not found</font> ");
+			};
+		
+		public function onCriticalError(e:Event):void{
+			statusBar.setTexSource(e.target.msg);//Пускай пользователь видит, что программа не смогла загрузить какие то внешние файлы
+			};
         
 		private function init(e:Event):void{
 			var initPosition:String;//Каким образом будут добавлятся первые особи
@@ -138,7 +168,7 @@ package{
 			numberOfCycles = 0;
 			
 			configuration.removeEventListener(ConfigurationContainer.LOADED, init);//Эти листенеры уже отработали и не неужны
-			configuration.removeEventListener(ConfigurationContainer.LOADING_ERROR, init);
+			configuration.removeEventListener(ConfigurationContainer.LOADING_ERROR, onConfigNotFound);
 			
 			debugLevel = configuration.getOption('main.debugLevel'); //Нужно ли отображать отладочную информацию
 			messenger = new Messenger(debugLevel);
@@ -238,6 +268,11 @@ package{
 						sendToRootObject:'getNewStatistics',//Какая структура в главной программе должна реагирывать на событие плагина
 						sendFromPluginObject:'messenger',//Какая структура плагина должна посылать событие
 						pluginEventHandler:Messenger.HAVE_EXT_DATA
+						},
+						{
+						sendToRootObject:'onCriticalError',//Если плагин не смог загрузить картинку или не нашел нужных опций в конфиге
+						sendFromPluginObject:'messenger',//Какая структура плагина должна посылать событие
+						pluginEventHandler:Messenger.CRITICAL_ERROR
 						},
 						{
 						sendFromRootObject:'startStopButtonEvent',
@@ -594,7 +629,6 @@ package{
 					{
 					stage.displayState = "normal";//выходим из полноэкранного режима
 				}
-				trace(stage.displayState);
 			}
 		    
 		private function onCloseWindowClick(e:ModelEvent):void{

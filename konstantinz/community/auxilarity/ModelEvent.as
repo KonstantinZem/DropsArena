@@ -13,10 +13,11 @@
 		 public static const SECOND_CLICK:String = 'secondClick';
 		 public static const NEW_STATISTIC:String = 'new_statistic';
 		 public const ERROR_MARK:int = 0;//Сообщение об ошибке помечаются в messanger помечаеся цифрой 0
-		 public const INFO_MARK:int = 2;
 		 public const INIT_MSG_MARK:int = 1;//Сообщения, при загрузки - выгрузки компонентов
-		 public const STATISTIC_MARK:int = 11;//Сообщение статистического характера помечаются в messanger помечаеся цифрой 10
+		 public const INFO_MARK:int = 2;
 		 public const DEBUG_MARK:int = 3;
+		 public const IOERROR_MARK:int = 4;//Ошибки, возникающие при невозможности загрузить внешний компонент
+		 public const STATISTIC_MARK:int = 11;//Сообщение статистического характера помечаются в messanger помечаеся цифрой 11
 		
 		 public function ModelEvent(type:String='') {
              super(type);
