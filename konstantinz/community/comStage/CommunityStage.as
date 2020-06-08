@@ -23,14 +23,17 @@ package konstantinz.community.comStage{
 		
 		public var chessDesk:Array;
 		
-		function CommunityStage(stgh:int,stgw:int,extOptions:Object){
+		function CommunityStage(stgh:int,stgw:int,extOptions:ConfigurationContainer){
 			
 			errorType = new ModelErrors();
 			
 			try{
-				debugLevel = extOptions.getOption('main.debugLevel');
 				
 				ARENA::DEBUG{
+					debugLevel = extOptions.getOption('main.debugLevel');
+					if(debugLevel == 'Error'){
+						debugLevel = '3';
+						}
 					messenger = new Messenger(debugLevel);
 					messenger.setMessageMark('Community stage');
 					}
@@ -45,7 +48,7 @@ package konstantinz.community.comStage{
 				cellSize = extOptions.getOption('main.cellSize');
 				
 				if(cellSize == 'Error'|| cellSize == null){//Если мы забыли внести в конфиг размер ячейки
-					cellSize = '1';//Даем ей значение по умолчанию
+					cellSize = '10';//Даем ей значение по умолчанию
 					}
 				
 				squSize = (stgw*Number(cellSize))/100;

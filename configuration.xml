@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
+<coment>There all can write brief notes about</coment>
 <main>
 	<debugLevel>0</debugLevel>
 	<pluginEnable>true</pluginEnable>
 	<individuals>
 		<group>
 			<!--thy will become adult from five month-->
-			<number>320</number>
-			<age>10404</age>
+			<number>100</number>
+			<age>10104</age>
 		</group>
 		<group>
-			<number>320</number>
+			<number>100</number>
 			<age>4824</age>
 		</group>
 		<lifeTime>42320</lifeTime>
@@ -51,6 +52,11 @@
 			<behavior>RandomWalker</behavior>
 		</rule>
 	</behaviourSwitching>
+	<stopAfter>
+		<counter>5</counter>
+		<!-- counterType can be set in 2 valuse typs: cycles or individuals -->
+		<counterType>cycle</counterType>
+	</stopAfter>
 </main>
 <plugins>
 	<cover>
@@ -1871,7 +1877,7 @@
 	<morisitaCounter>
         <description url='https://en.wikipedia.org/wiki/Morisita%27s_overlap_index'>Count [Morisita index]</description>
 		<task>
-			<name>morisita</name>
+			<name>sq1</name>
 			<icon></icon>
 			<debugLevel>3</debugLevel>
 			<switchingInterval>160</switchingInterval>

@@ -24,13 +24,13 @@ package{
    
     public class main extends Sprite{
 		
-		private const CURRENT_VERSION:String = '0.98';
-		private const CURRENT_BUILD:String = '191220';
+		private const CURRENT_VERSION:String = '0.99';
+		private const CURRENT_BUILD:String = '200605';
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
 		private const MIN_INDIVIDUAL_CRITICAL_NUMBER:int = 5;//Минимально подходящие для отслеживания статистики количество особей
 		private const MAX_INDIVIDUAL_CRITICAL_NUMBER:int = 5000;
-		private const PAUSE_AFTER_CYCLE:int = 2;//Время паузы между циклами передвижения особей
-		private const DEAD_INDIVIDUALS_REMOVING_INTERVAL:int = 100;
+		private const PAUSE_AFTER_CYCLE:int = 1;//Время паузы между циклами передвижения особей
+		private const DEAD_INDIVIDUALS_REMOVING_INTERVAL:int = 50;
 		
 		private var stgHeight:int;
 		private var stgWidth:int;
@@ -38,6 +38,7 @@ package{
 		private var msgString:String;
 		private var statRefreshTime:int;//Время обновления статистической информации
 		private var fieldRefreshTime:int;//Время обновления графики на поле -- нужно чтобы разгрузить программу
+		private var numberOfIndividuals:int//Текущие количество особей. Чтобы немного ускорить модель
 		private var versionText:Sprite;
 		private var statusBar:StatusBar;
 		private var msgWindow:TextWindow;
@@ -51,7 +52,6 @@ package{
 		private var stepTimer:Timer;
 		private var numberOfCycles:int;
 		private var fieldRrefreshCountdown:int;
-		private var numberOfIndividuals:int;
 		private var individualPictures:Vector.<IndividualGraphicInterface>
 		private var dumper:Dumper;
 		
@@ -127,7 +127,7 @@ package{
 			plugins = null;
 			}
         
-        private function initConfig():void{
+        private function initConfig():void{//Функция срабаотывает как при запуске так и перезагрузки модели
 			try{
 				messenger = new Messenger(debugLevel);
 				messenger.setMessageMark('Main');
@@ -135,7 +135,7 @@ package{
 				
 				var configName:String = loaderInfo.parameters.configName;//Берем название конфигурационного файла из html страницы
 				
-				if(configName == null){
+				if(configName == null){//Если имя конфигурационного файла не задано, ищем файл с именем по умолчанию
 					configName = 'configuration.xml';
 					}
 				configuration = ConfigurationContainer.instance;
@@ -442,6 +442,8 @@ package{
 					numberIndividualsInGroup += individualsAgeGroups[cycleCounter].groupQuantaty;
 
 				}
+			
+			numberOfIndividuals = individuals.length;//Сохраняем текущее количество особей
 			msgString = IND_NUMB + individuals.length;
 			messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
 			
@@ -486,7 +488,8 @@ package{
 					numberIndividualsInGroup += individualsAgeGroups[cycleCounter].groupQuantaty;
 
 				}
-		
+			
+			numberOfIndividuals = individuals.length;//Сохраняем текущее количество особей
 			msgString = IND_NUMB + individuals.length;
 			messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
 			}
@@ -497,8 +500,8 @@ package{
 			var stopPos:int = startPos + int(configuration.getOption('main.individuals.offspringsQuant'));
 				
 				for(var i:int = startPos;i<stopPos;i++){
-					var newX:int = e.target.currentChessDeskI;
-					var newY:int = e.target.currentChessDeskJ;
+					var newX:int = e.target.currentChessDeskY;
+					var newY:int = e.target.currentChessDeskX;
 					individuals[i] = new Individual(commStage.chessDesk, configuration, i,newX,newY);
 					individualPictures[i] = new IndividualGraphicInterface(
 					2,
@@ -513,6 +516,8 @@ package{
 					individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
 					individuals[i].externalTimer();
 				}
+				
+				numberOfIndividuals = individuals.length;//Сохраняем текущие количество особей
 				msgString = IND_NUMB + individuals.length;
 			    messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
 			}
@@ -554,6 +559,7 @@ package{
 					msgString = 'Now number of individuals is ' + individuals.length;
 					messenger.message(msgString, modelEvent.INFO_MARK);
 					}
+				numberOfIndividuals = individuals.length;//Сохраняем новое количество особей
 				msgString = IND_NUMB + individuals.length;
 				messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
 			}catch(e:Error){
@@ -661,7 +667,7 @@ package{
 			
 		
 		private function makeToStepNextIndividual(e:Event):void{
-			numberOfIndividuals = individuals.length;
+			
 			numberOfCycles++;
 			
 			if(numberOfIndividuals < MAX_INDIVIDUAL_CRITICAL_NUMBER && numberOfIndividuals > MIN_INDIVIDUAL_CRITICAL_NUMBER){
@@ -673,6 +679,7 @@ package{
 					stepTimer.stop();
 					showMessageWindow();
 					Accumulator.instance.stopRefresh();
+					
 					ARENA::DEBUG{
 						msgString = 'Emulation has finished. Number of individuals is ' + individuals.length;
 						messenger.message(msgString, modelEvent.INFO_MARK);
@@ -692,18 +699,19 @@ package{
 			}
 	
 	private function refreshIndividualPictures():void{
-		var counter:int = individualPictures.length;
 		
 		if(fieldRrefreshCountdown == 0){
-			for(var i:int = 0; i < counter; i++){
-				individualCurrentState.currentX = individuals[i].placement().x;
-				individualCurrentState.currentY = individuals[i].placement().y;
+			for(var i:int = 0; i < numberOfIndividuals; i++){
+				individualCurrentState.currentX = individuals[i].placement().currentX;
+				individualCurrentState.currentY = individuals[i].placement().currentY;
+				individualCurrentState.cellX = individuals[i].placement().cellX;
+				individualCurrentState.cellY = individuals[i].placement().cellY;
 				individualCurrentState.behaviour = individuals[i].behaviour();
 				individualCurrentState.statement = individuals[i].statement();
 				individualCurrentState.age = individuals[i].age();
 				individualCurrentState.direction = individuals[i].direction();
 				
-				individualPictures[i].dotStep(individualCurrentState);//Передаем координаты, куда особи надо переместится на следующем шаге
+				individualPictures[i].doStep(individualCurrentState);//Передаем координаты, куда особи надо переместится на следующем шаге
 			}
 			fieldRrefreshCountdown = fieldRefreshTime;
 		}else{

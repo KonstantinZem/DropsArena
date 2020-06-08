@@ -33,12 +33,12 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 				}
 			};
 		
-		override protected function onStepUp(currentX:int, currentY:int):void{//Идем вверх
-			if (currentY - viewDistance < stepLength){//Если особь дошла до верхнего края сцены
+		override protected function onStepUp(currentY:int, currentX:int):void{//Идем вверх
+			if (currentY - viewDistance <= BORDERS_APPROACHING_LIMIT){//Если особь дошла до верхнего края сцены
 				newPosition.y = currentY + stepLength;
 				stepsToTarget = leftOfStepsToTarget(0, viewDistance);
 				}else{
-					if(populationArea[currentX][currentY - stepsToTarget].speedDeleyA > currentPlaceQuality){
+					if(populationArea[currentY - stepsToTarget][currentX].speedDeleyA > currentPlaceQuality){//Если в поле зрения находится уасток с лучшими условиями чем в текущем
 						stepsToTarget = leftOfStepsToTarget(stepsToTarget, viewDistance);
 						newPosition.y = currentY - stepLength;
 						}else{
@@ -48,12 +48,12 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 					}
 			}
 		
-		override protected function onStepDown(currentX:int, currentY:int):void{//Идем вниз
-			if((currentY + stepsToTarget) > populationArea[0].length - 2){//Если особь дошла до нижнего края сцены
+		override protected function onStepDown(currentY:int, currentX:int):void{//Идем вниз
+			if((currentY + stepsToTarget) > bottomCorner - BORDERS_APPROACHING_LIMIT){//Если особь дошла до нижнего края сцены
 				newPosition.y = currentY - stepLength;
 				stepsToTarget = leftOfStepsToTarget(0, viewDistance);
 				}else{
-					if(populationArea[currentX][currentY + stepsToTarget].speedDeleyA > currentPlaceQuality){
+					if(populationArea[currentY + stepsToTarget][currentX].speedDeleyA > currentPlaceQuality){
 						stepsToTarget = leftOfStepsToTarget(stepsToTarget, viewDistance);
 						newPosition.y = currentY + stepLength;
 						}else{
@@ -63,12 +63,12 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 					}
 			}
 		
-		override protected function onStepLeft(currentX:int, currentY:int):void{//Идем влево
-			if(currentX - viewDistance < stepLength){//Если особь дошла до левого края сцены
+		override protected function onStepLeft(currentY:int, currentX:int):void{//Идем влево
+			if(currentX - viewDistance <= BORDERS_APPROACHING_LIMIT){//Если особь дошла до левого края сцены
 				newPosition.x = currentX + stepLength;//Делаем шаг вправо
 				stepsToTarget = leftOfStepsToTarget(0, viewDistance);//Сбрасываем линию поведению
 				}else{
-					if(populationArea[currentX - stepsToTarget][currentY].speedDeleyA > currentPlaceQuality){//Если в клетке левее условия среды лучше
+					if(populationArea[currentY][currentX - stepsToTarget].speedDeleyA > currentPlaceQuality){//Если в клетке левее условия среды лучше
 						stepsToTarget = leftOfStepsToTarget(stepsToTarget, viewDistance);
 						newPosition.x = currentX - stepLength;
 						}else{
@@ -78,12 +78,12 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 					}
 		}
 	
-		override protected function onStepRight(currentX:int, currentY:int):void{//Идем вправо
-			if(currentX + stepsToTarget > populationArea.length - 2){//Если особь дошла до края сцены
+		override protected function onStepRight(currentY:int, currentX:int):void{//Идем вправо
+			if(currentX + stepsToTarget >= rightCorner - BORDERS_APPROACHING_LIMIT){//Если особь дошла до края сцены
 				newPosition.x = currentX - stepLength;//Делаем шаг влево
 				stepsToTarget = leftOfStepsToTarget(0, viewDistance);//Сбрасываем линию поведению
 				}else{
-					if(populationArea[currentX + stepsToTarget][currentY].speedDeleyA > currentPlaceQuality){
+					if(populationArea[currentY][currentX + stepsToTarget].speedDeleyA > currentPlaceQuality){
 						stepsToTarget = leftOfStepsToTarget(stepsToTarget, viewDistance);
 						newPosition.x = currentX + stepLength;
 						}else{
@@ -93,16 +93,16 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 					}
 			}
 		
-		override protected function onStay(currentX:int, currentY:int):void{
+		override protected function onStay(currentY:int, currentX:int):void{
 			newPosition.x = currentX;
 			newPosition.y = currentY;
 			stepsToTarget = leftOfStepsToTarget(0, viewDistance);
 			}
 		
-		override protected function onBeginChoisingPosition(currentX:int, currentY:int):void{
+		override protected function onBeginChoisingPosition(currentY:int, currentX:int):void{
 			newPosition.x = currentX;
 			newPosition.y = currentY;
-			currentPlaceQuality = getPlaceQuality(currentX, currentY);
+			currentPlaceQuality = getPlaceQuality(currentY, currentX);
 			}
 			
 		override protected function onEndChoisingPosition():void{

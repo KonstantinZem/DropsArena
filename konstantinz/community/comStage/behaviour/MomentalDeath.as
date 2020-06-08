@@ -19,7 +19,9 @@ public class MomentalDeath extends BaseMotionBehaviour{
 				}
 				indSuspender = suspender;
 		}catch(e:Error){
-			messenger.message(e.message, modelEvent.ERROR_MARK);
+			ARENA::DEBUG{
+				messenger.message(e.message, modelEvent.ERROR_MARK);
+				}
 			}
 		}
 	public function killIndividual():void{
@@ -34,8 +36,10 @@ public class MomentalDeath extends BaseMotionBehaviour{
 			indSuspender.killIndividual();
 
 		}catch(e:Error){
-			msgString = 'Individual ' + individualName + ': ' + e.message;
-			messenger.message(msgString, modelEvent.ERROR_MARK);
+			ARENA::DEBUG{
+				msgString = 'Individual ' + individualName + ': ' + e.message;
+				messenger.message(msgString, modelEvent.ERROR_MARK);
+				}
 			}
 		}
 

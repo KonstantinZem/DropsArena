@@ -13,7 +13,11 @@ public class MotionBehaviourSwitcher{
 	private var momentalDeath:MomentalDeath;
 	private var migrationBehaviour:MigrationBehaviour;
 	private var indSuspender:StepDispatcher;
-	private var messenger:Messenger;
+	
+	ARENA::DEBUG{
+		private var messenger:Messenger;
+		}
+	
 	private var currentBehaviourName:String;//Через эту переменную можно узнать какая линия поведения сейчас активирована
 	private var viewDistance:int;
 	private var populationArea:Array;
@@ -25,8 +29,11 @@ public class MotionBehaviourSwitcher{
 	public function MotionBehaviourSwitcher(currentPopulationArea:Array, configSource:ConfigurationContainer, dbgLevel:String ='3'){
 		debugLevel = dbgLevel;
 		configuration = configSource;
-		messenger = new Messenger(debugLevel);
-		messenger.setMessageMark('Behaviour Switcher');
+		
+		ARENA::DEBUG{
+			messenger = new Messenger(debugLevel);
+			messenger.setMessageMark('Behaviour Switcher');
+			}
 		
 		baseMotionBehaviour = new BaseMotionBehaviour(debugLevel);
 		bestConditionsWalker = new BestConditionsWalker(debugLevel);

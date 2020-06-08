@@ -11,8 +11,8 @@
 		private var modelEvent:ModelEvent;
 		private var debugLevel:String;
 		
-		public var currentChessDeskI:int;//Посылаем вместе с событием координаты объекта вызвавшего его
-		public var currentChessDeskJ:int;
+		public var currentChessDeskY:int;//Посылаем вместе с событием координаты объекта вызвавшего его
+		public var currentChessDeskX:int;
 		public var pluginName:String;//Передаем плагину его имя так как сам он его не узнает. А это надо для загрузки, например, конфига
 		public var individual:int;//Передаем номер особи в массиве
 		public var scrollerPosition:Number;
@@ -33,8 +33,8 @@
 		}		
 		public function maturing():void{
 			dispatchEvent(new ModelEvent(ModelEvent.MATURING));
-			currentChessDeskI = 0;
-			currentChessDeskJ = 0;
+			currentChessDeskY = 0;
+			currentChessDeskX = 0;
 		}
 		
 		public function death():void{

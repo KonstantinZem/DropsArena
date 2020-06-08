@@ -9,6 +9,7 @@ package konstantinz.community.comStage{
 	public class StepDispatcher extends EventDispatcher{
 		
 		private const IMMORTAL_SIGHN:int = -2;
+		private const PAUSE_RESET:int = -1;
 		private const MOVING_SIGHT:String = 'moving';
 		private const SUSPEND_SIGHT:String = 'suspend';
 		private const STOP_SIGHT:String = 'stop';
@@ -18,7 +19,11 @@ package konstantinz.community.comStage{
 		private var indState:String;
 		private var lifeTime:int;
 		private var pauseTime:int;
-		private var messenger:Messenger;
+		
+		ARENA::DEBUG{
+			private var messenger:Messenger;
+			}
+		
 		private var collisionTime:int;
 		private var debugLevel:String;
 		
@@ -35,15 +40,16 @@ package konstantinz.community.comStage{
 			indState = MOVING_SIGHT;
 			indNumber = 0;
 			lifeTime = IMMORTAL_SIGHN;
-			messenger = new Messenger(debugLevel);
-			messenger.setMessageMark('Step dispatcher');
+			pauseTime = PAUSE_RESET;
 			
 			ARENA::DEBUG{
+				messenger = new Messenger(debugLevel);
+				messenger.setMessageMark('Step dispatcher');
 				messenger.message('Step dispatcher ' + indNumber  + ' has been created');
 				}
 			}
 			
-		public function statement(NewState:String = 'nothing', statementTime:int = 0):String{//Через эту функцию можно влиять на состояние особи
+		public function statement(NewState:String = 'nothing', statementTime:int = PAUSE_RESET):String{//Через эту функцию можно влиять на состояние особи
 			if(indState != STOP_SIGHT){
 			switch(NewState){
 				case 'moving':
@@ -81,7 +87,7 @@ package konstantinz.community.comStage{
 			}
 		
 		public function doStep():void{//Сигнал приходит от предыдущей особи
-			if(indState != STOP_SIGHT && indState != SUSPEND_SIGHT && pauseTime < 0){//Если уже можно передвигаться
+			if(indState != STOP_SIGHT && indState != SUSPEND_SIGHT && pauseTime == PAUSE_RESET){//Если уже можно передвигаться
 			  if(lifeTime != IMMORTAL_SIGHN){//Если особь не бессмертная
 				lifeTime --;
 				if(lifeTime < -1 && indState != DEAD_SIGHT && indState != SUSPEND_SIGHT && indState != STOP_SIGHT){//Если жизнь особи уже истекла, но пометки о ее смерти еще нет
@@ -89,12 +95,12 @@ package konstantinz.community.comStage{
 					}
 				}
 				message = indState;
-				dispatchEvent(new Event(StepDispatcher.DO_STEP));
+				dispatchEvent(new Event(StepDispatcher.DO_STEP));//Событие посылается внутрь класса Individual, чтобы там нача
 			}else{
 				pauseTime--;
 			
 				if(pauseTime < 0){//особь сама меняет статус по истечении паузы
-					pauseTime = -1;
+					pauseTime = PAUSE_RESET;
 					indState = MOVING_SIGHT;
 					}
 				}
@@ -115,7 +121,13 @@ package konstantinz.community.comStage{
 			indState = DEAD_SIGHT;
 			}
 		public function setLifeTime(newLifeTime:int):void{
-			lifeTime = newLifeTime;
+			if(newLifeTime > 0){
+				lifeTime = newLifeTime;
+				}else{
+					ARENA::DEBUG{
+						messenger.message('Individual will be immortal, cause new life time is ' + newLifeTime);
+						}
+				}
 			}
 			
 		public function getLifeTime():int{

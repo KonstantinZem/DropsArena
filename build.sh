@@ -18,4 +18,4 @@ mxmlc=$sdk'bin/mxmlc'
 
 "$mxmlc" morisitaCounter.as -output ../bin/plugins/morisitaCounter.swf -default-background-color 0xFFFFFF -default-size 1000 800 -use-network=false -strict=false -static-link-runtime-shared-libraries=true -compiler.define=ARENA::DEBUG,false
 
-zip -r '../dropsArens_'$buildDate'.zip' ../bin ../src/konstantinz ../src/*.as ../src/configuration.xml ../src/build.sh ../src/README.md
+zip -r '../dropsArens_'$buildDate'.zip' ../bin ../src/konstantinz ../src/*.as ../bin/configuration.xml ../src/build.sh ../src/README.md

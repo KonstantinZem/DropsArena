@@ -33,7 +33,7 @@
 				debugLevel = '3';//По умолчанию показываем все сообщения, кроме тей что посылаются из цикла
 				currentStatus = 'ready';
 				modelEvent = new ModelEvent();//Будем брать основные константы от сюда
-			}	
+				}	
 			}
 			
 		public static function get instance():ConfigurationContainer{
@@ -46,10 +46,10 @@
             }
 			
 		public function setConfigFileName(fileName:String):void{
-			cfgFileName = fileName;
+			//cfgFileName = fileName;
             XML.ignoreWhitespace = true;
 			myXML = new XML(); 
-			myXMLURL = new URLRequest(cfgFileName); 
+			myXMLURL = new URLRequest(fileName); 
 			myLoader = new URLLoader(myXMLURL);
 			
 			myLoader.addEventListener(Event.COMPLETE, xmlLoaded);  

@@ -10,9 +10,10 @@ package konstantinz.plugins{
 	
 	public class morisita extends Plugin{
 		private const BORDERCOLOR:Number = 0x000000;
-		private const IND_NUMB:String = 'ind_numb_m_plot:';//Пометка сообщения о количестве особей
-		private const IND_QUANT:String = 'ind_quant: '
-		private const MORISITA_INDEX:String = 'morisita_index: '
+		private const SEPARATOR:String = ':';
+		private const IND_NUMB:String = 'ind_numb_m';//Пометка сообщения о количестве особей
+		private const IND_QUANT:String = 'ind_quant: ';//Средняя численность
+		private const MORISITA_INDEX:String = 'morisita_index: ';
 		private const QUANT_STD:String = 'quant_std: ';
 	
 		public function morisita (){
@@ -223,7 +224,7 @@ package konstantinz.plugins{
 			mIndex = allPlotsNumber*(niSumm/(allIndividuals*(allIndividuals-1)));
 			msgString = 'source data: Idividuals '+ allIndividuals + ', plots ' + allPlotsNumber;
 			messenger.message(msgString, modelEvent.INFO_MARK);//Возвращаем индекс Мориситы с точностью 3 знака после запятой
-			msgString = IND_NUMB + allIndividuals;
+			msgString = IND_NUMB + currentTask.name + SEPARATOR + allIndividuals;
 			messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
 			msgString = IND_QUANT + averageQuant.toFixed(2);
 			messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем плотность особей для статистики

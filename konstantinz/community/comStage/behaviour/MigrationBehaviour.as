@@ -14,8 +14,12 @@ public class MigrationBehaviour extends BaseMotionBehaviour{
 	
 	public function MigrationBehaviour(configSource:ConfigurationContainer, dbgLevel:String){
 		var newDistance:int;
-		debugLevel = dbgLevel;
-		messenger.setDebugLevel (debugLevel);
+		
+		ARENA::DEBUG{
+			debugLevel = dbgLevel;
+			messenger.setDebugLevel (debugLevel);
+			}
+		
 		behaviourName = 'MigrationBehaviour';
 		state = RESET_STATE;
 		
@@ -94,18 +98,18 @@ public class MigrationBehaviour extends BaseMotionBehaviour{
 			directionAlreadyChoised = false;
 			}
 		
-		override protected function onStepUp(currentX:int, currentY:int):void{//Идем вверх
-			if (currentY < 1){//Если выходим за верхнюю границу поля
-				newPosition.y = newPosition.y + stepLength;
-				resetAllCounters();
+		override protected function onStepUp(currentY:int, currentX:int):void{//Идем вверх
+			if (currentY <= BORDERS_APPROACHING_LIMIT){//Если выходим за верхнюю границу поля
+				newPosition.y = newPosition.y + stepLength;//Делаем шаг назад
+				resetAllCounters();//И выключаем текущую линию поведения
 				state = CONSTANT_STATE;//Чтобы функция суперкласса getNewPosition вычислила новое направление
 				}else{
 					newPosition.y = newPosition.y - stepLength;
 				}
 			}
 		
-		override protected function onStepDown(currentX:int, currentY:int):void{//Идем вниз
-			if(currentY > populationArea[0].length-2){//Если вышли за пределы сцены, сбраываем поведение
+		override protected function onStepDown(currentY:int, currentX:int):void{//Идем вниз
+			if(currentY > bottomCorner - BORDERS_APPROACHING_LIMIT){//Если вышли за пределы сцены, сбраываем поведение
 				newPosition.y = currentY - stepLength;
 				resetAllCounters();
 				state = CONSTANT_STATE;//Чтобы функция суперкласса getNewPosition вычислила новое направление
@@ -114,8 +118,8 @@ public class MigrationBehaviour extends BaseMotionBehaviour{
 					}
 			}
 		
-		override protected function onStepRight(currentX:int, currentY:int):void{
-			if(currentX > populationArea.length-2){//Если особь дошла до правого края сцены
+		override protected function onStepRight(currentY:int, currentX:int):void{
+			if(currentX > rightCorner - BORDERS_APPROACHING_LIMIT){//Если особь дошла до правого края сцены
 				newPosition.x = currentX - stepLength;//Делаем шаг назад
 				resetAllCounters();
 				state = CONSTANT_STATE;//Чтобы функция суперкласса getNewPosition вычислила новое направление
@@ -124,8 +128,8 @@ public class MigrationBehaviour extends BaseMotionBehaviour{
 					}
 		}
 		
-		override protected function onStepLeft(currentX:int, currentY:int):void{//Идем влево
-			if(currentX <= stepLength){//Если можем выйти за пределы поля
+		override protected function onStepLeft(currentY:int, currentX:int):void{//Идем влево
+			if(currentX <= stepLength + BORDERS_APPROACHING_LIMIT){//Если можем выйти за пределы поля
 				newPosition.x = currentX + stepLength;//Делаем шаг вперед
 				resetAllCounters();
 				state = CONSTANT_STATE;//Чтобы функция суперкласса getNewPosition вычислила новое направление
@@ -134,7 +138,7 @@ public class MigrationBehaviour extends BaseMotionBehaviour{
 					}
 			}
 		
-		override protected function onStay(currentX:int, currentY:int):void{
+		override protected function onStay(currentY:int, currentX:int):void{
 			newPosition.x = currentX;
 			newPosition.y = currentY;
 			resetAllCounters();

@@ -31,27 +31,29 @@ package konstantinz.community.comStage{
 		
 		private var tickInterval:int = 20;//Интервал между тиками таймера
 		private var lifeStart:Date;
-		private var currentChessDeskI:int;//Номер строки текущего квадрата
-		private var currentChessDeskJ:int;//Номер столбца текущего квадрата
+		private var currentChessDeskY:int;//Номер строки текущего квадрата
+		private var currentChessDeskX:int;//Номер столбца текущего квадрата
 		private var stepLength:int;//Длинна шага особи
 		private var deleySteps:int;//количество ходов, которые надо пропустить для замедления движения
 		private var chessDesk:Array; //Ссылка на внешний массив с координатами и условиями среды
-		private var indPlacement:Array;
-		private var msgString:String;
 		private var debugLevel:String;
 		private var indAgeState:String;
 		private var currentBehaviourName:String;//Переключаться поведение будет только если название поведения из пришедшего сообщения будет отличаться от записанного сюда
 		
 		private var indConfiguration:ConfigurationContainer;
-		private var messenger:Messenger;
-		
+		private var individualState:IndividualState;
 		private var myBehaviour:BaseMotionBehaviour;
 		private var motionBehaviour:MotionBehaviourSwitcher;
 		private var maturingBehaviour:MaturingBehaviour;
 		private var stepDispatcher:StepDispatcher;
 		
-		private var modelEvent:ModelEvent;//А если это все брать из MotionBehaviour
-		private var errorType:ModelErrors;//Контейнер для ошибок;
+		ARENA::DEBUG{
+			private var messenger:Messenger;
+			private var msgString:String;
+			private var modelEvent:ModelEvent;//А если это все брать из MotionBehaviour
+			private var errorType:ModelErrors;//Контейнер для ошибок;
+			}
+		
 		private var timerForIndividuals:Timer; //Не самое удачное решение, снабдить каждую особь своим таймером, но сделать один из главного класса у меня не получается
 		
 		public var IndividualEvent:DispatchEvent;
@@ -68,14 +70,17 @@ package konstantinz.community.comStage{
 			
 			try{
 				indConfiguration = configuration;
-				debugLevel = indConfiguration.getOption('main.debugLevel');
 				
 				ARENA::DEBUG{
+					debugLevel = indConfiguration.getOption('main.debugLevel');
+						if(debugLevel == 'Error'){
+							debugLevel = '3';
+							}
 					messenger = new Messenger(debugLevel);
 					messenger.setMessageMark('Individual');
+					modelEvent = new ModelEvent();//Будем брать основные константы от сюда
 					}
 				
-				modelEvent = new ModelEvent();//Будем брать основные константы от сюда
 				indNumber = args[0];
 				
 				stepDispatcher = new StepDispatcher(debugLevel);
@@ -83,6 +88,7 @@ package konstantinz.community.comStage{
 				stepDispatcher.addEventListener(StepDispatcher.DO_STEP, step);
 				
 				lifeTime = int(indConfiguration.getOption('main.individuals.lifeTime'));
+				
 				stepDispatcher.setLifeTime(lifeTime);
 				
 				if(args[0]==undefined){
@@ -102,19 +108,13 @@ package konstantinz.community.comStage{
 					stepLength = 1;
 					
 					ARENA::DEBUG{
-						msgString = 'Step length: ' + errorType.varIsIncorrect;
+						msgString = 'Step length: ' + errorType.varIsIncorrect + '. It will be set in default value 1';
 						messenger.message(msgString, modelEvent.ERROR_MARK);
 						}
 					}
 				
 				chessDesk = stage;
-				
-				indPlacement = new Array();
-				indPlacement.x = 0;
-				indPlacement.y = 0;
-				indPlacement.direction = 0;
-				indPlacement.previousX = 0;
-				indPlacement.previousY = 0;
+				individualState = new IndividualState();		
 			
 				motionBehaviour = new MotionBehaviourSwitcher(chessDesk, indConfiguration, debugLevel);
 				stepDispatcher.addEventListener(StepDispatcher.COLLISION, motionBehaviour.onIndividualStateChange);
@@ -125,13 +125,15 @@ package konstantinz.community.comStage{
 				
 				maturingBehaviour = new MaturingBehaviour();
 				maturingBehaviour.setDeley(int(indConfiguration.getOption('main.individuals.maturingDeley')));
+				
+				//Координаты расспологаются по принципу ChessDesk[Up-Down][Left-Right]
 			
 				if(args[1]==undefined||args[2]==undefined){
-					currentChessDeskI = 0;//Если не указано начальное положение особи, начинаем двигаться с верхнего левого угла (первый квадрат)
-					currentChessDeskJ = 0;
+					currentChessDeskY = 0;//Если не указано начальное положение особи, начинаем двигаться с верхнего левого угла (первый квадрат)
+					currentChessDeskX = 0;
 					}else{
-						currentChessDeskI = args[1];
-						currentChessDeskJ = args[2];
+						currentChessDeskY = args[1];
+						currentChessDeskX = args[2];
 						}
 			
 				deleySteps = 1;
@@ -142,7 +144,7 @@ package konstantinz.community.comStage{
 				lifeStart = new Date();
 				
 				ARENA::DEBUG{
-					msgString = 'Individual ' + indNumber + ' has created. \n It current position is '+ currentChessDeskI+ ':' + currentChessDeskJ;
+					msgString = 'Individual ' + indNumber + ' has created. \n It current position is '+ currentChessDeskY+ ':' + currentChessDeskX;
 					messenger.message(msgString, modelEvent.INIT_MSG_MARK);
 					}
 				
@@ -159,7 +161,7 @@ package konstantinz.community.comStage{
 		
 		private function individualAlong():Boolean{//Есть ли в заданном квадрате кто либо еще
 						
-			if(individualCounter('count', 'individuals', currentChessDeskI, currentChessDeskJ) > 1 && chessDesk[currentChessDeskI][currentChessDeskJ].individualName != stepDispatcher.getIndividualNumber()){//Если встретились две особи
+			if(individualCounter('count', 'individuals', currentChessDeskY, currentChessDeskX) > 1 && chessDesk[currentChessDeskY][currentChessDeskX].individualName != stepDispatcher.getIndividualNumber()){//Если встретились две особи
 				return false;
 				
 				}else{
@@ -214,12 +216,12 @@ package konstantinz.community.comStage{
 				}
 		
 		private function maturing():void{
-			IndividualEvent.currentChessDeskI = currentChessDeskI;
-			IndividualEvent.currentChessDeskJ = currentChessDeskJ;
+			IndividualEvent.currentChessDeskY = currentChessDeskY;
+			IndividualEvent.currentChessDeskX = currentChessDeskX;
 			IndividualEvent.maturing();
 				
 			ARENA::DEBUG{
-				msgString = 'Maturing in '+ currentChessDeskI+ ':'+ currentChessDeskJ;
+				msgString = 'Maturing in '+ currentChessDeskY+ ':'+ currentChessDeskX;
 				messenger.message(msgString, modelEvent.DEBUG_MARK);
 				}
 			}
@@ -234,22 +236,23 @@ package konstantinz.community.comStage{
 			
 			//функция платформонезавмсимая, при условии, что кто то будет читать переменную individual.x и individual.y и на изменять сведения о положении особи
 			var numberOfIndividualsinCell:int;
+			var currenPosition:Array = new Array();//Верменная переменная, чтобы не вызывать myBehaviour.getNewPosition два раза.
 			
 			if(deleySteps > 0){
 				deleySteps--;//Уменьшаем количество пропущеных ходов
 				}
 			
 			if(stepDispatcher.statement() == MOVING_SIGHT && deleySteps==0){//И если отстояли на месте положенное количество тиков таймера, двигаемся дальше
-				
-				deleySteps = myBehaviour.getPlaceQuality(currentChessDeskI,currentChessDeskJ);//Смотрим на новой клетке число ходов
-				numberOfIndividualsinCell = individualCounter('count', ADULT_SIGHT, currentChessDeskI, currentChessDeskJ)
+		
+				deleySteps = myBehaviour.getPlaceQuality(currentChessDeskY,currentChessDeskX);//Смотрим на новой клетке число ходов
+				numberOfIndividualsinCell = individualCounter('count', ADULT_SIGHT, currentChessDeskY, currentChessDeskX)
 			
 				maturingBehaviour.onIndividualStep();
 				indAgeState = maturingBehaviour.getState();
 	
 				if(!individualAlong()){
 					stepDispatcher.statement(COLLISION_SIGHT);
-					numberOfIndividualsinCell = individualCounter('count', ADULT_SIGHT, currentChessDeskI, currentChessDeskJ);
+					numberOfIndividualsinCell = individualCounter('count', ADULT_SIGHT, currentChessDeskY, currentChessDeskX);
 					
 					if(maturingBehaviour.timeToMaturing() == true && numberOfIndividualsinCell > 1){//Если встретились две взрослые, то идет обычное двуполое размножение
 						maturing();//Начнется размножение. Позже надо предусмотреть возможность партеногенеза. Вызывая функцию maturing() с помощью события генерируемого внутри maturingBehaviour
@@ -259,23 +262,29 @@ package konstantinz.community.comStage{
 						stepDispatcher.statement(MOVING_SIGHT);
 						}
 				
-				individualCounter('remove', indAgeState, currentChessDeskI, currentChessDeskJ);
+				individualCounter('remove', indAgeState, currentChessDeskY, currentChessDeskX);
 				
-				indPlacement.previousX = chessDesk[currentChessDeskI][currentChessDeskJ].sqrX + 1;//Сохраняем свое прошлое положение
-				indPlacement.previousY = chessDesk[currentChessDeskI][currentChessDeskJ].sqrY + 1;
-						
-				currentChessDeskI = myBehaviour.getNewPosition(currentChessDeskI,currentChessDeskJ).x;
-				currentChessDeskJ = myBehaviour.getNewPosition(currentChessDeskI,currentChessDeskJ).y;
-				chessDesk[currentChessDeskI][currentChessDeskJ].individualName = stepDispatcher.getIndividualNumber();
+				individualState.previousX = chessDesk[currentChessDeskY][currentChessDeskX].sqrX; //Сохраняем свое прошлое положение
+				individualState.previousY = chessDesk[currentChessDeskY][currentChessDeskX].sqrY;
 				
-				individualCounter('add', indAgeState, currentChessDeskI, currentChessDeskJ);
+				currenPosition = myBehaviour.getNewPosition(currentChessDeskY,currentChessDeskX);
 				
-				indPlacement.x = chessDesk[currentChessDeskI][currentChessDeskJ].sqrX + 1;
-				indPlacement.y = chessDesk[currentChessDeskI][currentChessDeskJ].sqrY + 1;
+				currentChessDeskY = currenPosition.y;
+				currentChessDeskX = currenPosition.x;
+				
+				chessDesk[currentChessDeskY][currentChessDeskX].individualName = stepDispatcher.getIndividualNumber();
+				
+				individualCounter('add', indAgeState, currentChessDeskY, currentChessDeskX);
+				
+				individualState.currentX = chessDesk[currentChessDeskY][currentChessDeskX].sqrX;
+				individualState.currentY = chessDesk[currentChessDeskY][currentChessDeskX].sqrY;
+				individualState.cellY = currentChessDeskY;
+				individualState.cellX = currentChessDeskX;
+				individualState.border = myBehaviour.isOnBorder();
 				}
 			  
-			  if(chessDesk[currentChessDeskI][currentChessDeskJ].behaviourModel != '' && chessDesk[currentChessDeskI][currentChessDeskJ].behaviourModel != 'empty'){//Если в новом квадарте указанно поведение, которое особь должна начать проявлять
-				motionBehaviour.switchBehaviour(chessDesk[currentChessDeskI][currentChessDeskJ].behaviourModel);//Включаем этот тип
+			  if(chessDesk[currentChessDeskY][currentChessDeskX].behaviourModel != '' && chessDesk[currentChessDeskY][currentChessDeskX].behaviourModel != 'empty'){//Если в новом квадарте указанно поведение, которое особь должна начать проявлять
+				motionBehaviour.switchBehaviour(chessDesk[currentChessDeskY][currentChessDeskX].behaviourModel);//Включаем этот тип
 				}
 			  
 			  if(stepDispatcher.statement() == DEAD_SIGHT){
@@ -295,7 +304,7 @@ package konstantinz.community.comStage{
 				
 			deltaTime = lifeEnd.getTime() - lifeStart.getTime();
 			
-			individualCounter('remove', indAgeState, currentChessDeskI, currentChessDeskJ);//Освобождаем ячейку от следов своего присутсвия
+			individualCounter('remove', indAgeState, currentChessDeskY, currentChessDeskX);//Освобождаем ячейку от следов своего присутсвия
 			
 			ARENA::DEBUG{
 				msgString = 'Individual ' + stepDispatcher.getIndividualNumber() + ' is dead. R.I.P. \n' + 'It lived ' + Math.round((deltaTime)*0.00006) + ' min';
@@ -362,7 +371,7 @@ package konstantinz.community.comStage{
 							}
 						
 						stepDispatcher.statement(STOP_SIGHT, statementLength);
-						individualCounter('remove', indAgeState, currentChessDeskI, currentChessDeskJ);
+						individualCounter('remove', indAgeState, currentChessDeskY, currentChessDeskX);
 					break;
 					case MOVING_SIGHT:
 						if(stepDispatcher.statement() != STOP_SIGHT){
@@ -400,8 +409,8 @@ package konstantinz.community.comStage{
 				return stepDispatcher.statement();
 			}
 		
-		public function placement():Array{
-			return indPlacement;
+		public function placement():IndividualState{
+			return individualState;
 			}
 		
 		public function age(newAge:int = 0):String{
@@ -415,8 +424,14 @@ package konstantinz.community.comStage{
 				}
 			return indAgeState;
 			}
-		public function direction():int{
-			return myBehaviour.getDirection();
+		public function direction(newDirection:int = 6):int{
+			var currentDirection:int;
+			if(newDirection == 6){//По умолчанию случайное направление
+				currentDirection = myBehaviour.getDirection();
+				}else{
+					myBehaviour.setDirection(int(newDirection));
+					}
+			return currentDirection;
 			};
 		
 		public function behaviour(newBehaviour:String = 'empty'):String{
