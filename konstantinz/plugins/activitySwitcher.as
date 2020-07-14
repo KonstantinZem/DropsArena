@@ -309,7 +309,7 @@ public class activitySwitcher extends Plugin{
 		
 		stopedObjPosition = Math.round(Math.random()* (individuals.length - 2));
 			
-		if(individuals[stopedObjPosition]==null && individuals[stopedObjPosition].statement != 'dead'){//Если особь существует и движеться ???????????? сюда вставить критерий поиска, напримр если статус особе отличается от заданного
+		if(individuals[stopedObjPosition]==null && individuals[stopedObjPosition].movement() != 'dead'){//Если особь существует и движеться ???????????? сюда вставить критерий поиска, напримр если статус особе отличается от заданного
 			stopedObjPosition = setObjRange();
 			}
 				
@@ -339,16 +339,16 @@ public class activitySwitcher extends Plugin{
 					switch(currentTask.signalType){
 						case 'susupend':	
 						
-							if(individuals[currentTask.stopedIndividuals[i]].hasOwnProperty('statement')){
-								individuals[currentTask.stopedIndividuals[i]].statement('suspend', currentTask.switchingInterval);//Останавливаем особь на нужное время
+							if(individuals[currentTask.stopedIndividuals[i]].hasOwnProperty('movement')){
+								individuals[currentTask.stopedIndividuals[i]].movement('suspend', currentTask.switchingInterval);//Останавливаем особь на нужное время
 								}
 								else{
 									throw new ReferenceError('Can not find call statement property. It seems, that individual now not exist');
 									}
 						break;
 						case 'stop':
-							if(individuals[currentTask.stopedIndividuals[i]].hasOwnProperty('statement')){
-								individuals[currentTask.stopedIndividuals[i]].statement('stop', currentTask.switchingInterval);//Останавливаем особь на нужное время
+							if(individuals[currentTask.stopedIndividuals[i]].hasOwnProperty('movement')){
+								individuals[currentTask.stopedIndividuals[i]].movement('stop', currentTask.switchingInterval);//Останавливаем особь на нужное время
 								}
 								else{
 									throw new ReferenceError('Can not find function stopIndividual. It seems, that individual now not exist');
@@ -356,13 +356,13 @@ public class activitySwitcher extends Plugin{
 						break;
 						case 'kill':
 							
-							if(individuals[currentTask.stopedIndividuals[i]].hasOwnProperty('statement')){
+							if(individuals[currentTask.stopedIndividuals[i]].hasOwnProperty('movement')){
 								
 								if(currentTask.killStoped =='true'){//Если можно, убиваем всех особей из выборки
-									individuals[currentTask.stopedIndividuals[i]].statement('dead');
+									individuals[currentTask.stopedIndividuals[i]].movement('dead');
 									}else{
-										if(currentTask.individuals[stopedIndividuals[i]].statement() =='moved'){//А иначе убиваем только тех, кто движеться
-											currentTask.individuals[stopedIndividuals[i]].statement('dead');
+										if(currentTask.individuals[stopedIndividuals[i]].movement() =='moved'){//А иначе убиваем только тех, кто движеться
+											currentTask.individuals[stopedIndividuals[i]].movement('dead');
 											}
 									
 										}

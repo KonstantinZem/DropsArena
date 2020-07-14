@@ -25,7 +25,7 @@ package{
     public class main extends Sprite{
 		
 		private const CURRENT_VERSION:String = '0.99';
-		private const CURRENT_BUILD:String = '200605';
+		private const CURRENT_BUILD:String = '200714';
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
 		private const MIN_INDIVIDUAL_CRITICAL_NUMBER:int = 5;//Минимально подходящие для отслеживания статистики количество особей
 		private const MAX_INDIVIDUAL_CRITICAL_NUMBER:int = 5000;
@@ -46,7 +46,6 @@ package{
 		private var behaviourChoicer:BehaviourChoicer;
 		private var eventsForPlugins:Object;
 		private var eventsForPluginsList:Array;
-		private var individualCurrentState:IndividualState;
 		private var individualsAgeGroups:Array;
 		private var modelEvent:ModelEvent;
 		private var stepTimer:Timer;
@@ -202,8 +201,6 @@ package{
 			
 			individualsAgeGroups = new Array();
 			individualsAgeGroups = getIndividualAgeGroups('main.individuals');
-			
-			individualCurrentState = new IndividualState();
 			
 			individuals = new Vector.<Individual>();
 			individualPictures = new Vector.<IndividualGraphicInterface>();
@@ -415,10 +412,11 @@ package{
 		private function addInitIndividuals(indX:int, indY:int):void{//Добавляем первых особей
 			var i:int = 0;
 			var cycleCounter:int = 0;
-			
-			var numberIndividualsInGroup:int = individualsAgeGroups[0].groupQuantaty;
+			var numberIndividualsInGroup:int = 0;
 		
 			for(cycleCounter; cycleCounter < individualsAgeGroups.length; cycleCounter++){
+				
+				numberIndividualsInGroup += individualsAgeGroups[cycleCounter].groupQuantaty;
 				
 				for (i; i< numberIndividualsInGroup; i++){
 					
@@ -432,22 +430,22 @@ package{
 						);
 					individualPictures[i].drawIndividual();
 					individualPictures[i].age(individualsAgeGroups[cycleCounter].groupAge);
+					individualPictures[i].pname(individuals[i].name());
 					
 					commStage.addChild(individualPictures[i].individualBody);
 	
 					individuals[i].IndividualEvent.addEventListener(ModelEvent.MATURING, addNewIndividuals);
 					individuals[i].externalTimer();
 					
-					}
-					numberIndividualsInGroup += individualsAgeGroups[cycleCounter].groupQuantaty;
+					};
 
-				}
+				};
 			
 			numberOfIndividuals = individuals.length;//Сохраняем текущее количество особей
 			msgString = IND_NUMB + individuals.length;
 			messenger.message(msgString, modelEvent.STATISTIC_MARK);//Сохраняем количество особей для статистики
 			
-			}
+			};
 			
 		private function rndAddInitIndividuals():void{//Добавляем первых особей в случайных позициях
 			
@@ -456,15 +454,16 @@ package{
 			
 			var chessDeskLengthX:int = commStage.chessDesk.length - 1;
 			var chessDeskLengthY:int = commStage.chessDesk[1].length - 1;
-			
+	
 			var i:int = 0;
 			var cycleCounter:int = 0;
-			
-			var numberIndividualsInGroup:int = individualsAgeGroups[0].groupQuantaty;
+			var numberIndividualsInGroup:int;
 		
 			for(cycleCounter; cycleCounter < individualsAgeGroups.length; cycleCounter++){
 				
-				for (i; i< numberIndividualsInGroup; i++){
+				numberIndividualsInGroup += individualsAgeGroups[cycleCounter].groupQuantaty;
+				
+				for (i; i < numberIndividualsInGroup; i++){
 					
 					indXRnd = Math.round(Math.random() * chessDeskLengthX);
 					indYRnd = Math.round(Math.random() * chessDeskLengthY);
@@ -478,6 +477,7 @@ package{
 						);
 					individualPictures[i].drawIndividual();
 					individualPictures[i].age(individualsAgeGroups[cycleCounter].groupAge);
+					individualPictures[i].pname(individuals[i].name());
 					
 					commStage.addChild(individualPictures[i].individualBody);
 	
@@ -485,9 +485,8 @@ package{
 					individuals[i].externalTimer();
 					
 					}
-					numberIndividualsInGroup += individualsAgeGroups[cycleCounter].groupQuantaty;
 
-				}
+				};
 			
 			numberOfIndividuals = individuals.length;//Сохраняем текущее количество особей
 			msgString = IND_NUMB + individuals.length;
@@ -510,6 +509,7 @@ package{
 					);
 					
 					individualPictures[i].drawIndividual();
+					individualPictures[i].pname(individuals[i].name());
 					commStage.addChild(individualPictures[i].individualBody);
 					
 					individuals[i].age(1);
@@ -527,7 +527,7 @@ package{
 			var removedInd:int = 0
 			try{
 				for(var i:int = 0; i< individuals.length; i++){
-					if(individuals[i].statement() == 'dead'){
+					if(individuals[i].movement() == 'dead'){
 						
 						individuals[i] = null;//Убираем из массива особей
 						commStage.removeChild(individualPictures[i].individualBody);
@@ -591,7 +591,7 @@ package{
 			
 			counter = individuals.length;
 			for(var i:int = 0; i< counter; i++){
-				individuals[i].statement('moving');
+				individuals[i].movement('moving');
 				}
 			ARENA::DEBUG{
 				msgString = 'Individuals begin to move';
@@ -606,7 +606,7 @@ package{
 			stepTimer.stop();
 			counter = individuals.length;
 			for(var i:int = 0; i< counter; i++){
-				individuals[i].statement('suspend');
+				individuals[i].movement('suspend');
 				}
 				ARENA::DEBUG{
 					msgString = 'Individuals has stoped';
@@ -671,10 +671,12 @@ package{
 			numberOfCycles++;
 			
 			if(numberOfIndividuals < MAX_INDIVIDUAL_CRITICAL_NUMBER && numberOfIndividuals > MIN_INDIVIDUAL_CRITICAL_NUMBER){
+				
 				for(var i:int = 0; i< numberOfIndividuals; i++){
 					individuals[i].doStep();
 					}
-					refreshIndividualPictures();
+				refreshIndividualPictures();
+				
 				}else{
 					stepTimer.stop();
 					showMessageWindow();
@@ -699,6 +701,7 @@ package{
 			}
 	
 	private function refreshIndividualPictures():void{
+		var individualCurrentState:IndividualState = new IndividualState();//Чтобы ничто из других частей программы не повлияло на содержимое этой структуры, я перенес ее внутрь функции
 		
 		if(fieldRrefreshCountdown == 0){
 			for(var i:int = 0; i < numberOfIndividuals; i++){
@@ -707,15 +710,19 @@ package{
 				individualCurrentState.cellX = individuals[i].placement().cellX;
 				individualCurrentState.cellY = individuals[i].placement().cellY;
 				individualCurrentState.behaviour = individuals[i].behaviour();
-				individualCurrentState.statement = individuals[i].statement();
+				individualCurrentState.movement = individuals[i].movement();
 				individualCurrentState.age = individuals[i].age();
 				individualCurrentState.direction = individuals[i].direction();
 				
-				individualPictures[i].doStep(individualCurrentState);//Передаем координаты, куда особи надо переместится на следующем шаге
+				individualPictures[i].setState(individualCurrentState)
+			
+				individualPictures[i].doStep();//Передаем координаты, куда особи надо переместится на следующем шаге
 			}
+			
 			fieldRrefreshCountdown = fieldRefreshTime;
 		}else{
 			fieldRrefreshCountdown--;
+			
 			}
 	};
     }

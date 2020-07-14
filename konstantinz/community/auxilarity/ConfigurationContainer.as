@@ -46,7 +46,6 @@
             }
 			
 		public function setConfigFileName(fileName:String):void{
-			//cfgFileName = fileName;
             XML.ignoreWhitespace = true;
 			myXML = new XML(); 
 			myXMLURL = new URLRequest(fileName); 

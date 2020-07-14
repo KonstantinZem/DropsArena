@@ -49,7 +49,7 @@ package konstantinz.community.comStage{
 				}
 			}
 			
-		public function statement(NewState:String = 'nothing', statementTime:int = PAUSE_RESET):String{//Через эту функцию можно влиять на состояние особи
+		public function movement(NewState:String = 'nothing', statementTime:int = PAUSE_RESET):String{//Через эту функцию можно влиять на состояние особи
 			if(indState != STOP_SIGHT){
 			switch(NewState){
 				case 'moving':
@@ -89,9 +89,9 @@ package konstantinz.community.comStage{
 		public function doStep():void{//Сигнал приходит от предыдущей особи
 			if(indState != STOP_SIGHT && indState != SUSPEND_SIGHT && pauseTime == PAUSE_RESET){//Если уже можно передвигаться
 			  if(lifeTime != IMMORTAL_SIGHN){//Если особь не бессмертная
-				lifeTime --;
+				lifeTime --;//С каждым шагом уменьшаем время ее жизни
 				if(lifeTime < -1 && indState != DEAD_SIGHT && indState != SUSPEND_SIGHT && indState != STOP_SIGHT){//Если жизнь особи уже истекла, но пометки о ее смерти еще нет
-					killIndividual();
+					killIndividual();//Помечаем ее как мертвую
 					}
 				}
 				message = indState;

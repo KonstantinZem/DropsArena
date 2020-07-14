@@ -16,6 +16,7 @@ public class IndividualGraphicInterface extends Sprite{
 	private var indState:String
 	private var cellXNumb:int;
 	private var cellYNumb:int;
+	private var indNumber:int;
 	
 	ARENA::DEBUG{
 		private var msgString:String;
@@ -45,6 +46,7 @@ public class IndividualGraphicInterface extends Sprite{
 		
 		growthRange = 0;
 		indSize = 5;
+		indNumber = 0;
 		remainedGrowth = stepToAdulting;
 		if(maxSize > 0){//Если задан максимальный размер особи, 
 			indSize = minSize;//То для начала делаем особь маленькой
@@ -55,6 +57,13 @@ public class IndividualGraphicInterface extends Sprite{
 				indSize = minSize;
 				}
 		}
+	
+	public function pname(newNumber:int = -1):int{
+		
+		indNumber = newNumber;
+		
+		return indNumber;
+		};
 		
 	public function drawIndividual():void{//Рисует особь в виде цветного квадрата
 		//Функция напрямую завязана на графике
@@ -68,25 +77,27 @@ public class IndividualGraphicInterface extends Sprite{
 		
 		}
 	
-	public function doStep(currenteIndividualState:IndividualState):void{
-
-		indAge = currenteIndividualState.age;
-		individualBody.x = currenteIndividualState.currentX;
-		individualBody.y = currenteIndividualState.currentY;
-		cellXNumb = currenteIndividualState.cellX;//Чтобы можно было посмотреть, на каком квадрате особь стоит
-		cellYNumb = currenteIndividualState.cellY;
+	public function setState(currenteIndividualState:IndividualState):void{
+		currentState = currenteIndividualState;
+		}
+	
+	public function doStep():void{
 		
+		indAge = currentState.age;
+		individualBody.x = currentState.currentX;
+		individualBody.y = currentState.currentY;
+	
 		if(growthRange > 0 && remainedGrowth > 0){//Если особь вообще должна расти, контролируем чтобы особь не росла по достижении половозрелости
 			remainedGrowth--;
-			if(currenteIndividualState.statement != 'stop'){//Особь в состоянии гибирнации не должна расти
+			if(currentState.movement != 'stop'){//Особь в состоянии гибирнации не должна расти
 				currentScale = ip.scaleX + growthRange;
 				ip.scaleX = currentScale;
 				ip.scaleY = currentScale;
 				}
 			}
 		
-		markIndividual(currenteIndividualState.statement);
-		showAdditionMarks(currenteIndividualState);
+		markIndividual(currentState.movement);
+		showAdditionMarks(currentState);
 		
 		}
 		
@@ -161,7 +172,7 @@ public class IndividualGraphicInterface extends Sprite{
 	private function showAdditionMarks(currenteIndividualState:IndividualState):void{
 		try{
 			
-			if(currenteIndividualState.statement == 'moving'){
+			if(currenteIndividualState.movement == 'moving'){
 				switch(currenteIndividualState.behaviour){
 					case "BestConditionsWalker":
 						showMark('bestConditions', currenteIndividualState);
@@ -219,7 +230,7 @@ public class IndividualGraphicInterface extends Sprite{
 	
 	private function onMouseClick(event:MouseEvent):void{
 		ARENA::DEBUG{
-			msgString = 'Age: ' + indAge + '; Statement:' + indState +  '; x:' + cellXNumb + '; y:' + cellYNumb;
+			msgString = 'Individual: ' + indNumber + '; Age: ' + indAge + '; Statement:' + indState + '; behaviour: ' +  currentState.behaviour + '; x:' + currentState.cellX + '; y:' + currentState.cellY;
 			messenger.message(msgString)
 			}
 		};

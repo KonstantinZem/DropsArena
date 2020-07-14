@@ -36,25 +36,24 @@ public class MotionBehaviourSwitcher{
 			}
 		
 		baseMotionBehaviour = new BaseMotionBehaviour(debugLevel);
-		bestConditionsWalker = new BestConditionsWalker(debugLevel);
+		bestConditionsWalker = new BestConditionsWalker(configuration, debugLevel);
 		migrationBehaviour = new MigrationBehaviour(configuration, debugLevel);
 		momentalDeath = new MomentalDeath(debugLevel);
 		populationArea = currentPopulationArea;
-		
-		viewDistance = int(configuration.getOption('main.behaviourSwitching.viewDistance'));
 		
 		newBehaviour = baseMotionBehaviour;
 		
 		baseMotionBehaviour.setPopulationArea(populationArea);
 		bestConditionsWalker.setPopulationArea(populationArea);
-		bestConditionsWalker.setViewDistance(viewDistance);
 		migrationBehaviour.setPopulationArea(populationArea);
 		
 		currentBehaviourName = DEFAULT_BEHAVIOUR_NAME;
 		}
 		
 	public function setSuspender(suspender:StepDispatcher):void{
-		indSuspender = suspender;
+		if(indSuspender == null){
+			indSuspender = suspender;
+			}
 		bestConditionsWalker.setIndividualNumber(indSuspender.indNumber);
 		momentalDeath.setSuspender(indSuspender);
 		migrationBehaviour.setSuspender(indSuspender);
@@ -74,30 +73,27 @@ public class MotionBehaviourSwitcher{
 	
 	public function onNextStep(event:Event):void{//Функция вызывается каждый раз, когда особь делает очередной шаг
 	
-		if(newBehaviour.getState() != 'hold'){//Если линия поведения длящаяся несколько шагов уже закончилась
+		if(newBehaviour.getState() == 'reset'){//Если линия поведения длящаяся несколько шагов уже закончилась
 			newBehaviour = baseMotionBehaviour;//Переключаемся на линию поведения по умолчанию но она станет доступна только на следующем шаге
 			currentBehaviourName = DEFAULT_BEHAVIOUR_NAME;
 			}
 		};
 		
-	public function switchBehaviour(behaviourName:String):void{
+	public function switchBehaviour(behaviourName:String):void{//Через эту функцию поведение особи переключается из внешней среды
 			try{	
 				if(newBehaviour.getState() == 'reset'//Если текущая линия поведения уже закончилась
 					|| newBehaviour.getState() == 'constant' //Или если текущая линия поведения вообще реализуется в течении одного хода
-					&& currentBehaviourName != behaviourName
-					&& indSuspender.statement() != 'dead' //Если особь жива
-					&& indSuspender.statement() != 'stop'//И она движется
+					&& currentBehaviourName != behaviourName//Чтобы не беспокоить особь, если она уже реализует такую линию поведения
+					&& indSuspender.movement() != 'dead' //Если особь жива
+					&& indSuspender.movement() != 'stop'//И она движется
 					){
 				
-					currentBehaviourName = behaviourName;
-				
 					switch(behaviourName){
-						case 'RandomWalker':
+						case DEFAULT_BEHAVIOUR_NAME:
 							newBehaviour = baseMotionBehaviour;
 						break;
 					
 						case 'BestConditionsWalker':
-							bestConditionsWalker.reset();//Если поведение переключилось когда остались шаги, их предварительно надо сбросить
 							newBehaviour = bestConditionsWalker;
 						break;
 						
@@ -115,7 +111,9 @@ public class MotionBehaviourSwitcher{
 						break;
 					
 						}
+						currentBehaviourName = newBehaviour.getName();
 					}
+					
 				}catch(error:Error){
 					ARENA::DEBUG{
 						messenger.message('Individual ' + indSuspender.indNumber + '. ' + error +': ' + behaviourName, 0);
@@ -127,7 +125,7 @@ public class MotionBehaviourSwitcher{
 			}
 		
 		public function getCurrentBehaviour():String{
-			return newBehaviour.getName();
+			return currentBehaviourName;
 			}
 	}
 

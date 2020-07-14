@@ -10,7 +10,7 @@ package konstantinz.community.auxilarity.gui{
 		private const SUSPENDET_COLOR:Number = 0x808080; 
 		private const STOP_COLOR:Number = 0xFFFFFF;
 		private const VECTOR_LENGTH:Number = 5;
-		private const VECTOR_COLOR:Number = 0xFD2424;
+		private const VECTOR_COLOR:Number = 0xFFFFFF;
 		
 		private var walkindIndY:Sprite;
 		private var walkindIndA:Sprite;

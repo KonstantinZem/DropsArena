@@ -237,66 +237,102 @@ package konstantinz.community.comStage{
 			//функция платформонезавмсимая, при условии, что кто то будет читать переменную individual.x и individual.y и на изменять сведения о положении особи
 			var numberOfIndividualsinCell:int;
 			var currenPosition:Array = new Array();//Верменная переменная, чтобы не вызывать myBehaviour.getNewPosition два раза.
-			
-			if(deleySteps > 0){
-				deleySteps--;//Уменьшаем количество пропущеных ходов
-				}
-			
-			if(stepDispatcher.statement() == MOVING_SIGHT && deleySteps==0){//И если отстояли на месте положенное количество тиков таймера, двигаемся дальше
-		
-				deleySteps = myBehaviour.getPlaceQuality(currentChessDeskY,currentChessDeskX);//Смотрим на новой клетке число ходов
-				numberOfIndividualsinCell = individualCounter('count', ADULT_SIGHT, currentChessDeskY, currentChessDeskX)
-			
-				maturingBehaviour.onIndividualStep();
-				indAgeState = maturingBehaviour.getState();
-	
-				if(!individualAlong()){
-					stepDispatcher.statement(COLLISION_SIGHT);
-					numberOfIndividualsinCell = individualCounter('count', ADULT_SIGHT, currentChessDeskY, currentChessDeskX);
-					
-					if(maturingBehaviour.timeToMaturing() == true && numberOfIndividualsinCell > 1){//Если встретились две взрослые, то идет обычное двуполое размножение
-						maturing();//Начнется размножение. Позже надо предусмотреть возможность партеногенеза. Вызывая функцию maturing() с помощью события генерируемого внутри maturingBehaviour
-					    }
+			try{
+				if(deleySteps > 0){
+					deleySteps--;//Уменьшаем количество пропущеных ходов
+					}
 				
-					}else{
-						stepDispatcher.statement(MOVING_SIGHT);
+				if(currentChessDeskY < 0||currentChessDeskX < 0){//Если пришли неправильные координаты
+						throw new Error('Next place out of scene');
 						}
+			
+				if(stepDispatcher.movement() == MOVING_SIGHT && deleySteps==0){//И если отстояли на месте положенное количество тиков таймера, двигаемся дальше
+					
+					myBehaviour = motionBehaviour.newBehaviour;//Проверяем поведение на каждом шаге. Это из за особенностей самой среды flesh и, насколько я понимаю, нарушает паттерн "Декоратор"
+					
+					deleySteps = myBehaviour.getPlaceQuality(currentChessDeskY,currentChessDeskX);//Смотрим на новой клетке число ходов
+					numberOfIndividualsinCell = individualCounter('count', ADULT_SIGHT, currentChessDeskY, currentChessDeskX);
+			
+					maturingBehaviour.onIndividualStep();
+					indAgeState = maturingBehaviour.getState();
+	
+					if(!individualAlong()){
+						stepDispatcher.movement(COLLISION_SIGHT);
+						numberOfIndividualsinCell = individualCounter('count', ADULT_SIGHT, currentChessDeskY, currentChessDeskX);
+					
+						if(maturingBehaviour.timeToMaturing() == true && numberOfIndividualsinCell > 1){//Если встретились две взрослые, то идет обычное двуполое размножение
+							maturing();//Начнется размножение. Позже надо предусмотреть возможность партеногенеза. Вызывая функцию maturing() с помощью события генерируемого внутри maturingBehaviour
+							}
+				
+						}else{
+						stepDispatcher.movement(MOVING_SIGHT);
+					}
 				
 				individualCounter('remove', indAgeState, currentChessDeskY, currentChessDeskX);
+				
+				if(currentChessDeskY < 0||currentChessDeskX < 0){
+					throw new Error('Step out of scene');
+					}			
 				
 				individualState.previousX = chessDesk[currentChessDeskY][currentChessDeskX].sqrX; //Сохраняем свое прошлое положение
 				individualState.previousY = chessDesk[currentChessDeskY][currentChessDeskX].sqrY;
 				
 				currenPosition = myBehaviour.getNewPosition(currentChessDeskY,currentChessDeskX);
 				
+				if(currenPosition.x < 0||currenPosition.y < 0){
+					throw new Error('Behaviour return wrong individual coordinates');
+					}
+				
 				currentChessDeskY = currenPosition.y;
 				currentChessDeskX = currenPosition.x;
+				
 				
 				chessDesk[currentChessDeskY][currentChessDeskX].individualName = stepDispatcher.getIndividualNumber();
 				
 				individualCounter('add', indAgeState, currentChessDeskY, currentChessDeskX);
 				
-				individualState.currentX = chessDesk[currentChessDeskY][currentChessDeskX].sqrX;
-				individualState.currentY = chessDesk[currentChessDeskY][currentChessDeskX].sqrY;
-				individualState.cellY = currentChessDeskY;
-				individualState.cellX = currentChessDeskX;
-				individualState.border = myBehaviour.isOnBorder();
+				refreshIndividualStatement();
 				}
 			  
 			  if(chessDesk[currentChessDeskY][currentChessDeskX].behaviourModel != '' && chessDesk[currentChessDeskY][currentChessDeskX].behaviourModel != 'empty'){//Если в новом квадарте указанно поведение, которое особь должна начать проявлять
 				motionBehaviour.switchBehaviour(chessDesk[currentChessDeskY][currentChessDeskX].behaviourModel);//Включаем этот тип
 				}
 			  
-			  if(stepDispatcher.statement() == DEAD_SIGHT){
-				  killIndividual();
+			  if(stepDispatcher.movement() == DEAD_SIGHT){//Если особь прожила положенное ей время
+				  killIndividual();//Она должна умереть
 				  }
-		}
+			}catch(e:Error){
+				ARENA::DEBUG{
+				msgString = 'Individual ' + stepDispatcher.getIndividualNumber() + ' in nextStep(): ' + e.message + '(Y=' + currentChessDeskY + ', X=' + currentChessDeskX + ')';
+				messenger.message(msgString, modelEvent.ERROR_MARK);
+				
+				if(currentChessDeskX < 0){
+					currentChessDeskX = 0;
+					}
+				if(currentChessDeskY < 0){
+					currentChessDeskY = 0;
+					}
+				}
+			}
+		};
+		
+		private function refreshIndividualStatement():void{
+			individualState.currentX = chessDesk[currentChessDeskY][currentChessDeskX].sqrX;
+			individualState.currentY = chessDesk[currentChessDeskY][currentChessDeskX].sqrY;
+			individualState.cellY = currentChessDeskY;
+			individualState.cellX = currentChessDeskX;
+			individualState.border = myBehaviour.isOnBorder();
+			//individualState.behaviour = myBehaviour.getName();
+			individualState.movement = stepDispatcher.movement();
+			individualState.age = indAgeState;
+			individualState.name = stepDispatcher.getIndividualNumber();
+			}
 			
 		private function killIndividual():void{//Убирает особь со сцены
 			var lifeEnd:Date;
 			var deltaTime:int;
 			
-			stepDispatcher.statement(DEAD_SIGHT);//Теперь, если кто то попытается обратится к особи, он будет по крайне мере знать, что она присмерти
+			stepDispatcher.movement(DEAD_SIGHT);//Теперь, если кто то попытается обратится к особи, он будет по крайне мере знать, что она присмерти
 				
 			lifeEnd = new Date();
 			timerForIndividuals.stop();//Выключаем таймер
@@ -313,7 +349,7 @@ package konstantinz.community.comStage{
 			}
 			
 		private function step(e:Event):void{//Вызывается из StepDispatcher каждй раз, когда из него приходит событие StepDispatcher.DO_STEP
-			if(stepDispatcher.statement() != DEAD_SIGHT){
+			if(stepDispatcher.movement() != DEAD_SIGHT){
 				nextStep();
 				}
 			stepDispatcher.stepDone();
@@ -349,44 +385,44 @@ package konstantinz.community.comStage{
 			return stepDispatcher.getIndividualNumber();
 		}
 
-		public function statement(statementName:String = 'empty', statementLength:int = 0):String{
+		public function movement(statementName:String = 'empty', statementLength:int = 0):String{//Через эту функцию плагины могут останавливать и убивать особь
 			var indNumber:int = stepDispatcher.getIndividualNumber();
 			
-			if(stepDispatcher.statement() != DEAD_SIGHT && stepDispatcher.statement() != 'stop'){//Особь поменяет свое состояние только если она жива и не находится в гибернации
+			if(stepDispatcher.movement() != DEAD_SIGHT && stepDispatcher.movement() != 'stop'){//Особь поменяет свое состояние только если она жива и не находится в гибернации
 				switch(statementName){
-					case SUSPEND_SIGHT:
+					case SUSPEND_SIGHT://Особь должна уснуть и проснуться через определенное количество шагов
 						
 						ARENA::DEBUG{
 							msgString = 'Individual number '+ indNumber + ' has been suspended';
 							messenger.message(msgString, modelEvent.DEBUG_MARK);
 							}
 						
-						stepDispatcher.statement(SUSPEND_SIGHT, statementLength);
+						stepDispatcher.movement(SUSPEND_SIGHT, statementLength);
 					break;
-					case STOP_SIGHT:
+					case STOP_SIGHT://Должна остановиться пока ей не будет дана другая команда
 						
 						ARENA::DEBUG{
 							msgString = 'Individual number '+ indNumber + ' has been stoped';
 							messenger.message(msgString, modelEvent.DEBUG_MARK);
 							}
 						
-						stepDispatcher.statement(STOP_SIGHT, statementLength);
+						stepDispatcher.movement(STOP_SIGHT, statementLength);
 						individualCounter('remove', indAgeState, currentChessDeskY, currentChessDeskX);
 					break;
 					case MOVING_SIGHT:
-						if(stepDispatcher.statement() != STOP_SIGHT){
-							stepDispatcher.statement(MOVING_SIGHT);
+						if(stepDispatcher.movement() != STOP_SIGHT){
+							stepDispatcher.movement(MOVING_SIGHT);
 							}
 					break;
 					case DEAD_SIGHT:
-						if(stepDispatcher.statement() != DEAD_SIGHT){//Если особь уже не мертва
+						if(stepDispatcher.movement() != DEAD_SIGHT){//Если особь еще не прожила свою жизнь до конца, но ее надо убить
 							
 							ARENA::DEBUG{
 								msgString = 'Individual ' + indNumber + 'has killed';
 								messenger.message(msgString, modelEvent.INFO_MARK);
 								}
 							
-							killIndividual();
+							killIndividual();//Убиваем
 							}
 					break;
 					case 'empty':
@@ -394,7 +430,7 @@ package konstantinz.community.comStage{
 					break;
 					default:
 						ARENA::DEBUG{
-							msgString = 'Wrong statement name ' + statementName;
+							msgString = 'Wrong movement name ' + statementName;
 							messenger.message(msgString, modelEvent.ERROR_MARK);
 							}
 					break;
@@ -402,11 +438,11 @@ package konstantinz.community.comStage{
 				}else{
 					
 					ARENA::DEBUG{
-						msgString = 'Individual get '+ statementName + ' but it can not switching cause has status ' + stepDispatcher.statement();
+						msgString = 'Individual get '+ statementName + ' but it can not switching cause has status ' + stepDispatcher.movement();
 						messenger.message(msgString, modelEvent.DEBUG_MARK);//Применять только при малом числе особей
 						}
 					}
-				return stepDispatcher.statement();
+				return stepDispatcher.movement();
 			}
 		
 		public function placement():IndividualState{
@@ -421,6 +457,7 @@ package konstantinz.community.comStage{
 				lifeTime = lifeTime - newAge;
 				maturingBehaviour.setAdultAge(adultAge - newAge);
 				stepDispatcher.setLifeTime(lifeTime);
+				motionBehaviour.setSuspender(stepDispatcher);
 				}
 			return indAgeState;
 			}
@@ -434,16 +471,18 @@ package konstantinz.community.comStage{
 			return currentDirection;
 			};
 		
-		public function behaviour(newBehaviour:String = 'empty'):String{
+		public function behaviour(newBehaviour:String = 'empty'):String{//Через эту функцию при изменении условий среды главная программа передает новое поведение
 			var currentBehaviourName:String = 'undefined';
 				if(motionBehaviour != null){
 					if(newBehaviour == 'empty'){
 						currentBehaviourName = motionBehaviour.getCurrentBehaviour();//Если функцию вызвали без параметров, это значит, что она должна просто вывести название текущей модели поведения
 						}else{
-							motionBehaviour.switchBehaviour(newBehaviour);
-							myBehaviour = motionBehaviour.newBehaviour;
+							motionBehaviour.switchBehaviour(newBehaviour);//Переключаемся на новое поведение
+							myBehaviour = motionBehaviour.newBehaviour;//И передаем управление этой линии поведения
+							individualState.behaviour = myBehaviour.getName();
 							}
 						}
+
 				return currentBehaviourName;
 			}
 			

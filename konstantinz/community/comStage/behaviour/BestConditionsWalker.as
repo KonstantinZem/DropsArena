@@ -1,93 +1,79 @@
-package konstantinz.community.comStage.behaviour{
+﻿package konstantinz.community.comStage.behaviour{
 
-public class BestConditionsWalker extends BaseMotionBehaviour{
+import konstantinz.community.auxilarity.*
+
+public class BestConditionsWalker extends DirectionalMotionBehaviour{
 	
-	private var viewDistance:int = 0;//Растояние в клетках на на котором особь будет искать зону с лучшими условиями
-	private var stepsToTarget:int = 0;
-	
-	public function BestConditionsWalker(dbgLevel:String){
+	public function BestConditionsWalker(configSource:ConfigurationContainer, dbgLevel:String){
+		walkingDistance = distanceFromConfig(configSource, 'viewDistance');
 		debugLevel = dbgLevel;
 		behaviourName = 'BestConditionsWalker';
 		state = RESET_STATE;
 		}
 		
-		private function leftOfStepsToTarget(leftSteps:int, viewDst:int = 1):int{
-
-			if(leftSteps > 1){
-				leftSteps--;
-				}else{
-					leftSteps = viewDst;
-					}
-				
-				return leftSteps;
-			};
-		
 		public function setViewDistance(newViewDistance:int):void{
-			viewDistance = newViewDistance;
+			walkingDistance = newViewDistance;
 			}
 		
 		public function reset():void{//В случае, если модель поведения была прервана и особь не успела сделать нужное количество шагов
-			if(stepsToTarget != viewDistance){
-				stepsToTarget = viewDistance;//Счетчик шагов обнуляется
-				state = RESET_STATE;
-				}
+			stepsToTarget = walkingDistance;//Счетчик шагов обнуляется
+			state = RESET_STATE;//Текущая линия поведения сбрасывается
 			};
 		
 		override protected function onStepUp(currentY:int, currentX:int):void{//Идем вверх
-			if (currentY - viewDistance <= BORDERS_APPROACHING_LIMIT){//Если особь дошла до верхнего края сцены
-				newPosition.y = currentY + stepLength;
-				stepsToTarget = leftOfStepsToTarget(0, viewDistance);
+
+			if(currentY < walkingDistance){
+				stepsToTarget = countStepsToTarget(0, walkingDistance);
 				}else{
 					if(populationArea[currentY - stepsToTarget][currentX].speedDeleyA > currentPlaceQuality){//Если в поле зрения находится уасток с лучшими условиями чем в текущем
-						stepsToTarget = leftOfStepsToTarget(stepsToTarget, viewDistance);
+						stepsToTarget = countStepsToTarget(stepsToTarget, walkingDistance);
 						newPosition.y = currentY - stepLength;
 						}else{
-							stepsToTarget = leftOfStepsToTarget(0, viewDistance);
+							stepsToTarget = countStepsToTarget(0, walkingDistance);//Если не увидели подходящих условий, сбрасываем поведение
 							newPosition.y = currentY - stepLength;
 							}
 					}
 			}
 		
 		override protected function onStepDown(currentY:int, currentX:int):void{//Идем вниз
-			if((currentY + stepsToTarget) > bottomCorner - BORDERS_APPROACHING_LIMIT){//Если особь дошла до нижнего края сцены
-				newPosition.y = currentY - stepLength;
-				stepsToTarget = leftOfStepsToTarget(0, viewDistance);
+			if(currentY > bottomCorner - walkingDistance){//Если особь подошла к нижнему краю сцены ближе чем расстояние на которм она ищет хорошие условия
+				stepsToTarget = countStepsToTarget(0, walkingDistance);//Переключаем ее поведение на предвижение в случайных направлениях
 				}else{
-					if(populationArea[currentY + stepsToTarget][currentX].speedDeleyA > currentPlaceQuality){
-						stepsToTarget = leftOfStepsToTarget(stepsToTarget, viewDistance);
+					if(populationArea[currentY + stepsToTarget][currentX].speedDeleyA > currentPlaceQuality){//Если в поле зрения находится участок с лучшими условиями
+						stepsToTarget = countStepsToTarget(stepsToTarget, walkingDistance);//Идем к нему никуда не сворачивая
 						newPosition.y = currentY + stepLength;
-						}else{
-							stepsToTarget = leftOfStepsToTarget(0, viewDistance);
-							newPosition.y = currentY + stepLength;
+						}else{//А если условия в поле зрения ни отличаются от текущих
+							stepsToTarget = countStepsToTarget(0, walkingDistance);
+							newPosition.y = currentY + stepLength;//Просто делаем шаг вниз
 							}
 					}
 			}
 		
 		override protected function onStepLeft(currentY:int, currentX:int):void{//Идем влево
-			if(currentX - viewDistance <= BORDERS_APPROACHING_LIMIT){//Если особь дошла до левого края сцены
-				newPosition.x = currentX + stepLength;//Делаем шаг вправо
-				stepsToTarget = leftOfStepsToTarget(0, viewDistance);//Сбрасываем линию поведению
+			
+			if(currentX < walkingDistance){
+				stepsToTarget = countStepsToTarget(0, walkingDistance);
 				}else{
 					if(populationArea[currentY][currentX - stepsToTarget].speedDeleyA > currentPlaceQuality){//Если в клетке левее условия среды лучше
-						stepsToTarget = leftOfStepsToTarget(stepsToTarget, viewDistance);
+						 
+						stepsToTarget = countStepsToTarget(stepsToTarget, walkingDistance);
 						newPosition.x = currentX - stepLength;
 						}else{
-							stepsToTarget = leftOfStepsToTarget(0, viewDistance);
-							newPosition.x = currentX - stepLength;
+							stepsToTarget = countStepsToTarget(0, walkingDistance);
+							newPosition.x = currentX  - stepLength;
 							}
 					}
-		}
+			}
 	
 		override protected function onStepRight(currentY:int, currentX:int):void{//Идем вправо
 			if(currentX + stepsToTarget >= rightCorner - BORDERS_APPROACHING_LIMIT){//Если особь дошла до края сцены
-				newPosition.x = currentX - stepLength;//Делаем шаг влево
-				stepsToTarget = leftOfStepsToTarget(0, viewDistance);//Сбрасываем линию поведению
+				stepsToTarget = countStepsToTarget(0, walkingDistance);//Сбрасываем линию поведению
 				}else{
 					if(populationArea[currentY][currentX + stepsToTarget].speedDeleyA > currentPlaceQuality){
-						stepsToTarget = leftOfStepsToTarget(stepsToTarget, viewDistance);
+						stepsToTarget = countStepsToTarget(stepsToTarget, walkingDistance);
 						newPosition.x = currentX + stepLength;
 						}else{
-							stepsToTarget = leftOfStepsToTarget(0, viewDistance);
+							stepsToTarget = countStepsToTarget(0, walkingDistance);
 							newPosition.x = currentX + stepLength;
 							}
 					}
@@ -96,23 +82,26 @@ public class BestConditionsWalker extends BaseMotionBehaviour{
 		override protected function onStay(currentY:int, currentX:int):void{
 			newPosition.x = currentX;
 			newPosition.y = currentY;
-			stepsToTarget = leftOfStepsToTarget(0, viewDistance);
+			stepsToTarget = countStepsToTarget(0, walkingDistance);
 			}
 		
 		override protected function onBeginChoisingPosition(currentY:int, currentX:int):void{
-			newPosition.x = currentX;
-			newPosition.y = currentY;
-			currentPlaceQuality = getPlaceQuality(currentY, currentX);
-			}
+			try{
+				newPosition.x = currentX;
+				newPosition.y = currentY;
 			
-		override protected function onEndChoisingPosition():void{
-			if(stepsToTarget == viewDistance){//Если после очередого шага, количество оставшихся не уменьшилось
-				state = RESET_STATE;//Значит особь двигвлась в случайном направлении
-				}
-			if(stepsToTarget < 0){
-				throw new Error('Step to target les then zero');
-				}
-		};
+				if(currentX < 0|| currentY < 0){
+					throw new Error('Cordinate less then zero');
+					}
+				currentPlaceQuality = getPlaceQuality(currentY, currentX);
+	
+				}catch(e:Error){
+					ARENA::DEBUG{
+						msgString = 'Individual ' + individualName + ': onBeginChoisingPosition(): ' + e.message;
+						messenger.message(msgString, modelEvent.ERROR_MARK);
+						}
+					}
+			}
 
 	}
 }

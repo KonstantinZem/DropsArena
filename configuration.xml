@@ -7,7 +7,7 @@
 	<individuals>
 		<group>
 			<!--thy will become adult from five month-->
-			<number>100</number>
+			<number>120</number>
 			<age>10104</age>
 		</group>
 		<group>
@@ -25,16 +25,16 @@
 	<!-- initPosition of individual can be left-top, left-bottom,  right-top, right-bottom, center and random -->
 	<initPosition>random</initPosition>
 	<statRefreshTime>10</statRefreshTime>
-	<fieldRefreshTime>1</fieldRefreshTime>
+	<fieldRefreshTime>0</fieldRefreshTime>
 	<stepLength>1</stepLength>
 	<pluginsList>plugins/cover.swf;plugins/activity.swf;plugins/morisitaCounter.swf</pluginsList>
 	<arePluginsActiveOnLoading>false</arePluginsActiveOnLoading>
 	<behaviourSwitching>
 		<enable>true</enable>
 		<viewDistance>8</viewDistance>
-		<migrationDistance>40</migrationDistance>
-		<collisionsThreshold>6</collisionsThreshold>
-		<collisionsExpectionLimit>50</collisionsExpectionLimit>
+		<migrationDistance>20</migrationDistance>
+		<collisionsThreshold>5</collisionsThreshold>
+		<collisionsExpectionLimit>100</collisionsExpectionLimit>
 		<rule>
 			<condition>
 				<condition_name>inactive_ind_numb</condition_name>

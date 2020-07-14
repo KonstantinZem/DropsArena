@@ -5,17 +5,21 @@ package konstantinz.community.comStage.behaviour{
 	public class BaseMotionBehaviour implements MotionBehaviour{
 		
 		
-		protected const CONSTANT_STATE:String = 'constant';
+		protected const CONSTANT_STATE:String = 'constant';//Отмечаются только модели поведения для которого не предусмотрено переключение между различными состояниями
 		protected const HOLD_STATE:String = 'hold';
 		protected const RESET_STATE:String = 'reset';
-		protected const BORDERS_APPROACHING_LIMIT:int = 3
+		protected const BORDERS_APPROACHING_LIMIT:int = 3;
+		protected const STAY:int = 0;
+		protected const ON_RIGHT:int = 1;
+		protected const ON_LEFT:int = 2;
+		protected const ON_DOWN:int = 3;
+		protected const ON_UP:int = 4;
 		
 		private var previosChessDeskI:int;
 		private var previosChessDeskJ:int;
 		
 		protected var rightCorner:int//Правый край моделируемой территории
-		protected var bottomCorner:int//Левый край моделируемой территории
-		protected var amINearBorder:Boolean;//Флаг того, что особь находится возле границы
+		protected var bottomCorner:int//Нижний край моделируемой территории
 		protected var debugLevel:String;
 		protected var currentPlaceQuality:int;
 		protected var stepLength:int;
@@ -23,6 +27,7 @@ package konstantinz.community.comStage.behaviour{
 		protected var behaviourName:String;
 		protected var state:String;
 		protected var directionAlreadyChoised:Boolean;
+		protected var amINearBorder:Boolean;//Флаг того, что особь находится возле границы
 		
 		protected var newPosition:Array = new Array();
 		protected var individualName:int;
@@ -37,7 +42,7 @@ package konstantinz.community.comStage.behaviour{
 		function BaseMotionBehaviour(dbgLevel:String='3'){
 			behaviourName = 'RandomWalker';
 			directionAlreadyChoised = false;
-			state = CONSTANT_STATE;//Модель поведения не имеет условия начала и окончания
+			state = CONSTANT_STATE;//По умолчанию модель поведения не имеет условия начала и окончания
 			debugLevel = dbgLevel;
 			
 			ARENA::DEBUG{
@@ -45,6 +50,7 @@ package konstantinz.community.comStage.behaviour{
 				modelEvent = new ModelEvent();
 				messenger.setDebugLevel (debugLevel);
 				messenger.setMessageMark('Behaviour');
+				//castRandomGenerator();
 				}
 			
 			previosChessDeskI = 0;
@@ -60,13 +66,8 @@ package konstantinz.community.comStage.behaviour{
 					throw new Error('Population area array is empty');
 					}
 				populationArea = area;
-				rightCorner = populationArea[0].length -2;//Отнимаем два, чтобы особь не вышла за край массива сделав шаг [длинна масива -1] + 1
-				bottomCorner = populationArea.length -2;
-				
-				ARENA::DEBUG{
-					msgString = 'Right corner of aria is: ' + rightCorner + '; bottom cornet is: ' + bottomCorner;
-					messenger.message(msgString, modelEvent.INFO_MARK);
-					}
+				rightCorner = populationArea[0].length -1;//Отнимаем два, чтобы особь не вышла за край массива сделав шаг [длинна масива -1] + 1
+				bottomCorner = populationArea.length - 1;
 				
 			}catch(err:Error){
 				ARENA::DEBUG{
@@ -86,6 +87,10 @@ package konstantinz.community.comStage.behaviour{
 			
 			try{
 				
+				if(currentY < 0|| currentX < 0){
+					throw new Error('Cordinates out of scene')
+					}
+				
 				if(directionAlreadyChoised == false){//Направление передвижения может выбираться и в другом месте. Флаг подымается, чтобы небыло повторов
 					if(state != HOLD_STATE){//Если выбранное направление не нужно удерживать в течении нескольких ходов
 						indDirection = getMovieDirection();//Вычисляем новое направление движения особи
@@ -101,7 +106,7 @@ package konstantinz.community.comStage.behaviour{
 			
 			}catch(err:Error){
 				ARENA::DEBUG{
-					msgString = 'Individual ' + individualName + ': ' + 'in getNewPosition() ' + err.message;
+					msgString = 'Individual ' + individualName + ': ' + 'in getNewPosition() ' + err.message + ' (Y=' + currentY + ', X=' + currentX + ')';
 					messenger.message(msgString, modelEvent.ERROR_MARK);
 					}
 				}	
@@ -145,33 +150,71 @@ package konstantinz.community.comStage.behaviour{
 		};
 		
 		protected function getMovieDirection():int{
+			//В самой среде flash, если поставить цифру 4 генератор будет выдавать направления неравномерно, с перекосом в значение 3
 			return Math.round(Math.random()*5);//Пускай лучше этот код будет прописан в одном месте
 			};
 		
+		protected function castRandomGenerator():void{
+			var castDirection:int;
+			var rightNumb:int = 0;
+			var leftNumb:int = 0;
+			var upNumb:int = 0;
+			var downNumb:int = 0;
+			var stayNumb:int = 0;
+			
+			for(var i:int = 0; i < 1000; i++){
+				castDirection = getMovieDirection();
+				switch(castDirection){
+					case STAY: //Стоим наместе
+						stayNumb++;
+					break;
+					case ON_RIGHT://Направо
+						rightNumb++;
+					break;
+					case ON_LEFT://Налево
+						leftNumb++;
+					break;
+					case ON_DOWN: //Вниз
+						downNumb++;
+					break;
+					case ON_UP://Вверх
+						upNumb++;
+					break;
+
+					default://Стоим на месте
+						stayNumb++;
+					break;
+				}
+			}
+				ARENA::DEBUG{
+					msgString = ('Random number generator casting results:\n up = ' + upNumb + '\n down = ' + downNumb + '\n right = ' + rightNumb + '\n left = ' + leftNumb + '\n stay = ' + stayNumb)
+					messenger.message(msgString, modelEvent.DEBUG_MARK);
+					}
+			}
+		
 		protected function doStep(direction:int, currentY:int, currentX:int):void{
 			switch(direction){
-				case 0: //Стоим наместе
+				case STAY: //Стоим наместе
 					onStay(currentY, currentX);
 				break;
-				case 1://Направо
+				case ON_RIGHT://Направо
 					onStepRight(currentY, currentX);
 				break;
-				case 2://Налево
+				case ON_LEFT://Налево
 					onStepLeft(currentY, currentX);
 				break;
-				case 3: //Вниз
+				case ON_DOWN: //Вниз
 					onStepDown(currentY, currentX);
 				break;
-				case 4://Вверх
+				case ON_UP://Вверх
 					onStepUp(currentY, currentX);
 				break;
 
 				default://Стоим на месте
 					onStay(currentY, currentX);
-					//throw new Error('Wrong direction code');
 				break;
 				}
-		}
+		};
 		
 		protected function onStepUp(currentY:int, currentX:int):void{
 			if (currentY >= BORDERS_APPROACHING_LIMIT){
