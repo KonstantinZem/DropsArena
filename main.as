@@ -25,7 +25,7 @@ package{
     public class main extends Sprite{
 		
 		private const CURRENT_VERSION:String = '0.99';
-		private const CURRENT_BUILD:String = '200714';
+		private const CURRENT_BUILD:String = '200718';
 		private const IND_NUMB:String = 'ind_numb:';//Пометка сообщения о количестве особей
 		private const MIN_INDIVIDUAL_CRITICAL_NUMBER:int = 5;//Минимально подходящие для отслеживания статистики количество особей
 		private const MAX_INDIVIDUAL_CRITICAL_NUMBER:int = 5000;
@@ -510,6 +510,7 @@ package{
 					
 					individualPictures[i].drawIndividual();
 					individualPictures[i].pname(individuals[i].name());
+					individualPictures[i].age(1)
 					commStage.addChild(individualPictures[i].individualBody);
 					
 					individuals[i].age(1);
@@ -621,6 +622,9 @@ package{
 			removeAllObjects();//Очищаем все объекты модели
 			initConfig();//Запускаем программу с самого начала
 			stepTimer.stop();
+			if (ExternalInterface.available){
+					ExternalInterface.call('onReloadClick');//Запускаем во внешней программе действия, которые нужно сделать при перезакгрузке модели
+					}
 			}
 		
 		private function onDumpClick(e:ModelEvent):void{

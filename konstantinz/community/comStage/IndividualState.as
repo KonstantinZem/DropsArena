@@ -8,7 +8,7 @@ public class IndividualState{
 	public var direction:int = 0;
 	public var border:Boolean = false;
 	public var behaviour:String = '';
-	public var statement:String = '';
+	public var movement:String = '';
 	public var age:String = '';
 	public var cellX:int = 0;//Еее текущие положение в массиве cessDesk
 	public var cellY:int = 0;
